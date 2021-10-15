@@ -1,32 +1,85 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+  <v-app>
+
+    <!-- pass to component -->
+    <v-snackbar
+      v-model="snackbar"
+      :bottom="bottom"
+      :color="color"
+      :left="left"
+      :right="right"
+      :top="top"
+      :timeout="3000"
+      dark
+      shaped
+    >
+      <div>{{ message }}<b> {{ submessage }}</b> </div>
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          v-bind="attrs"
+          icon
+          @click="hidden_notication"
+        >
+          <v-icon>
+            mdi-close-circle
+          </v-icon>
+        </v-btn>
+      </template>
+    </v-snackbar>
+
+    <router-view />
+
+    <v-footer>
+      <h1>Universidad de Cordoba</h1>
+    </v-footer>
+  </v-app>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
+<script>
+import { mapState, mapMutations, mapActions } from "vuex";
+export default {
+  name: 'App',
+  metaInfo() {
+    return {
+      title: 'ITS',
+    };
+  },
+  mounted(){
+    this.autoLogin();
+  },
+  computed: {
+    ...mapState('notification', ['snackbar', 'color', 'top', 'bottom', 'right', 'left', 'message', 'submessage'])
+  },
+  watch: {
+    snackbar(val){
+      let $this = this;
+      if(val){
+        setTimeout(function(){
+          $this.hidden_notication()
+        }, 2000)
+      }
     }
+  },
+  methods: {
+    ...mapMutations('notification', ['dismiss']),
+    ...mapActions(['autoLogin']),
+    hidden_notication(){
+      this.dismiss()
+    }
+  }
+};
+</script>
+<style lang="scss">
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css? family=Comfortaa&display=swap');
+
+$body-font-family: 'Poppins';
+$title-font: 'Poppins';
+
+.v-application {
+  font-family: $body-font-family, sans-serif !important;
+  .title { // To pin point specific classes of some components
+    font-family: $title-font, sans-serif !important;
   }
 }
 </style>
