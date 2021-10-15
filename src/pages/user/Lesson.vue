@@ -38,15 +38,29 @@
                         </v-btn>
                     </v-toolbar>
                 </v-col>
+
+                <v-col cols="12">
+                    <v-toolbar flat rounded>
+                        <v-toolbar-title>
+                            
+                        </v-toolbar-title>
+
+                        <v-divider class="mx-2"  inset vertical></v-divider>
+
+                        <div class="flex-grow-1"></div>
+
+                         <material-stopwatch ref="stopwatch"></material-stopwatch>
+
+                    </v-toolbar>
+                </v-col>
                 
                 <v-col cols="4">
                     <v-sheet rounded="lg">
                     <v-list rounded color="transparent">
-                        <v-list-item-group v-model="currentStructure" color="primary">
+                        <v-list-item-group v-model="inputStructure" color="primary">
                             <v-list-item
                                 v-for="(structure, index) in lesson ? lesson.structure : []"
                                 :key="index"
-                                link
                                 :disabled="structure.isBlock"
                             >
                                 <v-list-item-content>
@@ -88,38 +102,45 @@
                         rounded="lg"
                     >
                         <v-card elevation="0" height="69vh" class="d-flex flex-column" >
-                            <v-toolbar flat rounded>
-                                <v-toolbar-title>
-                                    <p class="font-weight-semibold mb-1">
-                                        {{ lesson.structure[currentStructure].data.resource.description ? lesson.structure[currentStructure].data.resource.description : ""  }}
-                                    </p>
-                                </v-toolbar-title>
-
-                                <v-divider class="mx-2"  inset vertical></v-divider>
-
-                                <div class="flex-grow-1"></div>
-                                
-                            </v-toolbar>
-                            <material-stopwatch ref="stopwatch"></material-stopwatch>
+                            <v-card-title>
+                                <template v-if="lesson.structure[inputStructure] && lesson.structure[inputStructure].type == 'evaluation'">
+                                    Evalucación
+                                </template>
+                                <template v-else>
+                                    {{ lesson.structure[inputStructure].data.resource.description ? lesson.structure[inputStructure].data.resource.description : ""  }}
+                                </template>
+                            </v-card-title>
 
                             <v-card-text>
-                                {{ lesson.structure[currentStructure].data.resource.url ? lesson.structure[currentStructure].data.resource.url : ""  }}
+                                <template v-if="lesson.structure[inputStructure] && lesson.structure[inputStructure].type == 'evaluation'">
+                                    here do the evaluation
+                                </template>
+                                <template v-else>
+                                    {{ lesson.structure[inputStructure].data.resource.url ? lesson.structure[inputStructure].data.resource.url : ""  }}
+                                </template>
                             </v-card-text>
 
                             <v-spacer></v-spacer>
 
                             <v-card-actions>
                                 <v-layout row wrap align-items-end justify-center>
-                                    <v-flex shrink class="mr-5">
-                                        <h3 class="display-5">¿Qué te parecio este recurso? 😊</h3>
-                                        <material-rating :value="lesson.structure[currentStructure].data.rating ? lesson.structure[currentStructure].data.rating : rating" color="orange"></material-rating>
+                                    <v-flex shrink class="mr-5" align-items-center>
+                                        <h4 class="display-5">¿Qué te parecio este recurso? 😊</h4>
                                     </v-flex>
-                                </v-layout>
 
-                                <v-layout row wrap justify-end>
+                                    <v-flex shrink >
+                                        <material-rating :value="lesson.structure[inputStructure].data.rating ? lesson.structure[inputStructure].data.rating : rating" color="orange"></material-rating>
+                                    </v-flex>
+
                                     <v-flex shrink class="mr-5">
-                                        <v-btn color="primary" text @click="next">
+                                        <v-btn color="primary" text @click="finish" v-if="inputStructure == 5">
+                                            Finalizar
+                                            <v-icon>mdi-check</v-icon>
+                                        </v-btn>
+
+                                        <v-btn color="primary" text @click="next" v-else>
                                             Siguiente
+                                            <v-icon>mdi-arrow-right</v-icon>
                                         </v-btn>
                                     </v-flex>
                                 </v-layout>
@@ -137,12 +158,11 @@
     </v-main>
 </template>
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 export default {
     name: 'Lesson',
     data: () => ({
         rating: 0,
-        currentStructure: 0,
         loading: false,
         lesson: null,
         types: {
@@ -152,15 +172,28 @@ export default {
             "example" : "Ejemplo",
             "activity" : "Actividad",
             "evaluation" : "Evalucación",
-        }
+        },
+        assessments: [],
+        logs: [],
+        note: 0
     }),
     mounted(){
         this.getLesson();
     },
     computed: {
-        ...mapState(['user'])
+        ...mapState(['user']),
+        ...mapState('lesson',  ['currentStructure', 'trace']),
+        inputStructure: {
+            get() {
+                return this.currentStructure;
+            },
+            set(val) {
+                this.nextStructure(val);
+            },
+        },
     },
     methods: {
+        ...mapMutations('lesson', ['nextStructure', 'setTrace']),
         openSettings() {
             this.$refs.stopwatch.openSettingsDialog();
         },
@@ -187,7 +220,6 @@ export default {
 
             let structureIds = this.lesson.structure.map(s => s._id);
 
-
             this.$http.post('/metacore/initial', {
                 id_student: this.user.student_id,
                 id_course: this.$route.params.course,
@@ -195,7 +227,6 @@ export default {
                 structure: structureIds,
             })
             .then(response => {
-                console.log(response);
                 if(response.status == 200){
                     this.lesson.structure = this.lesson.structure.map( (s, index) => {
                         if(index > 0){
@@ -205,7 +236,6 @@ export default {
                         }
                         
                         s.data = response.data[index];
-
                         return s;
                     })
                 }
@@ -214,11 +244,104 @@ export default {
                 console.error(e.message);
             })
         },
-        next(){
-            if(this.currentStructure <= this.lesson.structure.length){
-                this.currentStructure = this.currentStructure + 1;
+        async next(){
+            if(this.currentStructure < (this.lesson.structure.length - 1)){
+                this.nextStructure(this.inputStructure + 1);
                 this.lesson.structure[this.currentStructure].isBlock = false;
+
+                if(this.lesson.structure[this.currentStructure].type == "evaluation"){
+                    console.log("here do evaluation");
+                }
+
+                this.assessments.push({
+                    assessment: Math.random(5),
+                    time_use: this.lesson.structure[this.currentStructure].data.time_use,
+                    like: this.lesson.structure[this.currentStructure].data.rating
+                })
+
+                if(this.assessments.length == 1){
+                    let response = await this.$http.post('/trace/create', { 
+                        student: this.user.student_id,
+                        course: this.$route.params.course,
+                        lesson: this.$route.params.lesson,
+                        assessments: this.assessments,
+                        logs: this.logs
+                    })
+
+                    if(response.status == 200){
+                        console.log(response.data);
+                        this.setTrace(response.data._id);
+                    }
+                } else {
+
+                    await this.$http.post('/trace/update', {
+                        id: this.trace,
+                        assessments: this.assessments,
+                        logs: this.logs
+                    })
+                }
             }
+        },
+        async finish(){
+
+            if(this.note > 3.5){
+
+                //save case and rebuild interface to next lesson
+
+                this.$http.post('/metacore/review', {
+                    id_student: this.user.student_id,
+                    id_course: this.$route.params.course,
+                    id_lesson: this.$route.params.lesson,
+                    structure: structureIds,
+                })
+                .then(response => {
+                    if(response.status == 200){
+                        
+                    }
+                })
+                .catch(e => {
+                    console.error(e.message);
+                })
+
+
+            } else {
+
+                let structureIds = this.lesson.structure.map(s => s._id);
+
+                let resourcesIds = this.lesson.structure.map(s => s.data.resource._id);
+
+                this.$http.post('/metacore/initial', {
+                    id_student: this.user.student_id,
+                    id_course: this.$route.params.course,
+                    id_lesson: this.$route.params.lesson,
+                    structure: structureIds,
+                    resources: resourcesIds
+                })
+                .then(response => {
+                    if(response.status == 200){
+                        this.nextStructure(0);
+
+                        console.log(response.data);
+
+                        this.lesson.structure = this.lesson.structure.map( (s, index) => {
+                            if(index > 0){
+                                s.isBlock = true;
+                            } else {
+                                s.isBlock = false;
+                            }
+                            
+                            s.data = response.data[index];
+                            return s;
+                        })
+                    } 
+                })
+                .catch(e => {
+                    console.error(e.message);
+                })
+            }
+
+            
+            
         },
         getAssessment(){
 
