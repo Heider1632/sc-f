@@ -35,8 +35,18 @@ export default {
         state.links = [
           {
             name: "Mis Cursos",
-            path: '/moderator/course',
-            icon: 'mdi-bell'
+            path: '/moderator',
+            icon: 'mdi-human-male-board'
+          },
+          {
+            name: "Mis Estudiantes",
+            path: '/moderator/student',
+            icon: 'mdi-account-circle'
+          },
+          {
+            name: "Mis Cuestionarios",
+            path: '/moderator/interview',
+            icon: 'mdi-clipboard-list'
           },
           // {
           //   name: 'Perfil',

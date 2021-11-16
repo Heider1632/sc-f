@@ -86,4 +86,61 @@ export default [
         Auth: false
       }
     },
+    //MODERATOR ROUTES
+    {
+      path: '/moderator',
+      name: 'Bienvenido Profesor',
+      view: 'moderator/Home',
+      meta: {
+        Auth: true, rol: [ 'ROLE_MODERATOR' ]
+      }
+    },
+    {
+      path: '/moderator/student',
+      name: 'Estudiantes Profesor',
+      view: 'moderator/Student',
+      meta: {
+        Auth: true, rol: [ 'ROLE_MODERATOR' ]
+      }
+    },
+    {
+      path: '/moderator/interview',
+      name: 'Cuestionarios Profesor',
+      view: 'moderator/Interview',
+      meta: {
+        Auth: true, rol: [ 'ROLE_MODERATOR' ]
+      }
+    },
+    {
+      path: '/moderator/course/:id/students',
+      name: 'Estudiantes Curso Profesor',
+      view: 'moderator/Course/Students',
+      meta: {
+        Auth: true, rol: [ 'ROLE_MODERATOR' ]
+      }
+    },
+    {
+      path: '/moderator/course/:id/lessons',
+      name: 'Lecciones Curso Profesor',
+      view: 'moderator/Course/Lessons',
+      meta: {
+        Auth: true, rol: [ 'ROLE_MODERATOR' ]
+      }
+    },
+    {
+      path: '/moderator/course/:id/statistics',
+      name: 'Estadisticas Curso Profesor',
+      view: 'moderator/Course/Statistics',
+      meta: {
+        Auth: true, rol: [ 'ROLE_MODERATOR' ]
+      }
+    },
+    {
+      path: '/moderator/course/:id/questionnaire',
+      name: 'Cuestionario Curso Profesor',
+      view: 'moderator/Course/Questionnaire',
+      meta: {
+        Auth: true, rol: [ 'ROLE_MODERATOR' ]
+      }
+    },
 ];

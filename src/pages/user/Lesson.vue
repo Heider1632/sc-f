@@ -3,7 +3,7 @@
         <app-bar></app-bar>
 
         <v-container fill-height>
-             <template v-if="loading">
+            <template v-if="loading">
                 <v-row justify="center" align="center">
                     <v-col cols="12" sm="4">
                         <material-loader></material-loader>
@@ -39,6 +39,7 @@
                     </v-toolbar>
                 </v-col>
 
+                <!-- TODO: progress learning student -->
                 <v-col cols="12">
                     <v-toolbar flat rounded>
                         <v-toolbar-title>
@@ -48,8 +49,6 @@
                         <v-divider class="mx-2"  inset vertical></v-divider>
 
                         <div class="flex-grow-1"></div>
-
-                         <material-stopwatch ref="stopwatch"></material-stopwatch>
 
                     </v-toolbar>
                 </v-col>
@@ -283,11 +282,12 @@ export default {
             }
         },
         async finish(){
+            //put teacher note (default 5)
+            this.assessments = [];
 
             if(this.note > 3.5){
 
                 //save case and rebuild interface to next lesson
-
                 this.$http.post('/metacore/review', {
                     id_student: this.user.student_id,
                     id_course: this.$route.params.course,
@@ -296,14 +296,25 @@ export default {
                 })
                 .then(response => {
                     if(response.status == 200){
-                        
+
+                        this.$http.post('/user/progress', {
+                            id_student: this.user.student_id,
+                            id_course: this.$route.params.course,
+                            id_lesson: this.$route.params.lesson,
+                        })
+                        .then(response => {
+                            if(response.status == 200){
+                                this.$router.push(`/course/${this.$route.params.course}`)
+                            }
+                        })
+                        .catch(error => {
+                            console.error(error.message);
+                        })                        
                     }
                 })
                 .catch(e => {
                     console.error(e.message);
                 })
-
-
             } else {
 
                 let structureIds = this.lesson.structure.map(s => s._id);
@@ -321,8 +332,6 @@ export default {
                     if(response.status == 200){
                         this.nextStructure(0);
 
-                        console.log(response.data);
-
                         this.lesson.structure = this.lesson.structure.map( (s, index) => {
                             if(index > 0){
                                 s.isBlock = true;
@@ -338,10 +347,7 @@ export default {
                 .catch(e => {
                     console.error(e.message);
                 })
-            }
-
-            
-            
+            }            
         },
         getAssessment(){
 

@@ -38,10 +38,10 @@
                                 v-for="(lesson, index) in course ? course.lessons : []"
                                 :key="index"
                                 link
-                                :disabled="lesson.isBlock"
+                                :disabled="progress[index].isActive"
                             >
                                 <v-list-item-content>
-                                    <v-list-item-icon v-if="lesson.isBlock">
+                                    <v-list-item-icon v-if="progress[index].isActive">
                                         <v-icon>mdi-disable</v-icon>
                                     </v-list-item-icon>
                                     <v-list-item-title>
@@ -88,6 +88,7 @@
     </v-main>
 </template>
 <script>
+import { mapState } from 'vuex';
 export default {
     name: 'Course',
     data: () => ({
@@ -101,8 +102,12 @@ export default {
             "example" : "Ejemplo",
             "activity" : "Actividad",
             "evaluation" : "Evalucación",
-        }
+        },
+        progress: [],
     }),
+    computed: {
+        ...mapState(['user'])
+    },
     mounted(){
         this.getCourse();
     },
@@ -115,9 +120,27 @@ export default {
 
                 this.course.lessons = this.course.lessons.sort((a, b) => a.order > b.order && 1 || -1)
 
-                this.course.lessons.map( (lesson, index) => {
-                    if(index > 0){
-                        this.course.lessons[index].isBlock = true;
+                this.progress = [];
+
+                this.course.lessons.map( async (lesson, index) => {
+
+                    try {
+                        let response = await this.$http.get('/progress/one', { params: { 
+                            student: this.user.student_id,
+                            course: this.$route.params.id,
+                            lesson: lesson._id
+                        }});
+
+                        this.progress.push(response.data);
+                    } catch (error) {
+                        let progress = await this.$http.post('/progress/create',   { 
+                            student: this.user.student_id,
+                            course: this.$route.params.id,
+                            lesson: lesson._id,
+                            isActive: lesson.order == 1 ? false : true
+                        });
+
+                        this.progress.push(progress.data);
                     }
                 })
 

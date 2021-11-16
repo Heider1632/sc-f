@@ -18,18 +18,15 @@
                     </v-layout>
                 </v-col>
 
-                <v-card flat rounded v-for="(course, index) in courses" :key="index" @click="go(`/course/${course._id}`)">
+                <v-card flat rounded v-for="(course, index) in courses" :key="index">
                     <v-card-title>{{ course.name }}</v-card-title>
                     
                     <v-card-subtitle>{{ course.description }}</v-card-subtitle>
 
                     <v-list rounded>
-                        <v-subheader>lecciones</v-subheader>
+                        <v-subheader>UNIDADES</v-subheader>
                         <v-list-item-group v-model="selectedItem" color="primary">
                             <v-list-item v-for="(lesson, i) in course.lessons" :key="i" @click="selectedItem = i">
-                                <!-- <v-list-item-icon>
-                                    <v-icon v-text="item.icon"></v-icon>
-                                </v-list-item-icon> -->
                                 <v-list-item-content>
                                     <v-list-item-title v-text="lesson.title"></v-list-item-title>
                                 </v-list-item-content>
@@ -37,8 +34,14 @@
                         </v-list-item-group>
                     </v-list>
 
-                    <v-card-actions>
-                    
+                    <v-card-actions class="mt-4">
+                        <v-btn text color="primary" @click="$router.push(`/moderator/course/${course._id}/students`)">Estudiantes</v-btn>
+                        <v-spacer></v-spacer>
+                        <v-btn text color="primary" @click="$router.push(`/moderator/course/${course._id}/lessons`)">Unidades</v-btn>
+                        <v-spacer></v-spacer>
+                        <v-btn text color="primary" @click="$router.push(`/moderator/course/${course._id}/questionnarie`)">Cuestionario</v-btn>
+                        <v-spacer></v-spacer>
+                        <v-btn text color="primary" @click="$router.push(`/moderator/course/${course._id}/statistics`)">Estadisticas</v-btn>
                     </v-card-actions>    
                 </v-card>
             </v-row>  
@@ -56,10 +59,7 @@ export default {
         courses: []
     }),
     mounted(){
-        let self = this;
-        setTimeout(()=> {
-            self.getCourses();
-        }, 1000)
+        this.getCourses();
     },
     computed: {
         ...mapState(['user'])
@@ -68,6 +68,22 @@ export default {
         go(route){
             this.$router.push(route);
         },
+        searchCourse(){
+            console.log("hola")
+        },
+        getCourses(){
+            this.loading = true;
+            this.$http.get(`/course/teacher/${this.user.id}`)
+            .then(response => {
+                console.log(response);
+                this.loading = false;
+                this.courses = response.data;
+            })
+            .catch(error => {
+                this.loading = false;
+                console.log(error.message)
+            })
+        }
     }
 }
 </script>
