@@ -128,6 +128,22 @@ export default [
       }
     },
     {
+      path: '/moderator/course/:id/lessons/:form',
+      name: 'Formulatio Lecciones Curso Profesor',
+      view: 'moderator/Course/FormLesson',
+      meta: {
+        Auth: true, rol: [ 'ROLE_MODERATOR' ]
+      }
+    },
+    {
+      path: '/moderator/course/:course/lesson/:lesson/structure',
+      name: 'Estructura Leccion Curso Profesor',
+      view: 'moderator/Course/Structure',
+      meta: {
+        Auth: true, rol: [ 'ROLE_MODERATOR' ]
+      }
+    },
+    {
       path: '/moderator/course/:id/statistics',
       name: 'Estadisticas Curso Profesor',
       view: 'moderator/Course/Statistics',
