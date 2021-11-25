@@ -29,9 +29,7 @@
 
     <router-view />
 
-    <v-footer>
-      <h1>Universidad de Cordoba</h1>
-    </v-footer>
+    <app-footer></app-footer>
   </v-app>
 </template>
 

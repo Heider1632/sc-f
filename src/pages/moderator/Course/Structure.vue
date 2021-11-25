@@ -1,9 +1,9 @@
 <template>
-    <v-main class="grey lighten-3">
-        <app-bar></app-bar>
+  <v-main class="grey lighten-3">
+    <app-bar></app-bar>
 
-        <v-container fill-height >
-             <v-row>
+    <v-container fill-height>
+      <v-row>
         <v-col class="mb-4" cols="12">
           <v-data-table
             :headers="headers"
@@ -35,12 +35,6 @@
               {{ types[item.type] }}
             </template>
             <template v-slot:[`item.actions`]="{ item }">
-              <v-icon
-                class="mr-2"
-                color="primary"
-                @click="$router.push(`/moderator/course/${$route.params.id}/lesson/${item.id}/structure`)"
-                >mdi-border-all</v-icon
-              >
               <v-dialog transition="dialog-top-transition" max-width="600">
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon
@@ -49,31 +43,11 @@
                     v-bind="attrs"
                     v-on="on"
                     @click="editLesson(item)"
-                    >mdi-pencil</v-icon
-                  >
-                </template>
-                <template v-slot:default="dialog">
-                  <v-card>
-                    <v-toolbar color="primary" dark
-                      >Opening from the bottom</v-toolbar
-                    >
-                    <v-card-text>
-                      <div class="text-h2 pa-12">Hello world!</div>
-                    </v-card-text>
-                    <v-card-actions class="justify-end">
-                      <v-btn text @click="dialog.value = false">Close</v-btn>
-                    </v-card-actions>
-                  </v-card>
-                </template>
-              </v-dialog>
-              <v-dialog transition="dialog-bottom-transition" max-width="600">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-icon
-                    color="primary"
-                    v-bind="attrs"
-                    v-on="on"
-                    @click="deleteLesson(item)"
-                    >mdi-delete</v-icon
+                    >{{
+                      item.type == "evaluation"
+                        ? "mdi-table-account"
+                        : "mdi-animation-play"
+                    }}</v-icon
                   >
                 </template>
                 <template v-slot:default="dialog">
@@ -94,48 +68,48 @@
           </v-data-table>
         </v-col>
       </v-row>
-        </v-container>
-    </v-main>
+    </v-container>
+  </v-main>
 </template>
 <script>
 // import { mapState } from 'vuex';
 export default {
-    name: 'StructureLessonCourseTeacher',
-    mounted(){
-        this.getLesson();
+  name: "StructureLessonCourseTeacher",
+  mounted() {
+    this.getLesson();
+  },
+  data: () => ({
+    headers: [
+      {
+        text: "Tipo",
+        align: "start",
+        sortable: true,
+        value: "type",
+      },
+      { text: "Acciones", value: "actions", sortable: false },
+    ],
+    types: {
+      introduction: "Introducción",
+      definition: "Definición",
+      description: "Descripción",
+      example: "Ejemplo",
+      activity: "Actividad",
+      evaluation: "Evalucación",
     },
-    data: () => ({
-        headers: [
-            {
-                text: "Tipo",
-                align: "start",
-                sortable: true,
-                value: "type",
-            },
-            { text: "Acciones", value: "actions", sortable: false },
-        ],
-        types: {
-            "introduction" : "Introducción",
-            "definition" : "Definición",
-            "description" : "Descripción",
-            "example" : "Ejemplo",
-            "activity" : "Actividad",
-            "evaluation" : "Evalucación",
-        },
-        lesson: null
-    }),
-    methods: {
-        getLesson(){
-            this.$http
-            .get(`/lesson/one?id=${this.$route.params.lesson}`)
-            .then((response) => {
-                console.log(response)
-                this.lesson = response.data;
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-        }
-    }
-}
+    lesson: null,
+  }),
+  methods: {
+    getLesson() {
+      this.$http
+        .get(`/lesson/one?id=${this.$route.params.lesson}`)
+        .then((response) => {
+          console.log(response);
+          this.lesson = response.data;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+  },
+};
 </script>

@@ -12,6 +12,7 @@
 export default {
     name: 'StudentTeacher',
     data: () => ({
+        
     }),
 }
 </script>

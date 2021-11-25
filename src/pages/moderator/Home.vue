@@ -39,8 +39,6 @@
                         <v-spacer></v-spacer>
                         <v-btn text color="primary" @click="$router.push(`/moderator/course/${course._id}/lessons`)">Unidades</v-btn>
                         <v-spacer></v-spacer>
-                        <v-btn text color="primary" @click="$router.push(`/moderator/course/${course._id}/questionnarie`)">Cuestionario</v-btn>
-                        <v-spacer></v-spacer>
                         <v-btn text color="primary" @click="$router.push(`/moderator/course/${course._id}/statistics`)">Estadisticas</v-btn>
                     </v-card-actions>    
                 </v-card>

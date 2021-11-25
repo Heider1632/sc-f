@@ -2,7 +2,7 @@
     <v-app-bar id="core-app-bar" fixed app elevate-on-scroll color="primary" flat >
         <v-container class="py-0 fill-height">
 
-            <img class="mr-3" :src="require('@/assets/logo.png')" height="40"/>
+            <img class="mr-3" :src="require('@/assets/images/logo-its.png')" height="40"/>
 
             <!-- <v-toolbar-title class="white--text font-weight-semibold align-self-center mr-4">
                 {{ user.name }} {{ user.lastname }}
