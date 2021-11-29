@@ -71,7 +71,17 @@
                         min-height="69vh"
                         rounded="lg"
                     >
-                        <v-card elevation="0" height="69vh" class="d-flex flex-column scroll" >
+                        <v-container fluid fill-height class="grey lighten-4" v-if="showFeedback">
+                            <v-layout justify-center align-center>
+                                <v-flex>
+                                    {{ this.assessment.feedbacks[feedback].name }}
+                                </v-flex>
+                                <v-flex>
+                                    <v-btn block color="primary" @click="rebuild">Intentarlo de nuevo</v-btn>
+                                </v-flex>
+                            </v-layout>
+                        </v-container>
+                        <v-card elevation="0" height="69vh" class="d-flex flex-column scroll" v-else>
                             <v-card-title>
                                 <template v-if="lesson.structure[inputStructure] && lesson.structure[inputStructure].type == 'evaluation'">
                                     {{ this.assessment.title }}
@@ -83,9 +93,12 @@
 
                             <v-card-text>
                                 <template v-if="lesson.structure[inputStructure] && lesson.structure[inputStructure].type == 'evaluation'">
-                                    <div v-for="(question, key) in assessment.questions" :key="key">
-                                        <v-select outlined :label="question.name" :items="question.options" item-text="label" />
-                                    </div>
+                                    <v-form ref="forminterview" class="mx-2" lazy-validation>
+                                        <template v-for="(question, key) in assessment.questions">
+                                            <v-select :key="key" outlined :label="question.name" v-model="question.user" :items="question.options" item-text="label" :rules="[v => !!v || 'Debes completar esta pregunta']" required />
+                                        </template>
+                                    </v-form>
+                                    
                                 </template>
                                 <template v-else>
                                     <video-embed :params="{ autoplay: 1}" :src="lesson.structure[inputStructure].data.resource.url"></video-embed>
@@ -145,7 +158,11 @@ export default {
         assessments: [],
         assessment: null,
         logs: [],
-        note: 0
+        note: 0,
+        feedback: 0,
+        isLoading: false,
+        showFeedback: false,
+        id_case: null,
     }),
     mounted(){
         this.getLesson();
@@ -164,6 +181,7 @@ export default {
     },
     methods: {
         ...mapMutations('lesson', ['nextStructure', 'setTrace']),
+        ...mapMutations('notification', ['open']),
         openSettings() {
             this.$refs.stopwatch.openSettingsDialog();
         },
@@ -196,6 +214,9 @@ export default {
             })
             .then(response => {
                 if(response.status == 200){
+
+                    this.id_case = response.data.id_case;
+
                     this.lesson.structure = this.lesson.structure.map((s, index) => {
                         if(index > 0){
                             s.isBlock = true;
@@ -203,7 +224,7 @@ export default {
                             s.isBlock = false;
                         }
                         
-                        s.data = response.data[index];
+                        s.data = response.data.plan[index];
                         return s;
                     })
                 }
@@ -213,13 +234,13 @@ export default {
             })
         },
         async next(){
-            if(this.currentStructure < (this.lesson.structure.length - 1)){
-                this.nextStructure(this.inputStructure + 1);
-                this.lesson.structure[this.currentStructure].isBlock = false;
 
-                if(this.lesson.structure[this.currentStructure].type == "evaluation"){
-                    console.log("here do evaluation");
-                } else {
+            if(this.currentStructure < this.lesson.structure.length){
+
+                if(this.currentStructure != 6){
+
+                    let resourcesIds = this.lesson.structure.map(s => { if(s.data){ return s.data.resource._id }});
+
                     this.assessments.push({
                         assessment: Math.random(5),
                         time_use: this.lesson.structure[this.currentStructure].data.time_use,
@@ -227,10 +248,11 @@ export default {
                     })
 
                     if(this.assessments.length == 1){
-                        let response = await this.$http.post('/trace/create', { 
+                        let response = await this.$http.post('/trace/create', {
                             student: this.user.student_id,
                             course: this.$route.params.course,
                             lesson: this.$route.params.lesson,
+                            resources: resourcesIds,
                             assessments: this.assessments,
                             logs: this.logs
                         })
@@ -243,91 +265,148 @@ export default {
 
                         await this.$http.post('/trace/update', {
                             id: this.trace,
+                            resources: resourcesIds,
                             assessments: this.assessments,
                             logs: this.logs
                         })
                     }
                 }
 
-                
+                this.nextStructure(this.inputStructure + 1);
+                this.lesson.structure[this.currentStructure].isBlock = false;
+
             }
         },
         async finish(){
-            //put teacher note (default 5)
-            this.assessments = [];
 
-            if(this.note == 5){
+            let valid = this.$refs.forminterview.validate();
 
-                //save case and rebuild interface to next lesson
-                this.$http.post('/metacore/review', {
-                    id_student: this.user.student_id,
-                    id_course: this.$route.params.course,
-                    id_lesson: this.$route.params.lesson,
-                    structure: structureIds,
-                })
-                .then(response => {
-                    if(response.status == 200){
-                        this.$http.post('/user/progress', {
-                            id_student: this.user.student_id,
-                            id_course: this.$route.params.course,
-                            id_lesson: this.$route.params.lesson,
-                        })
-                        .then(response => {
-                            if(response.status == 200){
-                                this.$router.push(`/course/${this.$route.params.course}`)
-                            }
-                        })
-                        .catch(error => {
-                            console.error(error.message);
-                        })                     
+            if(valid){
+                 //put teacher note (default 5)
+                this.assessments = [];
+
+                let sum = 0;
+                
+                this.assessment.questions.map(as => {
+                    if(as.response == as.user){
+                        let note = 5 / this.assessment.questions.length;
+                        sum= sum + note;
                     }
-                })
-                .catch(e => {
-                    console.error(e.message);
-                })
+                });
+
+                this.note = sum;
+
+                if(this.note == 5){
+
+                    let structureIds = this.lesson.structure.map(s => s._id);
+
+                    let resourcesIds = this.lesson.structure.map(s => { if(s.data){ return s.data }});
+
+                    //save case and rebuild interface to next lesson
+                    this.$http.post('/metacore/save', {
+                        id_student: this.user.student_id,
+                        id_course: this.$route.params.course,
+                        id_lesson: this.$route.params.lesson,
+                        resources: resourcesIds,
+                        structure: structureIds,
+                    })
+                    .then(response => {
+                        if(response.status == 200){
+                            this.$http.post('/metacore/review', {
+                                id_case: response.data._id,
+                                success: true,
+                                errors: false
+                            })
+                            .then(response => {
+
+                                if(response.status == 200){
+                                    this.$http.post('/progress/create', {
+                                        id_student: this.user.student_id,
+                                        id_course: this.$route.params.course,
+                                        id_lesson: this.$route.params.lesson,
+                                    })
+                                    .then(response => {
+                                        if(response.status == 200){
+                                            this.$router.push(`/course/${this.$route.params.course}`)
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error(error.message);
+                                    })   
+                                }
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            })
+                                            
+                        }
+                    })
+                    .catch(e => {
+                        console.error(e.message);
+                    })
+                } else {
+
+                    this.showFeedback = true;
+                }     
             } else {
+                
+                let args = {
+                    color: "error",
+                    message: "Error!",
+                    submessage: "Debes completar todas las preguntas",
+                    pos: ["top", "center"]
+                };
 
-                let structureIds = this.lesson.structure.map(s => s._id);
-
-                let resourcesIds = this.lesson.structure.map(s => s.data.resource._id);
-
-                this.$http.post('/metacore/initial', {
-                    id_student: this.user.student_id,
-                    id_course: this.$route.params.course,
-                    id_lesson: this.$route.params.lesson,
-                    structure: structureIds,
-                    resources: resourcesIds
-                })
-                .then(response => {
-                    if(response.status == 200){
-
-                        console.log(response.data);
-
-                        this.nextStructure(0);
-
-                        this.lesson.structure = this.lesson.structure.map( (s, index) => {
-                            if(index > 0){
-                                s.isBlock = true;
-                            } else {
-                                s.isBlock = false;
-                            }
-                            
-                            s.data = response.data[index];
-                            return s;
-                        })
-                    } 
-                })
-                .catch(e => {
-                    console.error(e.message);
-                })
-            }            
+                this.loading = false;
+                this.open(args);
+            }       
         },
         getAssessment(){
             this.$http.get(`/assessment/one?lesson=${this.$route.params.lesson}`)
             .then(response => {
                 if(response.status == 200){
+
+
                     this.assessment = response.data;                
                 }
+            })
+            .catch(e => {
+                console.error(e.message);
+            })
+        },
+        rebuild(){
+
+            this.showFeedback = false;
+
+            let structureIds = this.lesson.structure.map(s => s._id);
+
+            let resourcesIds = this.lesson.structure.map(s => { if(s.data){ return s.data.resource._id }});
+
+            this.$http.post('/metacore/initial', {
+                id_student: this.user.student_id,
+                id_course: this.$route.params.course,
+                id_lesson: this.$route.params.lesson,
+                structure: structureIds,
+                resources: resourcesIds
+            })
+            .then(response => {
+                if(response.status == 200){
+
+                    this.nextStructure(0);
+
+                    this.id_case = response.data.id_case;
+
+                    this.lesson.structure = this.lesson.structure.map( (s, index) => {
+                        if(index > 0){
+                            s.isBlock = true;
+                        } else {
+                            s.isBlock = false;
+                        }
+                        
+                        s.data = response.data.plan[index];
+                        return s;
+                    })
+                } 
             })
             .catch(e => {
                 console.error(e.message);
