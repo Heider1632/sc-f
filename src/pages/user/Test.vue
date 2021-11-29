@@ -88,7 +88,7 @@ export default {
             this.$http.get(`/student/one?id=${this.user.student_id}`)
             .then(response => {
                 if(response.status == 200){
-                    if(response.data.student.learningStyleDimensions.length > 0){
+                    if(response.data.learningStyleDimensions.length > 0){
                         this.$router.push('/')
                     }
                 }
