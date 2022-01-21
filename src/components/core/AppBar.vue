@@ -4,35 +4,16 @@
 
             <img class="mr-3" :src="require('@/assets/images/logo-its.png')" height="40"/>
 
-            <!-- <v-toolbar-title class="white--text font-weight-semibold align-self-center mr-4">
-                {{ user.name }} {{ user.lastname }}
-            </v-toolbar-title> -->
-
             <v-spacer></v-spacer>
-
-            <!-- <template v-if="!responsive">
-                <v-btn
-                    v-for="(link, index) in links"
-                    :key="`link--${index}`"
-                    @click="go(link.path)"
-                    text
-                    class="white--text"
-                >
-                    {{ link.name }}
-                    <v-icon v-if="link.icon">{{ link.icon }}</v-icon>
-                </v-btn>
-
-                <v-btn class="white--text" text @click="salir">
-                    Salir
-                    <v-icon>mdi-account-arrow-left</v-icon>
-                </v-btn>
-            </template> -->
 
             <v-menu >
                 <template v-slot:activator="{ on }">
                     <v-btn text class="white--text display-5" v-on="on">
                         {{ name }}
                     </v-btn>
+
+                    <!-- {{ learningStyleDimensions }} -->
+                    
                 </template>
 
                 <v-list >
@@ -47,6 +28,10 @@
                     </v-list-item>
                 </v-list>
             </v-menu>
+
+            <v-btn text class="white--text display-5">
+                <v-icon>mdi-home</v-icon>
+            </v-btn>
         </v-container>
     </v-app-bar>
 </template>
@@ -67,7 +52,6 @@ export default {
     computed: {
         ...mapState(['user', 'links']),
         name() {
-            console.log();
             if(this.user.name && this.user.lastname) {
                 return  `${this.user.name} ${this.user.lastname}`
             } else if(this.user.roles.includes('ROLE_MODERATOR')) {
@@ -75,6 +59,9 @@ export default {
             } else {
                 return "Administrador STI"
             }
+        },
+        learningStyleDimensions(){
+            return this.user.learningStyleDimensions.map((ls) => ls.name);
         }
     },
     methods: {

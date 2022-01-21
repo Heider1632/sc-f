@@ -14,6 +14,7 @@ export default {
     props: {
         value: {
             type: Number,
+            required: true
         },
         color: {
             type: String
@@ -22,6 +23,12 @@ export default {
     computed: {
         colorWrap() {
             return this.$props.color +  ' lighten-3';
+        }
+    },
+    methods: {
+        changeValue() {
+            let value = this.value;
+            this.$emit("update-value", value);
         }
     }
 }

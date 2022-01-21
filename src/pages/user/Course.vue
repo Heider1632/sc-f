@@ -30,7 +30,7 @@
                     </v-toolbar>
                 </v-col>
                 
-                <v-col cols="12">
+                <v-col cols="8">
                     <v-sheet rounded="lg">
                     <v-list rounded color="transparent">
                         <v-list-item-group v-model="selectedItem" color="primary">
@@ -54,7 +54,8 @@
 
                                 <v-list-item-action>
                                     <v-btn icon @click="goLesson(lesson._id)">
-                                        <v-icon color="grey lighten-1">mdi-arrow-right</v-icon>
+                                        <v-icon v-if="!progress[index].isActive" color="grey lighten-1">mdi-arrow-right</v-icon>
+                                        <v-icon v-else color="grey lighten-1">mdi-lock</v-icon>
                                     </v-btn>
                                 </v-list-item-action>
                             </v-list-item>
@@ -76,6 +77,12 @@
                             </v-list-item-content>
                         </v-list-item>
                     </v-list>
+                    </v-sheet>
+                </v-col>
+
+                 <v-col cols="4">
+                    <v-sheet rounded="lg">
+                    
                     </v-sheet>
                 </v-col>
             </v-row>
@@ -118,7 +125,7 @@ export default {
             .then(response => {
                 this.course = response.data;
 
-                this.course.lessons = this.course.lessons.sort((a, b) => a.order > b.order && 1 || -1)
+                this.course.lessons = this.course.lessons.sort((a, b) => a.order > b.order && 1 || -1);
 
                 this.progress = [];
 
