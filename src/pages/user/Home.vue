@@ -76,10 +76,7 @@ export default {
         courses: []
     }),
     mounted(){
-        let self = this;
-        setTimeout(()=> {
-            self.getCourses();
-        }, 1000)
+        this.getCourses();
     },
     computed: {
         ...mapState(['user'])

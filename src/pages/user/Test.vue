@@ -85,11 +85,13 @@ export default {
             this.test[index].index = this.test[index].options.findIndex(op => op.label == this.test[index].answer);
         },
         validateStudent(){
+            var self = this;
             this.$http.get(`/student/one?id=${this.user.student_id}`)
             .then(response => {
                 if(response.status == 200){
+                    console.log(response.data);
                     if(response.data.learningStyleDimensions.length > 0){
-                        this.$router.push('/')
+                        self.$router.push('/')
                     }
                 }
             })
