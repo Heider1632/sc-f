@@ -8,8 +8,16 @@
 
             <v-spacer></v-spacer>
 
-            <v-btn elevation="0" color="purple" @click="$router.push('/login')" class="white--text display-5">
+            <v-btn v-if="$route.path != '/about'" elevation="0" color="purple" @click="$router.push('/login')" class="white--text display-5 mx-2">
                 Iniciar Sesión
+            </v-btn>
+
+            <v-btn v-if="$route.path != '/about'" elevation="0" color="purple" @click="$router.push('/about')" class="white--text display-5 mx-2">
+                Acerca
+            </v-btn>
+
+            <v-btn v-if="$route.path == '/about'" elevation="0" color="purple" @click="$router.push('/')" class="white--text display-5">
+                Inicio
             </v-btn>
         </v-container>
     </v-app-bar>

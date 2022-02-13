@@ -1,19 +1,18 @@
 <template>
-    <v-app-bar id="core-app-bar" fixed app elevate-on-scroll color="primary" flat >
+    <v-app-bar id="core-app-bar" fixed app elevate-on-scroll color="white" flat >
         <v-container class="py-0 fill-height">
 
             <img class="mr-3" :src="require('@/assets/images/logo-its.png')" height="40"/>
+
+             <img class="mr-3" :src="require('@/assets/images/unicordoba-header.png')" height="40"/>
 
             <v-spacer></v-spacer>
 
             <v-menu >
                 <template v-slot:activator="{ on }">
-                    <v-btn text class="white--text display-5" v-on="on">
+                    <v-btn text class="purple--text display-5" v-on="on">
                         {{ name }}
                     </v-btn>
-
-                    <!-- {{ learningStyleDimensions }} -->
-                    
                 </template>
 
                 <v-list >
@@ -29,7 +28,7 @@
                 </v-list>
             </v-menu>
 
-            <v-btn text class="white--text display-5">
+            <v-btn text class="purple--text display-5">
                 <v-icon>mdi-home</v-icon>
             </v-btn>
         </v-container>

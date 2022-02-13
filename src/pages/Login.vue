@@ -3,7 +3,7 @@
     <v-container fill-height fluid class="section-container">
       <v-row class="signin">
         <v-col lg="6" md="6" class="pa-0 ma-0" v-if="!responsive">
-          <v-img :src="require('@/assets/images/bg-initial-1.png')" class="full-height-img" ></v-img>
+          <v-img :src="require('@/assets/images/sifilis.jpg')" class="full-height-img" ></v-img>
         </v-col>
         <v-col lg="6" md="6" sm="12" class="right">
           <validation-observer ref="observerLogin">
@@ -158,6 +158,9 @@ export default {
           userAgent: userAgent
         })
         .then(response => {
+
+          console.log(response);
+          
           if(response.status == 200){
             
             localStorage.setItem("token", response.data.accessToken);
@@ -213,7 +216,7 @@ export default {
   .signin {
     padding: 0;
     width: 100%;
-    height: 100vh;
+    height: calc(100vh - 150px);
     .right {
       display: flex;
       justify-content: center;

@@ -5,6 +5,14 @@ export default [
     view: "Welcome"
   },
   {
+    path: "/about",
+    name: "Acerca",
+    view: "About",
+    meta: {
+      Auth: false,
+    },
+  },
+  {
     path: "/home",
     name: "Bienvenido a STI",
     view: "user/Home",
