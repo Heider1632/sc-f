@@ -414,6 +414,21 @@ export default {
         this.toggleTimer();
         this.toogleTotalTime();
 
+        this.$http.post("/metacore/history", {
+          id_case: this.id_case,
+          id_student: this.user.student_id,
+        })
+        .then(response => {
+          console.log(response)
+        })
+        .catch(error => console.log(error))
+
+        let resourcesIds = this.lesson.structure.map((s) => {
+          if (s.data) {
+            return s.data;
+          }
+        });
+
         //put teacher note (default 5)
         this.assessments = [];
 
@@ -426,23 +441,12 @@ export default {
           }
         });
 
-        let response = await this.$http.post("/metacore/history", {
-          id_case: this.id_case,
-          id_student: this.user.student_id,
-        })
-
-        if(response.status == 200){
-          console.log("done");
-        }
 
         this.note = sum;
 
         if (this.note == 5) {
-          let resourcesIds = this.lesson.structure.map((s) => {
-            if (s.data) {
-              return s.data;
-            }
-          });
+
+        
 
           //save case and rebuild interface to next lesson
           this.$http
