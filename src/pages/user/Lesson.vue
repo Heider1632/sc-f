@@ -237,6 +237,7 @@ export default {
     isRunning: false,
     isRunningTotal: false,
     interval: null,
+    intervalTotal: null,
   }),
   mounted() {
     this.getLesson();
@@ -266,9 +267,9 @@ export default {
     ...mapMutations("notification", ["open"]),
     toogleTotalTime() {
       if (this.isRunningTotal) {
-        clearInterval(this.interval);
+        clearInterval(this.intervalTotal);
       } else {
-        this.interval = setInterval(this.incrementTotalTime, 1000);
+        this.intervalToal = setInterval(this.incrementTotalTime, 1000);
       }
       this.isRunningTotal = !this.isRunningTotal;
     },
@@ -411,17 +412,6 @@ export default {
       let valid = this.$refs.forminterview.validate();
 
       if (valid) {
-        this.toggleTimer();
-        this.toogleTotalTime();
-
-        this.$http.post("/metacore/history", {
-          id_case: this.id_case,
-          id_student: this.user.student_id,
-        })
-        .then(response => {
-          console.log(response)
-        })
-        .catch(error => console.log(error))
 
         let resourcesIds = this.lesson.structure.map((s) => {
           if (s.data) {
@@ -441,13 +431,20 @@ export default {
           }
         });
 
-
         this.note = sum;
 
+        this.$http.post("/metacore/history", {
+          id_case: this.id_case,
+          id_student: this.user.student_id,
+          was: this.note == 5 ? 'success' : 'error'
+        })
+        .then(response => {
+          console.log(response)
+        })
+        .catch(error => console.log(error))
+
         if (this.note == 5) {
-
-        
-
+          
           //save case and rebuild interface to next lesson
           this.$http
             .post("/metacore/update", {
