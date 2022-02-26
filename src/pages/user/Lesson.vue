@@ -11,7 +11,7 @@
         </v-row>
       </template>
       <template v-else>
-        <v-row>
+        <v-row v-if="lesson">
           <v-col cols="12">
             <v-toolbar flat rounded>
               <v-toolbar-title>
@@ -45,14 +45,18 @@
           <v-col cols="4">
             <v-sheet rounded="lg">
               <v-list rounded color="transparent">
-                <v-list-item-group v-model="currentStructure" color="primary">
+                <v-list-item-group color="primary">
                   <v-list-item
-                    v-for="(structure, index) in lesson ? lesson.structure : []"
-                    :key="index"
-                    :disabled="structure.isBlock"
+                    v-for="(structure, indice) in lesson
+                      ? lesson.structure
+                      : []"
+                    :key="structure.id"
+                    :disabled="progress[indice] && progress[indice].isBlock"
                   >
                     <v-list-item-content>
-                      <v-list-item-icon v-if="structure.isBlock">
+                      <v-list-item-icon
+                        v-if="progress[indice] && progress[indice].isBlock"
+                      >
                         <v-icon>mdi-disable</v-icon>
                       </v-list-item-icon>
                       <v-list-item-title>
@@ -71,7 +75,7 @@
                         dark
                         elevation="0"
                         @click="finish"
-                        v-if="currentStructure === 5"
+                        v-if="progress[index] && progress[index].index === 5"
                       >
                         Finalizar
                         <v-icon>mdi-check</v-icon>
@@ -80,7 +84,7 @@
                         color="purple"
                         dark
                         elevation="0"
-                        @click="next"
+                        @click="skip"
                         v-else
                       >
                         Siguiente
@@ -121,17 +125,18 @@
                 <v-card-title>
                   <template
                     v-if="
-                      lesson.structure[currentStructure] &&
-                      lesson.structure[currentStructure].type == 'evaluation'
+                      lesson.structure[index] &&
+                      lesson.structure[index].type == 'evaluation' &&
+                      assessment
                     "
                   >
-                    {{ this.assessment.title }}
+                    {{ assessment.title }}
                   </template>
                   <template v-else>
                     {{
-                      lesson.structure[currentStructure].data.resource.description
-                        ? lesson.structure[currentStructure].data.resource
-                            .description
+                      lesson.structure[index].data &&
+                      lesson.structure[index].data.resource.description
+                        ? lesson.structure[index].data.resource.description
                         : ""
                     }}
                     - {{ time }}
@@ -142,8 +147,9 @@
                   <div class="text-center">
                     <template
                       v-if="
-                        lesson.structure[currentStructure] &&
-                        lesson.structure[currentStructure].type == 'evaluation'
+                        lesson.structure[index] &&
+                        lesson.structure[index].type == 'evaluation' &&
+                        assessment
                       "
                     >
                       <v-form ref="forminterview" class="mx-2" lazy-validation>
@@ -166,11 +172,11 @@
                       </v-form>
                     </template>
                     <template v-else>
-                      <!-- <div style="width: 100%;"><div style="position: relative; padding-bottom: 56.25%; padding-top: 0; height: 0;"><iframe frameborder="0" width="1200" height="675" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://view.genial.ly/61a1b324249c210d9676cf86" type="text/html" allowscriptaccess="always" allowfullscreen="true" scrolling="yes" allownetworking="all"></iframe> </div> </div> -->
                       <video-embed
                         :params="{ autoplay: 1 }"
                         :src="
-                          lesson.structure[currentStructure].data.resource.url
+                          lesson.structure[index].data &&
+                          lesson.structure[index].data.resource.url
                         "
                       ></video-embed>
                     </template>
@@ -183,16 +189,16 @@
                       shrink
                       class="mr-5"
                       align-items-center
-                      v-if="lesson.structure[currentStructure].data"
+                      v-if="lesson.structure[index].data"
                     >
                       <h4 class="display-5">
                         ¿Qué tal útil te parecio este recurso? 😊
                       </h4>
                     </v-flex>
 
-                    <v-flex shrink v-if="lesson.structure[currentStructure].data">
+                    <v-flex shrink v-if="lesson.structure[index].data">
                       <v-rating
-                        v-model="lesson.structure[currentStructure].data.rating"
+                        v-model="rating"
                         background-color="orange lighten-3"
                         color="orange"
                         large
@@ -210,10 +216,11 @@
   </v-main>
 </template>
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
   name: "Lesson",
   data: () => ({
+    index: 0,
     rating: 0,
     loading: false,
     lesson: null,
@@ -225,6 +232,7 @@ export default {
       activity: "Actividad",
       evaluation: "Evalucación",
     },
+    progress: [],
     assessments: [],
     assessment: null,
     logs: [],
@@ -244,18 +252,10 @@ export default {
   },
   computed: {
     ...mapState(["user"]),
-    ...mapState("lesson", ["currentStructure", "currentFeedback", "trace"]),
-    // currentStructure: {
-    //   get() {
-    //     return this.currentStructure;
-    //   },
-    //   set(val) {
-    //     this.nextStructure(val);
-    //   },
-    // },
+    ...mapGetters("lesson", ["getCurrentFeedback", "getTrace"]),
     inputFeedback: {
       get() {
-        return this.currentFeedback;
+        return this.getCurrentFeedback;
       },
       set(val) {
         this.nextFeedback(val);
@@ -263,10 +263,11 @@ export default {
     },
   },
   methods: {
-    ...mapMutations("lesson", ["nextStructure", "nextFeedback", "setTrace"]),
+    ...mapMutations("lesson", ["nextFeedback", "setTrace"]),
     ...mapMutations("notification", ["open"]),
     toogleTotalTime() {
       if (this.isRunningTotal) {
+        this.totalTime = 0;
         clearInterval(this.intervalTotal);
       } else {
         this.intervalToal = setInterval(this.incrementTotalTime, 1000);
@@ -275,6 +276,7 @@ export default {
     },
     toggleTimer() {
       if (this.isRunning) {
+        this.time = 0;
         clearInterval(this.interval);
       } else {
         this.interval = setInterval(this.incrementTime, 1000);
@@ -309,58 +311,95 @@ export default {
 
       return array;
     },
-    getLesson() {
+    async getLesson() {
       this.loading = true;
-      this.$http
-        .get(`/lesson/one?id=${this.$route.params.lesson}`)
-        .then((response) => {
-          this.lesson = response.data;
-          this.getResources();
-          this.getAssessment();
-          this.loading = false;
-        })
-        .catch((error) => {
-          this.loading = false;
-          console.log(error);
-        });
-    },
-    getResources() {
-      let structureIds = this.lesson.structure.map((s) => s._id);
 
-      this.$http
-        .post("/metacore/initial", {
+      try {
+        let response = await this.$http.get(
+          `/lesson/one?id=${this.$route.params.lesson}`
+        );
+
+        this.lesson = response.data;
+
+        Promise.all(
+          this.lesson.structure.map(async (structure, index) => {
+            try {
+              let responseProgress = await this.$http.get("/history/one", {
+                params: {
+                  student: this.user.student_id,
+                  course: this.$route.params.course,
+                  lesson: this.$route.params.lesson,
+                  structure: structure._id,
+                },
+              });
+
+              this.progress.push(responseProgress.data);
+            } catch (error) {
+              let progress = await this.$http.post("/history/create", {
+                student: this.user.student_id,
+                course: this.$route.params.course,
+                lesson: this.$route.params.lesson,
+                structure: structure._id,
+                isBlock: index == 0 ? false : true,
+                index: index,
+              });
+
+              this.progress.push(progress.data);
+            }
+          })
+        ).then(async (_) => {
+          await this.getResources();
+          await this.getAssessment();
+        });
+      } catch (e) {
+        console.log(e.message);
+      }
+
+      this.loading = false;
+    },
+    async getResources() {
+      if (this.id_case == null) {
+
+        
+        let structureIds = this.lesson.structure.map((s) => s._id);
+
+        let response = await this.$http.post("/metacore/initial", {
           id_student: this.user.student_id,
           id_course: this.$route.params.course,
           id_lesson: this.$route.params.lesson,
           structure: structureIds,
-        })
-        .then((response) => {
-          if (response.status == 200) {
-            this.id_case = response.data.id_case;
-
-            this.lesson.structure = this.lesson.structure.map((s, index) => {
-              if (index > 0) {
-                s.isBlock = true;
-              } else {
-                s.isBlock = false;
-              }
-
-              s.data = response.data.plan[index];
-              return s;
-            });
-
-            this.toggleTimer();
-            this.toogleTotalTime();
-          }
-        })
-        .catch((e) => {
-          console.error(e.message);
         });
+
+        this.id_case = response.data.id_case;
+
+        this.lesson.structure = this.lesson.structure.map((s, index) => {
+          s.data = response.data.plan[index];
+          return s;
+        });
+      }
+
+      this.toggleTimer();
+      this.toogleTotalTime();
     },
-    async next() {
-      if (this.currentStructure < this.lesson.structure.length) {
-        if (this.currentStructure != 6) {
-          this.lesson.structure[this.currentStructure].data.time_use = this.time;
+    async getAssessment() {
+      try {
+        let response = await this.$http.get(
+          `/assessment/one?lesson=${this.$route.params.lesson}`
+        );
+
+        this.assessment = response.data;
+        this.assessment.questions = this.shuffle(this.assessment.questions);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async skip() {
+      if (this.index < this.lesson.structure.length) {
+        this.index = this.progress.filter((p) => p.isBlock === false)[0].index;
+
+        try {
+          this.lesson.structure[this.index].data.time_use = this.time;
+          this.lesson.structure[this.index].data.rating = this.rating;
 
           let resourcesIds = this.lesson.structure.map((s) => {
             if (s.data) {
@@ -369,10 +408,8 @@ export default {
           });
 
           this.assessments.push({
-            assessment: Math.random(5),
-            time_use:
-              this.lesson.structure[this.currentStructure].data.time_use,
-            like: this.lesson.structure[this.currentStructure].data.rating,
+            time_use: this.lesson.structure[this.index].data.time_use,
+            like: this.lesson.structure[this.index].data.rating,
           });
 
           if (this.assessments.length == 1) {
@@ -386,40 +423,52 @@ export default {
             });
 
             if (response.status == 200) {
-              console.log(response.data);
               this.setTrace(response.data._id);
             }
           } else {
             await this.$http.post("/trace/update", {
-              id: this.trace,
+              id: this.getTrace,
               resources: resourcesIds,
               assessments: this.assessments,
               logs: this.logs,
             });
           }
+
+          let response = await this.$http.post("/history/update", {
+            id: this.progress[this.index]._id,
+            isBlock: true,
+          });
+
+          if (response && response.data) {
+            this.progress[this.index].isBlock = true;
+
+            let history = await this.$http.post("/history/update", {
+              id: this.progress[this.index + 1]._id,
+              isBlock: false,
+            });
+
+            if (history && history.data) {
+              this.rating = 0;
+              this.toggleTimer();
+              this.progress[this.index + 1].isBlock = false;
+              this.toggleTimer();
+            }
+          }
+        } catch (e) {
+          console.log(e);
         }
-
-        this.time = 0;
-        this.toggleTimer();
-        this.time = 0;
-        this.toggleTimer();
-
-        this.nextStructure(this.currentStructure + 1);
-        this.lesson.structure[this.currentStructure].isBlock = false;
       }
     },
     async finish() {
       let valid = this.$refs.forminterview.validate();
 
       if (valid) {
-
         let resourcesIds = this.lesson.structure.map((s) => {
           if (s.data) {
             return s.data;
           }
         });
 
-        //put teacher note (default 5)
         this.assessments = [];
 
         let sum = 0;
@@ -433,62 +482,50 @@ export default {
 
         this.note = sum;
 
-        this.$http.post("/metacore/history", {
-          id_case: this.id_case,
-          id_student: this.user.student_id,
-          was: this.note == 5 ? 'success' : 'error'
-        })
-        .then(response => {
-          console.log(response)
-        })
-        .catch(error => console.log(error))
+        Promise.all([
+          this.$http.post("/metacore/history", {
+            id_case: this.id_case,
+            id_student: this.user.student_id,
+            was: this.note == 5 ? "success" : "error",
+            note: this.note,
+          }),
+          this.$http.post("/metacore/update", {
+            id_case: this.id_case,
+            resources: resourcesIds,
+          }),
+        ]).then((response) => {
+          console.log(response);
+        });
 
         if (this.note == 5) {
-          
-          //save case and rebuild interface to next lesson
           this.$http
-            .post("/metacore/update", {
+            .post("/metacore/review", {
               id_case: this.id_case,
-              resources: resourcesIds,
+              success: true,
+              errors: false,
+              time: this.totalTime,
             })
             .then((response) => {
               if (response.status == 200) {
+                this.toogleTotalTime();
                 this.$http
-                  .post("/metacore/review", {
-                    id_case: response.data._id,
-                    success: true,
-                    errors: false,
-                    time: this.totalTime,
+                  .post("/progress/create", {
+                    id_student: this.user.student_id,
+                    id_course: this.$route.params.course,
+                    id_lesson: this.$route.params.lesson,
                   })
                   .then((response) => {
                     if (response.status == 200) {
-                      this.totalTime = 0;
-                      this.toogleTotalTime();
-                      this.$http
-                        .post("/progress/create", {
-                          id_student: this.user.student_id,
-                          id_course: this.$route.params.course,
-                          id_lesson: this.$route.params.lesson,
-                        })
-                        .then((response) => {
-                          if (response.status == 200) {
-                            this.$router.push(
-                              `/course/${this.$route.params.course}`
-                            );
-                          }
-                        })
-                        .catch((error) => {
-                          console.error(error.message);
-                        });
+                      this.$router.push(`/course/${this.$route.params.course}`);
                     }
                   })
                   .catch((error) => {
-                    console.log(error);
+                    console.error(error.message);
                   });
               }
             })
-            .catch((e) => {
-              console.error(e.message);
+            .catch((error) => {
+              console.log(error);
             });
         } else {
           if (this.inputFeedback < 4) {
@@ -499,8 +536,6 @@ export default {
 
           this.showFeedback = true;
           this.assessments = [];
-          this.nextStructure(0);
-          this.getAssessment();
         }
       } else {
         let args = {
@@ -514,59 +549,50 @@ export default {
         this.open(args);
       }
     },
-    getAssessment() {
-      this.$http
-        .get(`/assessment/one?lesson=${this.$route.params.lesson}`)
-        .then((response) => {
-          if (response.status == 200) {
-            this.assessment = response.data;
-            this.assessment.questions = this.shuffle(this.assessment.questions);
-          }
-        })
-        .catch((e) => {
-          console.error(e.message);
-        });
-    },
-    rebuild() {
+    async rebuild() {
       this.showFeedback = false;
-
-      let structureIds = this.lesson.structure.map((s) => s._id);
 
       let resourcesIds = this.lesson.structure.map((s) => {
         if (s.data) {
-          return { resource: s.data.resource._id, time_use: 0, rating: 0 };
+          return {
+            resource: s.data.resource._id,
+            time_use: s.data.time_use,
+            rating: s.data.rating,
+          };
         }
       });
 
-      this.$http
-        .post("/metacore/save", {
-          id_student: this.user.student_id,
-          id_course: this.$route.params.course,
-          id_lesson: this.$route.params.lesson,
-          structure: structureIds,
+      Promise.all([
+        this.$http.post("/metacore/update", {
+          id_case: this.id_case,
           resources: resourcesIds,
-        })
-        .then((response) => {
-          if (response.status == 200) {
-            this.nextStructure(0);
+        }),
+        this.$http.post("/metacore/review", {
+          id_case: this.id_case,
+          success: false,
+          error: true,
+          time: this.totalTime,
+        }),
+      ]).then(async (result) => {
+        console.log(result);
+        if (result && result.filter((r) => r.status == 200)) {
+          this.id_case = null;
 
-            this.id_case = response.data.id_case;
+          await this.$http.post("/history/update", {
+            id: this.progress[this.index]._id,
+            isBlock: true,
+          });
 
-            this.lesson.structure = this.lesson.structure.map((s, index) => {
-              if (index > 0) {
-                s.isBlock = true;
-              } else {
-                s.isBlock = false;
-              }
+          this.index = 0;
 
-              s.data = response.data.plan[index];
-              return s;
-            });
-          }
-        })
-        .catch((e) => {
-          console.error(e.message);
-        });
+          await this.$http.post("/history/update", {
+            id: this.progress[this.index]._id,
+            isBlock: false,
+          });
+
+          await this.getLesson();
+        }
+      });
     },
   },
 };

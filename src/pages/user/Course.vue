@@ -16,7 +16,7 @@
             <v-toolbar flat rounded>
               <v-toolbar-title>
                 <p class="font-weight-semibold display-5 mb-1">
-                    Panel Personal
+                  Panel Personal
                 </p>
               </v-toolbar-title>
 
@@ -29,7 +29,6 @@
           <v-col cols="8">
             <v-sheet rounded="lg">
               <v-list rounded color="transparent">
-
                 <v-list-item color="primary">
                   <v-list-item-content>
                     Curso: {{ course ? course.name : "" }}
@@ -41,10 +40,10 @@
                     v-for="(lesson, index) in course ? course.lessons : []"
                     :key="index"
                     link
-                    :disabled="progress[index].isActive"
+                    :disabled="progress[index] && progress[index].isActive"
                   >
                     <v-list-item-content>
-                      <v-list-item-icon v-if="progress[index].isActive">
+                      <v-list-item-icon v-if="progress[index] && progress[index].isActive">
                         <v-icon>mdi-disable</v-icon>
                       </v-list-item-icon>
                       <v-list-item-title>
@@ -58,7 +57,7 @@
                     <v-list-item-action>
                       <v-btn icon @click="goLesson(lesson._id)">
                         <v-icon
-                          v-if="!progress[index].isActive"
+                          v-if="progress[index] && !progress[index].isActive"
                           color="grey lighten-1"
                           >mdi-arrow-right</v-icon
                         >
@@ -93,25 +92,25 @@
 
                 <v-divider class="my-2"></v-divider>
 
-                 <v-list-item color="grey lighten-4">
+                <v-list-item color="grey lighten-4">
                   <v-list-item-content>
                     <v-list-item-title> Programa del curso </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
 
-                 <v-list-item color="grey lighten-4">
+                <v-list-item color="grey lighten-4">
                   <v-list-item-content>
                     <v-list-item-title> Metodología </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
 
-                 <v-list-item color="grey lighten-4">
+                <v-list-item color="grey lighten-4">
                   <v-list-item-content>
                     <v-list-item-title> Referencias </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
 
-                <br>
+                <br />
 
                 <v-list-item color="primary">
                   <v-list-item-content>
@@ -123,16 +122,19 @@
 
                 <v-list-item color="grey lighten-4">
                   <v-list-item-content>
-                    <v-list-item-title> ¿Necesitas ayuda con el sistema? </v-list-item-title>
+                    <v-list-item-title>
+                      ¿Necesitas ayuda con el sistema?
+                    </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
 
                 <v-list-item color="grey lighten-4">
                   <v-list-item-content>
-                    <v-list-item-title> Más recursos educativos </v-list-item-title>
+                    <v-list-item-title>
+                      Más recursos educativos
+                    </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-
               </v-list>
             </v-sheet>
           </v-col>
@@ -170,28 +172,32 @@ export default {
     this.getCourse();
   },
   methods: {
-    getCourse() {
+    async getCourse() {
       this.loading = true;
-      this.$http
-        .get(`/course/one?id=${this.$route.params.id}`)
-        .then((response) => {
-          this.course = response.data;
 
-          this.progress = [];
+      try {
+        var responseCourse = await this.$http.get(
+          `/course/one?id=${this.$route.params.id}`
+        );
 
-          this.course.lessons.map(async (lesson, index) => {
-            try {
-              let response = await this.$http.get("/progress/one", {
-                params: {
-                  student: this.user.student_id,
-                  course: this.$route.params.id,
-                  lesson: lesson._id,
-                },
-              });
+        this.course = responseCourse.data;
 
-              this.progress.push(response.data);
-            } catch (error) {
-              let progress = await this.$http.post("/progress/create", {
+        this.progress = [];
+
+        Promise.all(this.course.lessons.map(async (lesson, index) => {
+          try {
+
+            let responseProgress = await this.$http.get("/progress/one", {
+              params: {
+                student: this.user.student_id,
+                course: this.$route.params.id,
+                lesson: lesson._id,
+              },
+            });
+
+            this.progress.push(responseProgress.data);
+          } catch (error) {
+            let progress = await this.$http.post("/progress/create", {
                 student: this.user.student_id,
                 course: this.$route.params.id,
                 lesson: lesson._id,
@@ -199,19 +205,19 @@ export default {
               });
 
               this.progress.push(progress.data);
-            }
-          });
-
+          }
+        }))
+        .then(_ => {
           this.course.lessons = this.course.lessons.sort(
             (a, b) => (a.order > b.order && 1) || -1
           );
-
-          this.loading = false;
-        })
-        .catch((error) => {
-          this.loading = false;
-          console.log(error);
         });
+        
+      } catch (e) {
+        this.course = null;
+      }
+
+      this.loading = false;
     },
     goLesson(id) {
       this.$router.push(`/course/${this.course._id}/lesson/${id}`);
