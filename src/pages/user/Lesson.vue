@@ -590,7 +590,7 @@ export default {
             isBlock: false,
           });
 
-          await this.getLesson();
+          this.$router.push(`/course/${this.$route.params.course}`)
         }
       });
     },
