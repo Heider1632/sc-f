@@ -51,7 +51,7 @@ export default {
     computed: {
         ...mapState(['user', 'links']),
         name() {
-            if(this.user.name && this.user.lastname) {
+            if(this.user.roles.includes('ROLE_USER')) {
                 return  `${this.user.name} ${this.user.lastname}`
             } else if(this.user.roles.includes('ROLE_MODERATOR')) {
                 return "Profesor STI"

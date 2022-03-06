@@ -35,15 +35,15 @@
                   </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item-group v-model="selectedItem" color="primary">
+                <v-list-item-group color="primary">
                   <v-list-item
                     v-for="(lesson, index) in course ? course.lessons : []"
                     :key="index"
                     link
-                    :disabled="progress[index] && progress[index].isActive"
+                    :disabled="progress[index] && progress.filter((x) => x.lesson == lesson._id)[0].isActive"
                   >
                     <v-list-item-content>
-                      <v-list-item-icon v-if="progress[index] && progress[index].isActive">
+                      <v-list-item-icon v-if="progress[index] && progress.filter((x) => x.lesson == lesson._id)[0].isActive">
                         <v-icon>mdi-disable</v-icon>
                       </v-list-item-icon>
                       <v-list-item-title>
@@ -57,7 +57,7 @@
                     <v-list-item-action>
                       <v-btn icon @click="goLesson(lesson._id)">
                         <v-icon
-                          v-if="progress[index] && !progress[index].isActive"
+                          v-if="progress[index] && !progress.filter((x) => x.lesson == lesson._id)[0].isActive"
                           color="grey lighten-1"
                           >mdi-arrow-right</v-icon
                         >
@@ -153,7 +153,6 @@ export default {
   name: "Course",
   data: () => ({
     rating: 0,
-    selectedItem: 0,
     loading: false,
     course: null,
     types: {
@@ -168,7 +167,7 @@ export default {
   computed: {
     ...mapState(["user"]),
   },
-  mounted() {
+  created() {
     this.getCourse();
   },
   methods: {
@@ -194,6 +193,8 @@ export default {
                 lesson: lesson._id,
               },
             });
+
+            console.log(responseProgress);
 
             this.progress.push(responseProgress.data);
           } catch (error) {

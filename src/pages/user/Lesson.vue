@@ -51,11 +51,11 @@
                       ? lesson.structure
                       : []"
                     :key="structure.id"
-                    :disabled="progress[indice] && progress[indice].isBlock"
+                    :disabled="progress[indice] && progress.filter((x) => x.structure == structure._id)[0].isBlock"
                   >
                     <v-list-item-content>
                       <v-list-item-icon
-                        v-if="progress[indice] && progress[indice].isBlock"
+                        v-if="progress[indice] && progress.filter((x) => x.structure == structure._id)[0].isBlock"
                       >
                         <v-icon>mdi-disable</v-icon>
                       </v-list-item-icon>
@@ -75,7 +75,7 @@
                         dark
                         elevation="0"
                         @click="finish"
-                        v-if="progress[index] && progress[index].index === 5"
+                        v-if="progress[getIndex] && progress[getIndex].index === 5"
                       >
                         Finalizar
                         <v-icon>mdi-check</v-icon>
@@ -125,8 +125,8 @@
                 <v-card-title>
                   <template
                     v-if="
-                      lesson.structure[index] &&
-                      lesson.structure[index].type == 'evaluation' &&
+                      lesson.structure[getIndex] &&
+                      lesson.structure[getIndex].type == 'evaluation' &&
                       assessment
                     "
                   >
@@ -134,9 +134,9 @@
                   </template>
                   <template v-else>
                     {{
-                      lesson.structure[index].data &&
-                      lesson.structure[index].data.resource.description
-                        ? lesson.structure[index].data.resource.description
+                      lesson.structure[getIndex].data &&
+                      lesson.structure[getIndex].data.resource.description
+                        ? lesson.structure[getIndex].data.resource.description
                         : ""
                     }}
                     - {{ time }}
@@ -147,8 +147,8 @@
                   <div class="text-center">
                     <template
                       v-if="
-                        lesson.structure[index] &&
-                        lesson.structure[index].type == 'evaluation' &&
+                        lesson.structure[getIndex] &&
+                        lesson.structure[getIndex].type == 'evaluation' &&
                         assessment
                       "
                     >
@@ -175,8 +175,8 @@
                       <video-embed
                         :params="{ autoplay: 1 }"
                         :src="
-                          lesson.structure[index].data &&
-                          lesson.structure[index].data.resource.url
+                          lesson.structure[getIndex].data &&
+                          lesson.structure[getIndex].data.resource.url
                         "
                       ></video-embed>
                     </template>
@@ -189,14 +189,14 @@
                       shrink
                       class="mr-5"
                       align-items-center
-                      v-if="lesson.structure[index].data"
+                      v-if="lesson.structure[getIndex].data"
                     >
                       <h4 class="display-5">
                         ¿Qué tal útil te parecio este recurso? 😊
                       </h4>
                     </v-flex>
 
-                    <v-flex shrink v-if="lesson.structure[index].data">
+                    <v-flex shrink v-if="lesson.structure[getIndex].data">
                       <v-rating
                         v-model="rating"
                         background-color="orange lighten-3"
@@ -220,7 +220,6 @@ import { mapState, mapMutations, mapGetters } from "vuex";
 export default {
   name: "Lesson",
   data: () => ({
-    index: 0,
     rating: 0,
     loading: false,
     lesson: null,
@@ -239,7 +238,6 @@ export default {
     note: 0,
     isLoading: false,
     showFeedback: false,
-    id_case: null,
     time: 0,
     totalTime: 0,
     isRunning: false,
@@ -247,12 +245,12 @@ export default {
     interval: null,
     intervalTotal: null,
   }),
-  mounted() {
+  created() {
     this.getLesson();
   },
   computed: {
     ...mapState(["user"]),
-    ...mapGetters("lesson", ["getCurrentFeedback", "getTrace"]),
+    ...mapGetters("lesson", ["getCurrentFeedback", "getTrace", "getIdCase", "getIndex"]),
     inputFeedback: {
       get() {
         return this.getCurrentFeedback;
@@ -263,7 +261,7 @@ export default {
     },
   },
   methods: {
-    ...mapMutations("lesson", ["nextFeedback", "setTrace"]),
+    ...mapMutations("lesson", ["nextFeedback", "setTrace", "setIdCase", "setIndex"]),
     ...mapMutations("notification", ["open"]),
     toogleTotalTime() {
       if (this.isRunningTotal) {
@@ -348,6 +346,9 @@ export default {
             }
           })
         ).then(async (_) => {
+
+          this.setIndex(this.progress.filter((p) => p.isBlock === false)[0].index);
+          
           await this.getResources();
           await this.getAssessment();
         });
@@ -358,9 +359,8 @@ export default {
       this.loading = false;
     },
     async getResources() {
-      if (this.id_case == null) {
+      if (this.getIdCase == null) {
 
-        
         let structureIds = this.lesson.structure.map((s) => s._id);
 
         let response = await this.$http.post("/metacore/initial", {
@@ -370,7 +370,21 @@ export default {
           structure: structureIds,
         });
 
-        this.id_case = response.data.id_case;
+        this.setIdCase(response.data.id_case);
+
+        this.lesson.structure = this.lesson.structure.map((s, index) => {
+          s.data = response.data.plan[index];
+          return s;
+        });
+      } else {
+
+        console.log('se selecciona el caso');
+
+        let response = await this.$http.get("/metacore/one", {
+          id: this.getIdCase
+        });
+
+        console.log(response);
 
         this.lesson.structure = this.lesson.structure.map((s, index) => {
           s.data = response.data.plan[index];
@@ -394,12 +408,12 @@ export default {
       }
     },
     async skip() {
-      if (this.index < this.lesson.structure.length) {
-        this.index = this.progress.filter((p) => p.isBlock === false)[0].index;
+      if (this.getIndex < this.lesson.structure.length) {
+        this.setIndex(this.progress.filter((p) => p.isBlock === false)[0].index);
 
         try {
-          this.lesson.structure[this.index].data.time_use = this.time;
-          this.lesson.structure[this.index].data.rating = this.rating;
+          this.lesson.structure[this.getIndex].data.time_use = this.time;
+          this.lesson.structure[this.getIndex].data.rating = this.rating;
 
           let resourcesIds = this.lesson.structure.map((s) => {
             if (s.data) {
@@ -408,8 +422,8 @@ export default {
           });
 
           this.assessments.push({
-            time_use: this.lesson.structure[this.index].data.time_use,
-            like: this.lesson.structure[this.index].data.rating,
+            time_use: this.lesson.structure[this.getIndex].data.time_use,
+            like: this.lesson.structure[this.getIndex].data.rating,
           });
 
           if (this.assessments.length == 1) {
@@ -435,22 +449,22 @@ export default {
           }
 
           let response = await this.$http.post("/history/update", {
-            id: this.progress[this.index]._id,
+            id: this.progress[this.getIndex]._id,
             isBlock: true,
           });
 
           if (response && response.data) {
-            this.progress[this.index].isBlock = true;
+            this.progress[this.getIndex].isBlock = true;
 
             let history = await this.$http.post("/history/update", {
-              id: this.progress[this.index + 1]._id,
+              id: this.progress[this.getIndex + 1]._id,
               isBlock: false,
             });
 
             if (history && history.data) {
               this.rating = 0;
               this.toggleTimer();
-              this.progress[this.index + 1].isBlock = false;
+              this.progress[this.getIndex + 1].isBlock = false;
               this.toggleTimer();
             }
           }
@@ -484,13 +498,13 @@ export default {
 
         Promise.all([
           this.$http.post("/metacore/history", {
-            id_case: this.id_case,
+            id_case: this.getIdCase,
             id_student: this.user.student_id,
             was: this.note == 5 ? "success" : "error",
             note: this.note,
           }),
           this.$http.post("/metacore/update", {
-            id_case: this.id_case,
+            id_case: this.getIdCase,
             resources: resourcesIds,
           }),
         ]).then((response) => {
@@ -500,7 +514,7 @@ export default {
         if (this.note == 5) {
           this.$http
             .post("/metacore/review", {
-              id_case: this.id_case,
+              id_case: this.getIdCase,
               success: true,
               errors: false,
               time: this.totalTime,
@@ -564,29 +578,28 @@ export default {
 
       Promise.all([
         this.$http.post("/metacore/update", {
-          id_case: this.id_case,
+          id_case: this.getIdCase,
           resources: resourcesIds,
         }),
         this.$http.post("/metacore/review", {
-          id_case: this.id_case,
+          id_case: this.getIdCase,
           success: false,
           error: true,
           time: this.totalTime,
         }),
       ]).then(async (result) => {
-        console.log(result);
         if (result && result.filter((r) => r.status == 200)) {
-          this.id_case = null;
+          this.setIdCase(null)
 
           await this.$http.post("/history/update", {
-            id: this.progress[this.index]._id,
+            id: this.progress[this.getIndex]._id,
             isBlock: true,
           });
 
-          this.index = 0;
+          this.setIndex(0);
 
           await this.$http.post("/history/update", {
-            id: this.progress[this.index]._id,
+            id: this.progress[this.getIndex]._id,
             isBlock: false,
           });
 
