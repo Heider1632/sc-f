@@ -148,7 +148,7 @@
   </v-main>
 </template>
 <script>
-import { mapState } from "vuex";
+import { mapMutations, mapState } from "vuex";
 export default {
   name: "Course",
   data: () => ({
@@ -171,6 +171,8 @@ export default {
     this.getCourse();
   },
   methods: {
+    ...mapMutations("lesson", ["setIdCase"]),
+    ...mapMutations("course",  ["setLessons"]),
     async getCourse() {
       this.loading = true;
 
@@ -180,6 +182,8 @@ export default {
         );
 
         this.course = responseCourse.data;
+
+
 
         this.progress = [];
 
@@ -193,8 +197,6 @@ export default {
                 lesson: lesson._id,
               },
             });
-
-            console.log(responseProgress);
 
             this.progress.push(responseProgress.data);
           } catch (error) {
@@ -212,6 +214,16 @@ export default {
           this.course.lessons = this.course.lessons.sort(
             (a, b) => (a.order > b.order && 1) || -1
           );
+
+          this.progress.map(p => {
+            this.course.lessons.map((l, index) => {
+              if(l._id == p.lesson){
+                this.course.lessons[index].isActive = p.isActive
+              }
+            })
+          })
+
+          this.setLessons(this.course.lessons);
         });
         
       } catch (e) {
