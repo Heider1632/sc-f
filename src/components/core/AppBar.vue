@@ -11,7 +11,7 @@
             <v-menu >
                 <template v-slot:activator="{ on }">
                     <v-btn text class="purple--text display-5" v-on="on">
-                        {{ name }}
+                        {{ name }} {{ user.learningStyleDimensions.map(ls => ls.name) }}
                     </v-btn>
                 </template>
 
