@@ -22,4 +22,4 @@ axios.interceptors.request.use(
     }
 );
 
-axios.defaults.baseURL = process.env.NODE_ENV === 'production' ? 'http://http://153.92.214.161:3000/api' : 'http://localhost:3000/api';
+axios.defaults.baseURL = process.env.NODE_ENV === 'production' ? 'http://stib.proyectosifilisgestasionaria.com/' : 'http://localhost:3000/api';
