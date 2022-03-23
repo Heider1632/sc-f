@@ -125,9 +125,12 @@
                 class="grey lighten-4"
                 v-if="showFeedback"
               >
-                <v-layout justify-center align-center>
+                <v-layout column justify-center align-center>
                   <v-flex>
-                    {{ this.assessment.feedbacks[inputFeedback].name }}
+                    <p class="subtitle mb-2"> Retroalimentacion general: {{ this.assessment.feedback }} </p>
+                  </v-flex>
+                  <v-flex v-for="(feedback, key) in feedbacks" :key="`feedback-${key}`">
+                    <p class="subtitle mb-2"> Retroalimentacion {{ key  + 1 }}: {{ feedback.name }} </p>
                   </v-flex>
                   <v-flex>
                     <v-btn block color="primary" @click="rebuild"
@@ -186,12 +189,13 @@
                           lazy-validation
                         >
                           <template
-                            v-for="(question, key) in assessment.questions"
+                            v-for="(question, key) in questions"
                           >
+                            <p class="subtitle text-justify" :key="`title-${key}`"> {{ question.name }} </p>
                             <v-select
-                              :key="key"
+                              :key="`question-${key}`"
                               outlined
-                              :label="question.name"
+                              
                               v-model="question.user"
                               :items="question.options"
                               item-text="label"
@@ -337,6 +341,8 @@ export default {
     progress: [],
     assessments: [],
     assessment: null,
+    questions: [],
+    feedbacks: [],
     logs: [],
     note: 0,
     isLoading: false,
@@ -529,14 +535,36 @@ export default {
       this.toggleTimer();
       this.toogleTotalTime();
     },
+    checkNotRepeat(current) {
+
+      let isValid = this.questions.filter((q) =>
+        q.name == current.name  
+      )
+
+      return isValid.length > 0
+    },
+    getRandom(NUMBERS_LENGTH) {
+      return Math.floor(Math.random() * NUMBERS_LENGTH)
+    },
     async getAssessment() {
+
       try {
         let response = await this.$http.get(
           `/assessment/one?lesson=${this.$route.params.lesson}`
         );
 
         this.assessment = response.data;
-        this.assessment.questions = this.shuffle(this.assessment.questions);
+
+        this.questions = []
+
+        while(this.questions.length < 5){
+          const randomIndex = this.getRandom(this.assessment.questions.length);
+
+          if (!this.checkNotRepeat(this.assessment.questions[randomIndex])){
+            this.questions.push(this.assessment.questions[randomIndex]);
+          }
+        }
+
       } catch (e) {
         console.log(e);
       }
@@ -656,6 +684,10 @@ export default {
           if (as.response == as.user) {
             let note = 5 / this.assessment.questions.length;
             sum = sum + note;
+          } else {
+            if(as.feedbacks.length > 0){
+              this.feedbacks.push(as.feedbacks[0]);
+            }
           }
         });
 
@@ -786,12 +818,6 @@ export default {
 
           
         } else {
-          if (this.inputFeedback < 4) {
-            this.nextFeedback(this.inputFeedback + 1);
-          } else {
-            this.nextFeedback(0);
-          }
-
           this.showFeedback = true;
           this.assessments = [];
         }
@@ -860,6 +886,7 @@ export default {
             this.setConfirm(true);
           });
 
+          this.feedbacks = [];
           this.$router.push(`/course/${this.$route.params.course}`);
         }
       });
