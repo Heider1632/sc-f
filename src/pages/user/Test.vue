@@ -179,7 +179,7 @@ export default {
                 this.$http.post('/test/user/update', { learningStyle: learningStyle, student: this.user.student_id })
                 .then(response => {
                     if(response.status == 200){
-                        this.$router.push('/');
+                        this.$router.push('/home');
                     } else {
                         let args = {
                             color: "error",
