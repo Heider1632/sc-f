@@ -486,7 +486,7 @@ export default {
                 course: this.$route.params.course,
                 lesson: this.$route.params.lesson,
                 structure: structure._id,
-                isBlock: index == 0 ? false : true,
+                isBlock: index == 3 ? false : true,
                 index: index,
               });
 
