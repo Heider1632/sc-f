@@ -614,11 +614,13 @@ export default {
             });
           }
 
-          let resourcesIds = this.lesson.structure.filter((s) => {
+          let resourcesIds = this.lesson.structure.map((s) => {
             if (s.data) {
               return s.data.resource._id;
             }
           });
+
+          resourcesIds = resourcesIds.filter(rs => rs != undefined);
 
           if (this.assessments.length == 1) {
             let response = await this.$http.post("/trace/create", {
@@ -672,17 +674,21 @@ export default {
       let valid = this.$refs.forminterview.validate();
 
       if (valid) {
-        let resourcesIds = this.lesson.structure.filter((s) => {
+        let resourcesIds = this.lesson.structure.map((s) => {
           if (s.data) {
             return s.data;
           }
         });
 
+        resourcesIds = resourcesIds.filter(ri => ri != undefined);
+
+        console.log(resourcesIds);
+
         let sum = 0;
 
-        this.assessment.questions.map((as) => {
+        this.questions.map((as) => {
           if (as.response == as.user) {
-            let note = 5 / this.assessment.questions.length;
+            let note = 5 / this.questions.length;
             sum = sum + note;
           } else {
             if(as.feedbacks.length > 0){
@@ -701,7 +707,7 @@ export default {
           }
         });
 
-        Promise.all([
+        await Promise.all([
           this.$http.post("/metacore/history", {
             id_case: this.getIdCase,
             id_student: this.user.student_id,
@@ -717,7 +723,7 @@ export default {
         });
 
         if (this.note == 5 && this.isValid) {
-          this.$http
+                  this.$http
             .post("/metacore/review", {
               id_case: this.getIdCase,
               success: true,
@@ -734,6 +740,7 @@ export default {
                 );
 
                 if (currentLesson.length > 0) {
+
                   currentLesson = currentLesson[0];
 
                   let response = await this.$http.post("/progress/update", {
@@ -742,14 +749,16 @@ export default {
                   });
 
                   if (response.status == 200) {
-                    //paso a activar la siguiente leccion
 
                     if (
                       this.getLessons.indexOf(currentLesson) <
                       this.getLessons.length - 1
                     ) {
+
+                      let index = this.getLessons.indexOf(currentLesson);
+
                       let result = await this.$http.post("/progress/update", {
-                        id: currentLesson._id,
+                        id: this.getLessons[index + 1]._id,
                         isActive: false,
                       });
 
@@ -758,6 +767,10 @@ export default {
                           `/course/${this.$route.params.course}`
                         );
                       }
+                    } else {
+                      this.$router.push(
+                        `/course/${this.$route.params.course}`
+                      );
                     }
                   }
                 }
@@ -795,19 +808,39 @@ export default {
                   if (response.status == 200) {
                     //paso a activar la siguiente leccion
 
+                    currentLesson = currentLesson[0];
+
+                  let response = await this.$http.post("/progress/update", {
+                    id: currentLesson._id,
+                    isActive: true,
+                  });
+
+                  if (response.status == 200) {
+                    //paso a activar la siguiente leccion
+
                     if (
                       this.getLessons.indexOf(currentLesson) <
                       this.getLessons.length - 1
                     ) {
+
+                      let index = this.getLessons.indexOf(currentLesson);
+
                       let result = await this.$http.post("/progress/update", {
-                        id: currentLesson._id,
+                        id: this.getLessons[index + 1]._id,
                         isActive: false,
                       });
 
                       if (result.status == 200) {
-                        this.$router.push(`/course/${this.$route.params.course}`);
+                        this.$router.push(
+                          `/course/${this.$route.params.course}`
+                        );
                       }
+                    } else {
+                      this.$router.push(
+                        `/course/${this.$route.params.course}`
+                      );
                     }
+                  }
                   }
                 }
               }
@@ -818,8 +851,21 @@ export default {
 
           
         } else {
-          this.showFeedback = true;
-          this.assessments = [];
+
+          this.$http.post("/metacore/review", {
+              id_case: this.getIdCase,
+              success: false,
+              error: true,
+              time: this.totalTime,
+            }).then(async (result) => {
+             if (result.status == 200) {
+                this.toogleTotalTime();
+                this.setIdCase(null);
+                this.showFeedback = true;
+                this.assessments = [];
+             }
+          })
+          
         }
       } else {
         let args = {
@@ -837,59 +883,33 @@ export default {
       this.setConfirm(true);
       this.showFeedback = false;
 
-      let resourcesIds = this.lesson.structure.map((s) => {
-        if (s.data) {
-          return {
-            resource: s.data.resource._id,
-            time_use: s.data.time_use,
-            rating: s.data.rating,
-          };
-        }
+      await this.$http.post("/history/update", {
+        id: this.progress.filter((f) => f.index == 0)._id,
+        isBlock: false,
       });
 
-      Promise.all([
-        this.$http.post("/metacore/update", {
-          id_case: this.getIdCase,
-          resources: resourcesIds,
-        }),
-        this.$http.post("/metacore/review", {
-          id_case: this.getIdCase,
-          success: false,
-          error: true,
-          time: this.totalTime,
-        }),
-      ]).then(async (result) => {
-        if (result && result.filter((r) => r.status == 200)) {
-          this.setIdCase(null);
-
-          await this.$http.post("/history/update", {
-            id: this.progress.filter((f) => f.index == 0)._id,
-            isBlock: false,
-          });
-
-          await Promise.all(
-            this.progress.map(async (p, index) => {
-              if (p.index != 0) {
-                return await this.$http.post("/history/update", {
-                  id: p._id,
-                  isBlock: true,
-                });
-              } else {
-                return await this.$http.post("/history/update", {
-                  id: p._id,
-                  isBlock: false,
-                });
-              }
-            })
-          ).then((response) => {
-            this.skipProgress();
-            this.setConfirm(true);
-          });
-
-          this.feedbacks = [];
-          this.$router.push(`/course/${this.$route.params.course}`);
-        }
+      await Promise.all(
+        this.progress.map(async (p, index) => {
+          if (p.index != 0) {
+            return await this.$http.post("/history/update", {
+              id: p._id,
+              isBlock: true,
+            });
+          } else {
+            return await this.$http.post("/history/update", {
+              id: p._id,
+              isBlock: false,
+            });
+          }
+        })
+      ).then((response) => {
+        this.skipProgress();
+        this.setConfirm(true);
       });
+
+      this.feedbacks = [];
+      this.$router.push(`/course/${this.$route.params.course}`);
+        
     },
     async test() {
       await Promise.all(
