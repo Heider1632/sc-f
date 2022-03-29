@@ -2,16 +2,16 @@
     <v-app-bar id="core-app-bar" fixed app elevate-on-scroll color="white" flat >
         <v-container class="py-0 fill-height">
 
-            <img class="mr-3" :src="require('@/assets/images/logo-its.png')" height="40"/>
+            <img class="mr-3 hidden-sm-and-down" :src="require('@/assets/images/logo-its.png')" height="40"/>
 
-             <img class="mr-3" :src="require('@/assets/images/unicordoba-header.png')" height="40"/>
+             <img class="mr-3 hidden-xs" :src="require('@/assets/images/unicordoba-header.png')" height="40"/>
 
             <v-spacer></v-spacer>
 
-            <v-menu >
+            <v-menu>
                 <template v-slot:activator="{ on }">
                     <v-btn text class="purple--text display-5" v-on="on">
-                        {{ name }} {{ user.learningStyleDimensions.map(ls => ls.name) }}
+                        {{ name }}
                     </v-btn>
                 </template>
 
@@ -28,9 +28,6 @@
                 </v-list>
             </v-menu>
 
-            <v-btn text class="purple--text display-5">
-                <v-icon>mdi-home</v-icon>
-            </v-btn>
         </v-container>
     </v-app-bar>
 </template>
@@ -85,5 +82,18 @@ export default {
 
 #core-app-bar a {
   text-decoration: none;
+}
+
+html {
+    font-size: 90%;
+    @media only screen and (min-width: 600px) {
+        font-size: 50%;
+    }
+    @media only screen and (min-width: 1000px) {
+        font-size: 98%;
+    }
+    @media only screen and (min-width: 1200px) {
+        font-size: 100%;
+    }
 }
 </style>

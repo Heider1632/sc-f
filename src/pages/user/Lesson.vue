@@ -12,7 +12,7 @@
       </template>
       <template v-else>
         <v-row v-if="lesson">
-          <v-col cols="12">
+          <v-col md="12" sm="12">
             <v-toolbar flat rounded>
               <v-toolbar-title>
                 <p class="font-weight-semibold mb-1">
@@ -29,7 +29,7 @@
 
               <div class="flex-grow-1"></div>
 
-              <v-breadcrumbs :items="getLessons">
+              <v-breadcrumbs :items="getLessons" class="hidden-sm-and-down">
                 <template v-slot:item="{ item }">
                   <v-breadcrumbs-item
                     :class="item._id == $route.params.lesson ? 'red--text' : ''"
@@ -42,7 +42,7 @@
             </v-toolbar>
           </v-col>
 
-          <v-col cols="4">
+          <v-col lg="4" md="4" sm="4" cols="12">
             <div class="mb-1">
               <v-toolbar flat rounded prominent>
                 <v-layout column wrap align-content-space-around align-start>
@@ -65,7 +65,7 @@
             </div>
           </v-col>
 
-          <v-col cols="8">
+          <v-col lg="8" md="8" sm="8" cols="12">
             <v-toolbar flat rounded prominent>
               <v-spacer></v-spacer>
 
@@ -78,7 +78,7 @@
             </v-toolbar>
           </v-col>
 
-          <v-col cols="4">
+          <v-col lg="4" md="4" sm="4" cols="12">
             <v-sheet rounded="lg">
               <v-list rounded color="transparent">
                 <v-list-item-group color="primary" v-model="inputIndex">
@@ -117,7 +117,7 @@
             </v-sheet>
           </v-col>
 
-          <v-col cols="8">
+          <v-col lg="8" md="8" sm="8" cols="12">
             <v-sheet min-height="60vh" rounded="lg">
               <v-container
                 fluid

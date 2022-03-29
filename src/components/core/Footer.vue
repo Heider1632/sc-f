@@ -12,7 +12,7 @@
     <v-container>
       <v-row>
         <v-col cols="2">
-          <v-img :src="require('@/assets/images/unicor.png')" />
+          <v-img class="hidden-sm-and-down" :src="require('@/assets/images/unicor.png')" />
         </v-col>
         <v-col cols="10">
           <v-card flat tile class="white--text text-center pa-3">
