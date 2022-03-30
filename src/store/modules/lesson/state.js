@@ -3,5 +3,9 @@ export default {
     trace: null,
     id_case: null,
     index: 0,
-    confirm: true
+    confirm: true,
+    assessments: [],
+    progress: [],
+    showFinishButton: false,
+    showBackButton: false,
 }

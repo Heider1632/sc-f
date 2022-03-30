@@ -40,10 +40,10 @@
                     v-for="(lesson, index) in course ? course.lessons : []"
                     :key="index"
                     link
-                    :disabled="progress[index] && progress.filter((x) => x.lesson == lesson._id)[0].isActive"
+                    :disabled="progress[index] && progress.filter((x) => x.lesson == lesson._id)[0] && progress.filter((x) => x.lesson == lesson._id)[0].isActive"
                   >
                     <v-list-item-content>
-                      <v-list-item-icon v-if="progress[index] && progress.filter((x) => x.lesson == lesson._id)[0].isActive">
+                      <v-list-item-icon v-if="progress[index] && progress.filter((x) => x.lesson == lesson._id)[0] && progress.filter((x) => x.lesson == lesson._id)[0].isActive">
                         <v-icon>mdi-disable</v-icon>
                       </v-list-item-icon>
                       <v-list-item-title>
@@ -57,7 +57,7 @@
                     <v-list-item-action>
                       <v-btn icon @click="goLesson(lesson._id)">
                         <v-icon
-                          v-if="progress[index] && !progress.filter((x) => x.lesson == lesson._id)[0].isActive"
+                          v-if="progress[index] && progress.filter((x) => x.lesson == lesson._id)[0] && !progress.filter((x) => x.lesson == lesson._id)[0].isActive"
                           color="grey lighten-1"
                           >mdi-arrow-right</v-icon
                         >
