@@ -38,14 +38,12 @@ export default {
     createAsyncProgress({ commit }, params) {
         return new Promise((resolve, reject) => {
             axios.post("/history/create", {
-                params: {
-                    student: params.student,
-                    course: params.course,
-                    lesson: params.lesson,
-                    structure: params.structure,
-                    isBlock: params.isBlock,
-                    index: params.index,
-                  }
+                student: params.student,
+                course: params.course,
+                lesson: params.lesson,
+                structure: params.structure,
+                isBlock: params.isBlock,
+                index: params.index,
             }).then(response => {
                 commit('pushProgress', response.data);
                 resolve(response);
