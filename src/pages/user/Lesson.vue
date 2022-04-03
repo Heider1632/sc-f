@@ -124,7 +124,9 @@
                     <v-layout column justify-center align-center>
                       <v-flex>
                         <v-alert type="error">
-                          Obtuviste el {{ percentage }}% en la calificación. Te invitamos a repetir la unidad para mejorar este porcentaje ¡Ánimo!
+                          Obtuviste el {{ percentage }}% en la calificación. Te
+                          invitamos a repetir la unidad para mejorar este
+                          porcentaje ¡Ánimo!
                         </v-alert>
                         <p class="subtitle mb-2">
                           Retroalimentacion general: {{ assessment.feedback }}
@@ -162,7 +164,6 @@
                 v-else
               >
                 <v-card-text class="justify-center">
-                  
                   <div class="text-center">
                     <template
                       v-if="
@@ -218,7 +219,6 @@
                       </template>
                     </template>
                     <template v-else>
-                      
                       <video-embed
                         v-if="
                           lesson.structure[inputIndex] &&
@@ -293,7 +293,7 @@
                   @click="back"
                   v-if="
                     getProgress[inputIndex] &&
-                    getProgress[inputIndex].index != 0 && 
+                    getProgress[inputIndex].index != 0 &&
                     getProgress[inputIndex].index != 5
                   "
                 >
@@ -449,7 +449,10 @@ export default {
   },
   watch: {
     inputIndex(val) {
-      if(this.lesson.structure[val].data && this.lesson.structure[val].data.rating != 0){
+      if (
+        this.lesson.structure[val].data &&
+        this.lesson.structure[val].data.rating != 0
+      ) {
         this.rating = this.lesson.structure[val].data.rating;
       } else {
         this.rating = 0;
@@ -725,8 +728,10 @@ export default {
             }
 
             //TODO: update in vuex
-            this.setAsyncProgress({ id: this.getProgress[this.inputIndex + 1]._id, index: this.inputIndex + 1 });
-            
+            this.setAsyncProgress({
+              id: this.getProgress[this.inputIndex + 1]._id,
+              index: this.inputIndex + 1,
+            });
 
             this.rating = 0;
             this.toggleTimer();
@@ -775,7 +780,7 @@ export default {
 
         this.note = sum;
 
-        this.percentage = this.note * 100 / 5;
+        this.percentage = (this.note * 100) / 5;
 
         this.getAssessments.forEach((as) => {
           if (as.time_use > 60 && as.like > 3) {
@@ -850,7 +855,6 @@ export default {
                       });
 
                       if (result.status == 200) {
-                        
                         this.$router.push(
                           `/course/${this.$route.params.course}`
                         );
@@ -893,12 +897,14 @@ export default {
                   if (response.status == 200) {
                     //paso a activar la siguiente leccion
 
-                    currentLesson = currentLesson[0];
+                    if (currentLesson.index < 4) {
+                      let index = this.getLessons.indexOf(currentLesson);
 
-                    let response = await this.$http.post("/progress/update", {
-                      id: currentLesson._id,
-                      isActive: true,
-                    });
+                      await this.$http.post("/progress/update", {
+                        id: this.getLessons[index + 1]._id,
+                        isActive: false,
+                      });
+                    }
 
                     let args = {
                       color: "success",
@@ -912,31 +918,7 @@ export default {
                     this.setAssessments([]);
                     this.setProgress([]);
 
-                    if (response.status == 200) {
-                      //paso a activar la siguiente leccion
-
-                      if (
-                        this.getLessons.indexOf(currentLesson) <
-                        this.getLessons.length - 1
-                      ) {
-                        let index = this.getLessons.indexOf(currentLesson);
-
-                        let result = await this.$http.post("/progress/update", {
-                          id: this.getLessons[index + 1]._id,
-                          isActive: false,
-                        });
-
-                        if (result.status == 200) {
-                          this.$router.push(
-                            `/course/${this.$route.params.course}`
-                          );
-                        }
-                      } else {
-                        this.$router.push(
-                          `/course/${this.$route.params.course}`
-                        );
-                      }
-                    }
+                    this.$router.push(`/course/${this.$route.params.course}`);
                   }
                 }
               }
@@ -1017,13 +999,13 @@ export default {
       ).then((response) => {
         console.log(response);
         this.reorderProgress();
-        response.map(r => {
-          if(r.data.index == 5){
+        response.map((r) => {
+          if (r.data.index == 5) {
             this.updateProgress({ index: r.data.index, isBlock: false });
           } else {
             this.updateProgress({ index: r.data.index, isBlock: true });
           }
-        })
+        });
 
         this.setConfirm(false);
       });
