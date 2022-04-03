@@ -448,8 +448,14 @@ export default {
     },
   },
   watch: {
-    inputIndex(oldValue, newValue) {
-      if (newValue == 5) {
+    inputIndex(val) {
+      if(this.lesson.structure[val].data && this.lesson.structure[val].data.rating != 0){
+        this.rating = this.lesson.structure[val].data.rating;
+      } else {
+        this.rating = 0;
+      }
+
+      if (val == 5) {
         this.setConfirm(true);
       }
     },
