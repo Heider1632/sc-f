@@ -152,7 +152,7 @@
               <v-card
                 elevation="0"
                 :height="
-                  progress[inputIndex] && progress[inputIndex].index === 5
+                  getProgress[inputIndex] && getProgress[inputIndex].index === 5
                     ? '65vh'
                     : !getConfirm
                     ? '50vh'
@@ -389,8 +389,6 @@ export default {
       evaluation: "Evaluación",
     },
     isValid: false,
-    progress: [],
-    assessments: [],
     assessment: null,
     questions: [],
     feedbacks: [],
@@ -468,10 +466,12 @@ export default {
       "setIdCase",
       "setIndex",
       "setConfirm",
-      "setAssessment",
+      "setAssessments",
+      "reorderProgress",
       "pushAssessment",
       "setProgress",
       "pushProgress",
+      "updateProgress",
       "setShowFinishButton",
       "setShowBackButton",
     ]),
@@ -552,7 +552,7 @@ export default {
         this.lesson = response.data;
 
         this.setProgress([]);
-        this.setAssessment([]);
+        this.setAssessments([]);
 
         Promise.all(
           this.lesson.structure.map(async (structure, index) => {
@@ -582,11 +582,14 @@ export default {
             lesson: this.$route.params.lesson,
           }).then(
             (response) => {
-              if (response.length > 0) {
-              } else {
-                this.inputIndex = 0;
-              }
-              console.log(response);
+              // console.log(response);
+              // if (response.data.length > 0) {
+              //   let last = response.data[response.data.length - 1];
+              //   this.inputIndex = last.assessments.length;
+              // } else {
+              //   this.inputIndex = 0;
+              // }
+              this.inputIndex = 0;
             },
             (error) => {
               console.log(error.message);
@@ -672,6 +675,8 @@ export default {
           this.setConfirm(true);
         }
 
+        this.reorderProgress();
+
         if (this.lesson.structure[this.inputIndex].data.rating != 0) {
           try {
             if (this.lesson.structure[this.inputIndex].data) {
@@ -714,7 +719,7 @@ export default {
             }
 
             //TODO: update in vuex
-            this.setAsyncProgress({ index: this.inputIndex + 1, isBlock: false });
+            this.setAsyncProgress({ id: this.getProgress[this.inputIndex + 1]._id, index: this.inputIndex + 1 });
             
 
             this.rating = 0;
@@ -766,7 +771,7 @@ export default {
 
         this.percentage = this.note * 100 / 5;
 
-        this.assessments.forEach((as) => {
+        this.getAssessments.forEach((as) => {
           if (as.time_use > 60 && as.like > 3) {
             this.isValid = true;
           } else {
@@ -823,7 +828,7 @@ export default {
                   };
 
                   this.open(args);
-                  this.setAssessment([]);
+                  this.setAssessments([]);
                   this.setProgress([]);
 
                   if (response.status == 200) {
@@ -898,7 +903,7 @@ export default {
                     };
 
                     this.open(args);
-                    this.setAssessment([]);
+                    this.setAssessments([]);
                     this.setProgress([]);
 
                     if (response.status == 200) {
@@ -980,9 +985,9 @@ export default {
             });
           }
         })
-      ).then((response) => {
+      ).then((_) => {
         this.setConfirm(true);
-        this.setAssessment([]);
+        this.setAssessments([]);
         this.setProgress([]);
         this.feedbacks = [];
         this.$router.push(`/course/${this.$route.params.course}`);
@@ -1004,7 +1009,16 @@ export default {
           }
         })
       ).then((response) => {
-        // this.skipProgress();
+        console.log(response);
+        this.reorderProgress();
+        response.map(r => {
+          if(r.data.index == 5){
+            this.updateProgress({ index: r.data.index, isBlock: false });
+          } else {
+            this.updateProgress({ index: r.data.index, isBlock: true });
+          }
+        })
+
         this.setConfirm(false);
       });
     },

@@ -13,7 +13,7 @@ export default {
                     'Authorization': `Bearer ${token}`
               }
             }).then(response => {
-                commit('updateProgress', { index: index, isBlock: response.data.isBlock });
+                commit('updateProgress', { index: index, isBlock: false });
                 resolve(response);
             }, error => {
                 reject(error);
@@ -35,7 +35,7 @@ export default {
                     'Authorization': `Bearer ${token}`
               }
             }).then(response => {
-                commit('setTrace', response.data);
+                // commit('setTrace', response.data);
                 resolve(response);
             }, error => {
                 reject(error);
