@@ -60,6 +60,7 @@
                   </v-flex>
 
                   <v-flex> Tiempo: {{ time }} Segundos </v-flex>
+                  <v-flex> Intento N°: {{ attempts }} </v-flex>
                 </v-layout>
               </v-toolbar>
             </div>
@@ -161,6 +162,7 @@
                 v-else
               >
                 <v-card-text class="justify-center">
+                  
                   <div class="text-center">
                     <template
                       v-if="
@@ -216,6 +218,7 @@
                       </template>
                     </template>
                     <template v-else>
+                      
                       <video-embed
                         v-if="
                           lesson.structure[inputIndex] &&
@@ -290,6 +293,7 @@
                   @click="back"
                   v-if="
                     getProgress[inputIndex] &&
+                    getProgress[inputIndex].index != 0 && 
                     getProgress[inputIndex].index != 5
                   "
                 >
@@ -375,13 +379,14 @@ export default {
     rating: 0,
     loading: false,
     lesson: null,
+    attempts: 0,
     types: {
       introduction: "Introducción",
       definition: "Definición",
       description: "Descripción",
       example: "Ejemplo",
       activity: "Actividad",
-      evaluation: "Evalucación",
+      evaluation: "Evaluación",
     },
     isValid: false,
     progress: [],
@@ -402,6 +407,7 @@ export default {
     percentage: 0,
   }),
   created() {
+    this.getAttempts();
     this.getLesson();
   },
   computed: {
@@ -445,13 +451,11 @@ export default {
   },
   watch: {
     inputIndex(oldValue, newValue) {
-      console.log(newValue);
       if (newValue == 5) {
         this.setConfirm(true);
       }
     },
     rating(val) {
-      console.log(val);
       if (val != 0) {
         this.lesson.structure[this.inputIndex].data.rating = val;
       }
@@ -464,12 +468,15 @@ export default {
       "setIdCase",
       "setIndex",
       "setConfirm",
+      "setAssessment",
       "pushAssessment",
+      "setProgress",
       "pushProgress",
       "setShowFinishButton",
       "setShowBackButton",
     ]),
     ...mapActions("lesson", [
+      "setAsyncProgress",
       "getAsyncProgress",
       "createAsyncProgress",
       "getAsyncTrace",
@@ -521,6 +528,17 @@ export default {
 
       return array;
     },
+    async getAttempts() {
+      try {
+        let response = await this.$http.get(
+          `/student/attempts?student=${this.user.student_id}&course=${this.$route.params.course}&lesson=${this.$route.params.lesson}`
+        );
+
+        this.attempts = response.data.count;
+      } catch (error) {
+        console.log(error.message);
+      }
+    },
     async getLesson() {
       this.loading = true;
 
@@ -532,6 +550,9 @@ export default {
         );
 
         this.lesson = response.data;
+
+        this.setProgress([]);
+        this.setAssessment([]);
 
         Promise.all(
           this.lesson.structure.map(async (structure, index) => {
@@ -656,7 +677,7 @@ export default {
             if (this.lesson.structure[this.inputIndex].data) {
               this.lesson.structure[this.inputIndex].data.time_use += this.time;
 
-              this.assessments.push({
+              this.pushAssessment({
                 time_use: this.lesson.structure[this.inputIndex].data.time_use,
                 like: this.lesson.structure[this.inputIndex].data.rating,
               });
@@ -670,13 +691,13 @@ export default {
 
             resourcesIds = resourcesIds.filter((rs) => rs != undefined);
 
-            if (this.assessments.length == 1) {
+            if (this.getAssessments.length == 1) {
               let response = await this.$http.post("/trace/create", {
                 student: this.user.student_id,
                 course: this.$route.params.course,
                 lesson: this.$route.params.lesson,
                 resources: resourcesIds,
-                assessments: this.assessments,
+                assessments: this.getAssessments,
                 logs: this.logs,
               });
 
@@ -687,17 +708,14 @@ export default {
               await this.$http.post("/trace/update", {
                 id: this.getTrace,
                 resources: resourcesIds,
-                assessments: this.assessments,
+                assessments: this.getAssessments,
                 logs: this.logs,
               });
             }
 
-            if (this.progress.filter((p) => p.isBlock === true).length > 0) {
-              await this.$http.post("/history/update", {
-                id: this.progress.filter((p) => p.isBlock === true)[0]._id,
-                isBlock: false,
-              });
-            }
+            //TODO: update in vuex
+            this.setAsyncProgress({ index: this.inputIndex + 1, isBlock: false });
+            
 
             this.rating = 0;
             this.toggleTimer();
@@ -805,6 +823,8 @@ export default {
                   };
 
                   this.open(args);
+                  this.setAssessment([]);
+                  this.setProgress([]);
 
                   if (response.status == 200) {
                     if (
@@ -819,6 +839,7 @@ export default {
                       });
 
                       if (result.status == 200) {
+                        
                         this.$router.push(
                           `/course/${this.$route.params.course}`
                         );
@@ -877,6 +898,8 @@ export default {
                     };
 
                     this.open(args);
+                    this.setAssessment([]);
+                    this.setProgress([]);
 
                     if (response.status == 200) {
                       //paso a activar la siguiente leccion
@@ -944,7 +967,7 @@ export default {
       this.showFeedback = false;
 
       await Promise.all(
-        this.progress.map(async (p, index) => {
+        this.getProgress.map(async (p, index) => {
           if (p.index != 0) {
             return await this.$http.post("/history/update", {
               id: p._id,
@@ -959,6 +982,8 @@ export default {
         })
       ).then((response) => {
         this.setConfirm(true);
+        this.setAssessment([]);
+        this.setProgress([]);
         this.feedbacks = [];
         this.$router.push(`/course/${this.$route.params.course}`);
       });

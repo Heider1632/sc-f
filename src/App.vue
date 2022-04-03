@@ -80,4 +80,6 @@ $title-font: 'Poppins';
     font-family: $title-font, sans-serif !important;
   }
 }
+
+iframe { height: 70vh; width: 100vh; }
 </style>

@@ -1,7 +1,27 @@
 import axios from "axios"
 
 export default {
+    setAsyncProgress: async ({ commit }, { id, index }) => {
+        let token = localStorage.getItem('token');
+        return new Promise((resolve, reject) => {
+            axios.post("/history/update", {
+                id: id,
+                isBlock: false,
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+              }
+            }).then(response => {
+                commit('updateProgress', { index: index, isBlock: response.data.isBlock });
+                resolve(response);
+            }, error => {
+                reject(error);
+            })
+        });
+    },
     getAsyncTrace: async ({ commit }, params) => {
+        let token = localStorage.getItem('token');
         return new Promise((resolve, reject) => {
             axios.get("/assessment/student", {
                 params: {
@@ -9,6 +29,11 @@ export default {
                     course: params.course,
                     lesson: params.lesson
                 }
+            },{
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+              }
             }).then(response => {
                 commit('setTrace', response.data);
                 resolve(response);
@@ -18,6 +43,7 @@ export default {
         })
     },
     getAsyncProgress({ commit }, params) {
+        let token = localStorage.getItem('token');
         return new Promise((resolve, reject) => {
             axios.get("/history/one", {
                 params: {
@@ -26,6 +52,11 @@ export default {
                     lesson: params.lesson,
                     structure: params.structure
                 }
+            },{
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+              }
             }).then(response => {
                 commit('pushProgress', response.data);
                 resolve(response);
@@ -36,6 +67,7 @@ export default {
 
     },
     createAsyncProgress({ commit }, params) {
+        let token = localStorage.getItem('token');
         return new Promise((resolve, reject) => {
             axios.post("/history/create", {
                 student: params.student,
@@ -44,6 +76,11 @@ export default {
                 structure: params.structure,
                 isBlock: params.isBlock,
                 index: params.index,
+            },{
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+              }
             }).then(response => {
                 commit('pushProgress', response.data);
                 resolve(response);
