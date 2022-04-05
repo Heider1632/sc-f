@@ -7,5 +7,6 @@ export default {
     getAssessments: (state) => state.assessments,
     getProgress: (state) => state.progress,
     getShowFinishButton: (state) => state.showFinishButton,
-    getShowBackButton: (state) => state.showBackButton
+    getShowBackButton: (state) => state.showBackButton,
+    getShowWin: (state) => state.win,
 }

@@ -8,4 +8,5 @@ export default {
     progress: [],
     showFinishButton: false,
     showBackButton: false,
+    win: false
 }

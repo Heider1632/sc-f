@@ -113,11 +113,36 @@
 
           <v-col lg="8" md="8" sm="8" cols="12">
             <v-sheet min-height="60vh" rounded="lg">
+
               <v-container
                 fluid
                 fill-height
                 class="grey lighten-4"
-                v-if="showFeedback"
+                v-if="getShowWin"
+              >
+                <v-card elevation="0">
+                  <v-card-text>
+                    <v-layout column justify-center align-center>
+                      <v-flex>
+                        <v-alert type="success">
+                          Has alcanzado el 100% de la lección. Te invitamos a continuar desarrollando las siguientes unidades del curso.
+                        </v-alert>
+                       
+                      </v-flex>
+                      <hr />
+                      <v-flex>
+                        <v-btn text color="purple" @click="goToCourse">Finalizar</v-btn>
+                      </v-flex>
+                    </v-layout>
+                  </v-card-text>
+                </v-card>
+              </v-container>
+
+              <v-container
+                fluid
+                fill-height
+                class="grey lighten-4"
+                v-else-if="showFeedback"
               >
                 <v-card elevation="0">
                   <v-card-text>
@@ -169,7 +194,7 @@
                       v-if="
                         lesson.structure[inputIndex] &&
                         lesson.structure[inputIndex].type == 'evaluation' &&
-                        assessment
+                        assessment && !getShowWin
                       "
                     >
                       <template v-if="inputConfirm">
@@ -213,7 +238,11 @@
                                 (v) => !!v || 'Debes completar esta pregunta',
                               ]"
                               required
-                            />
+                            >
+                            <template v-slot:item="slotProps">
+                              {{slotProps.item.label}}
+                            </template>
+                            </v-select>
                           </template>
                         </v-form>
                       </template>
@@ -420,6 +449,7 @@ export default {
       "getProgress",
       "getShowFinishButton",
       "getShowBackButton",
+      "getShowWin",
     ]),
     ...mapGetters("course", ["getLessons"]),
     inputFeedback: {
@@ -483,6 +513,7 @@ export default {
       "updateProgress",
       "setShowFinishButton",
       "setShowBackButton",
+      "setWin",
     ]),
     ...mapActions("lesson", [
       "setAsyncProgress",
@@ -830,38 +861,22 @@ export default {
                     isActive: true,
                   });
 
-                  let args = {
-                    color: "success",
-                    message: "Felicitaciones!",
-                    submessage:
-                      "Has alcanzado el 100% de la lección. Te invitamos a continuar desarrollando las siguientes unidades del curso.",
-                    pos: ["top", "center"],
-                  };
-
-                  this.open(args);
+                  this.setWin(true);
                   this.setAssessments([]);
                   this.setProgress([]);
 
                   if (response.status == 200) {
-                    if (
-                      this.getLessons.indexOf(currentLesson) <
-                      this.getLessons.length - 1
-                    ) {
+                    //paso a activar la siguiente leccion
+
+                    if (currentLesson.index < 4) {
                       let index = this.getLessons.indexOf(currentLesson);
 
-                      let result = await this.$http.post("/progress/update", {
+                      await this.$http.post("/progress/update", {
                         id: this.getLessons[index + 1]._id,
                         isActive: false,
                       });
-
-                      if (result.status == 200) {
-                        this.$router.push(
-                          `/course/${this.$route.params.course}`
-                        );
-                      }
-                    } else {
-                      this.$router.push(`/course/${this.$route.params.course}`);
                     }
+                    
                   }
                 }
               }
@@ -894,6 +909,10 @@ export default {
                     isActive: true,
                   });
 
+                  this.setWin(true);
+                  this.setAssessments([]);
+                  this.setProgress([]);
+
                   if (response.status == 200) {
                     //paso a activar la siguiente leccion
 
@@ -906,19 +925,7 @@ export default {
                       });
                     }
 
-                    let args = {
-                      color: "success",
-                      message: "Felicitaciones!",
-                      submessage:
-                        "Has alcanzado el 100% de la lección. Te invitamos a continuar desarrollando las siguientes unidades del curso.",
-                      pos: ["top", "center"],
-                    };
-
-                    this.open(args);
-                    this.setAssessments([]);
-                    this.setProgress([]);
-
-                    this.$router.push(`/course/${this.$route.params.course}`);
+                    
                   }
                 }
               }
@@ -1010,6 +1017,10 @@ export default {
         this.setConfirm(false);
       });
     },
+    goToCourse(){
+      this.setWin(false);
+      this.$router.push(`/course/${this.$route.params.course}`);
+    }
   },
 };
 </script>
@@ -1022,4 +1033,5 @@ export default {
 .scroll {
   overflow-y: scroll;
 }
+
 </style>

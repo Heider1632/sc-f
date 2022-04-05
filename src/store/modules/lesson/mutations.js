@@ -16,5 +16,6 @@ export default {
     pushProgress: (state, progress) => state.progress.push(progress),
     setShowFinishButton: (state, finish) => state.showFinishButton = finish,
     setShowBackButton: (state, back) => state.showBackButton = back,
+    setWin: (state, win) => state.win = win
 
 }
