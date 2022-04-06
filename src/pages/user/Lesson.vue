@@ -183,7 +183,7 @@
                     ? '65vh'
                     : !getConfirm
                     ? '50vh'
-                    : '85vh'
+                    : '70vh'
                 "
                 class="d-flex flex-column scroll"
                 v-else
@@ -837,6 +837,23 @@ export default {
         });
 
         if (this.note == 5 && this.isValid) {
+
+          await Promise.all(
+            this.getProgress.map(async (p) => {
+              if (p.index != 0) {
+                return await this.$http.post("/history/update", {
+                  id: p._id,
+                  isBlock: true,
+                });
+              } else {
+                return await this.$http.post("/history/update", {
+                  id: p._id,
+                  isBlock: false,
+                });
+              }
+            })
+          )
+
           this.$http
             .post("/metacore/review", {
               id_case: this.getIdCase,
@@ -885,6 +902,23 @@ export default {
               console.log(error);
             });
         } else if (this.note == 5) {
+
+          await Promise.all(
+            this.getProgress.map(async (p) => {
+              if (p.index != 0) {
+                return await this.$http.post("/history/update", {
+                  id: p._id,
+                  isBlock: true,
+                });
+              } else {
+                return await this.$http.post("/history/update", {
+                  id: p._id,
+                  isBlock: false,
+                });
+              }
+            })
+          )
+          
           this.$http
             .post("/metacore/review", {
               id_case: this.getIdCase,
