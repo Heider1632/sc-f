@@ -1,21 +1,23 @@
 <template>
-  <v-main class="grey lighten-3">
+  <v-main class="grey lighten-2">
     <app-bar></app-bar>
 
-    <v-container fill-height>
-      <template v-if="loading">
-        <v-row justify="center" align="center">
-          <v-col cols="12" sm="4">
-            <material-loader></material-loader>
-          </v-col>
-        </v-row>
-      </template>
-      <template v-else>
+    <template v-if="loading">
+       <v-container fill-height >
+      <v-row justify="center" align="center">
+        <v-col cols="12" sm="4">
+          <material-loader></material-loader>
+        </v-col>
+      </v-row>
+       </v-container>
+    </template>
+    <template v-esle>
+      <v-container>
         <v-row>
-          <v-col cols="12">
-            <v-toolbar flat rounded>
+          <v-col cols="12" class="pt-6">
+            <v-toolbar flat rounded color="primary" >
               <v-toolbar-title>
-                <p class="font-weight-semibold display-5 mb-1">
+                <p class="white--text font-weight-semibold display-5 mb-1">
                   Panel Personal
                 </p>
               </v-toolbar-title>
@@ -26,24 +28,61 @@
             </v-toolbar>
           </v-col>
 
-          <v-col cols="8">
+          <v-col cols="6">
+            <h1 class="pa-2 subtitle">
+              Curso: {{ course ? course.name : "" }}
+            </h1>
+          </v-col>
+
+          <v-col cols="6">
+            <v-sheet class="border">
+              <h1 class="pa-2 subtitle">Acerca de este curso</h1>
+              <p class="pa-2 subtitle-2 text-justify">
+                Laravel es un framework open source que nos ayuda a crear
+                aplicaciones mas rápido, fácil y seguro. Su principal objetivo
+                es desarrollar código PHP de forma elegante y simple pero
+                también se destaca por su integración, escalabilidad y facilidad
+                de mantenimiento. En este curso aprenderás a:
+              </p>
+
+              <p class="pa-2 subtitle-2 text-justify">
+                Configurar el entorno de desarrollo Conectar Laravel con una
+                base de datos Usar Laravel Mix para compilar archivos CSS,
+                JavaScript, SASS, etc. Añadir componentes y vistas a la
+                autenticación con Laravel Breeze Subir a producción tu
+                aplicación Inscríbete ahora mismo ¡Las primeras clases son
+                gratis!
+              </p>
+            </v-sheet>
+          </v-col>
+        </v-row>
+      </v-container>
+
+      <v-container fluid class="white">
+        <v-row class="mr-10 ml-10">
+          <v-col md="8" sm="12">
             <v-sheet rounded="lg">
               <v-list rounded color="transparent">
-                <v-list-item color="primary">
-                  <v-list-item-content>
-                    Curso: {{ course ? course.name : "" }}
-                  </v-list-item-content>
-                </v-list-item>
-
-                <v-list-item-group color="primary">
+                <v-list-item-group>
                   <v-list-item
                     v-for="(lesson, index) in course ? course.lessons : []"
                     :key="index"
                     link
-                    :disabled="progress[index] && progress.filter((x) => x.lesson == lesson._id)[0] && progress.filter((x) => x.lesson == lesson._id)[0].isActive"
+                    :disabled="
+                      progress[index] &&
+                      progress.filter((x) => x.lesson == lesson._id)[0] &&
+                      progress.filter((x) => x.lesson == lesson._id)[0].isActive
+                    "
                   >
                     <v-list-item-content>
-                      <v-list-item-icon v-if="progress[index] && progress.filter((x) => x.lesson == lesson._id)[0] && progress.filter((x) => x.lesson == lesson._id)[0].isActive">
+                      <v-list-item-icon
+                        v-if="
+                          progress[index] &&
+                          progress.filter((x) => x.lesson == lesson._id)[0] &&
+                          progress.filter((x) => x.lesson == lesson._id)[0]
+                            .isActive
+                        "
+                      >
                         <v-icon>mdi-disable</v-icon>
                       </v-list-item-icon>
                       <v-list-item-title>
@@ -57,7 +96,12 @@
                     <v-list-item-action>
                       <v-btn icon @click="goLesson(lesson._id)">
                         <v-icon
-                          v-if="progress[index] && progress.filter((x) => x.lesson == lesson._id)[0] && !progress.filter((x) => x.lesson == lesson._id)[0].isActive"
+                          v-if="
+                            progress[index] &&
+                            progress.filter((x) => x.lesson == lesson._id)[0] &&
+                            !progress.filter((x) => x.lesson == lesson._id)[0]
+                              .isActive
+                          "
                           color="grey lighten-1"
                           >mdi-arrow-right</v-icon
                         >
@@ -81,8 +125,8 @@
             </v-sheet>
           </v-col>
 
-          <v-col cols="4">
-            <v-sheet rounded="lg">
+          <v-col md="4" sm="12">
+            <v-sheet class="border">
               <v-list rounded color="transparent">
                 <v-list-item color="primary">
                   <v-list-item-content>
@@ -139,8 +183,8 @@
             </v-sheet>
           </v-col>
         </v-row>
-      </template>
-    </v-container>
+      </v-container>
+    </template>
 
     <v-footer>
       <h1>Universidad de Cordoba</h1>
@@ -172,7 +216,7 @@ export default {
   },
   methods: {
     ...mapMutations("lesson", ["setIdCase"]),
-    ...mapMutations("course",  ["setLessons"]),
+    ...mapMutations("course", ["setLessons"]),
     async getCourse() {
       this.loading = true;
 
@@ -183,24 +227,22 @@ export default {
 
         this.course = responseCourse.data;
 
-
-
         this.progress = [];
 
-        Promise.all(this.course.lessons.map(async (lesson, index) => {
-          try {
+        Promise.all(
+          this.course.lessons.map(async (lesson, index) => {
+            try {
+              let responseProgress = await this.$http.get("/progress/one", {
+                params: {
+                  student: this.user.student_id,
+                  course: this.$route.params.id,
+                  lesson: lesson._id,
+                },
+              });
 
-            let responseProgress = await this.$http.get("/progress/one", {
-              params: {
-                student: this.user.student_id,
-                course: this.$route.params.id,
-                lesson: lesson._id,
-              },
-            });
-
-            this.progress.push(responseProgress.data);
-          } catch (error) {
-            let progress = await this.$http.post("/progress/create", {
+              this.progress.push(responseProgress.data);
+            } catch (error) {
+              let progress = await this.$http.post("/progress/create", {
                 student: this.user.student_id,
                 course: this.$route.params.id,
                 lesson: lesson._id,
@@ -208,24 +250,23 @@ export default {
               });
 
               this.progress.push(progress.data);
-          }
-        }))
-        .then(_ => {
+            }
+          })
+        ).then((_) => {
           this.course.lessons = this.course.lessons.sort(
             (a, b) => (a.order > b.order && 1) || -1
           );
 
-          this.progress.map(p => {
+          this.progress.map((p) => {
             this.course.lessons.map((l, index) => {
-              if(l._id == p.lesson){
-                this.course.lessons[index].isActive = p.isActive
+              if (l._id == p.lesson) {
+                this.course.lessons[index].isActive = p.isActive;
               }
-            })
-          })
+            });
+          });
 
           this.setLessons(this.course.lessons);
         });
-        
       } catch (e) {
         this.course = null;
       }
@@ -238,3 +279,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+.border {
+  border-left: 3px solid purple;
+}
+</style>

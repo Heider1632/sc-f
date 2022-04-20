@@ -1,5 +1,5 @@
 <template>
-  <v-main class="grey lighten-3">
+  <v-main class="white">
     <app-bar></app-bar>
 
     <v-container fill-height>
@@ -13,13 +13,13 @@
       <template v-else>
         <v-row v-if="lesson">
           <v-col md="12" sm="12">
-            <v-toolbar flat rounded>
+            <v-toolbar flat rounded color="primary">
               <v-toolbar-title>
-                <p class="font-weight-semibold mb-1">
+                <p class="white--text font-weight-semibold mb-1">
                   {{ lesson ? lesson.title : "" }}
                 </p>
                 <v-progress-linear
-                  color="red lighten-2"
+                  color="white"
                   buffer-value="20"
                   stream
                 ></v-progress-linear>
@@ -32,7 +32,7 @@
               <v-breadcrumbs :items="getLessons" class="hidden-sm-and-down">
                 <template v-slot:item="{ item }">
                   <v-breadcrumbs-item
-                    :class="item._id == $route.params.lesson ? 'red--text' : ''"
+                    :class="item._id == $route.params.lesson ? 'black--text' : 'white--text'"
                     :disabled="item.isActive"
                   >
                     {{ item.title.split(".")[0] }}
@@ -43,31 +43,35 @@
           </v-col>
 
           <v-col lg="4" md="4" sm="4" cols="12">
-            <div class="mb-1">
-              <v-toolbar flat rounded prominent>
-                <v-layout column wrap align-content-space-around align-start>
-                  <v-flex shrink>
-                    <v-btn
-                      color="purple"
-                      dark
-                      elevation="0"
-                      class="mb-4 mt-4"
-                      @click="$router.go(-1)"
-                    >
-                      volver al area personal
-                      <v-icon small>mdi-arrow-left</v-icon>
-                    </v-btn>
-                  </v-flex>
+            <v-sheet class="border">
+              <div class="mb-1">
+                <v-toolbar flat rounded prominent>
+                  <v-layout column wrap align-content-space-around align-start>
+                    <v-flex shrink>
+                      <v-btn
+                        color="purple"
+                        dark
+                        elevation="0"
+                        class="mb-4 mt-4"
+                        @click="$router.go(-1)"
+                      >
+                        volver al area personal
+                        <v-icon small>mdi-arrow-left</v-icon>
+                      </v-btn>
+                    </v-flex>
 
-                  <v-flex> Tiempo: {{ time }} Segundos </v-flex>
-                  <v-flex> Intento N°: {{ attempts }} </v-flex>
-                </v-layout>
-              </v-toolbar>
+                    <v-flex> Tiempo: {{ time }} Segundos </v-flex>
+                    <v-flex> Intento N°: {{ attempts }} </v-flex>
+                  </v-layout>
+                </v-toolbar>
             </div>
+            </v-sheet>
+            
           </v-col>
 
           <v-col lg="8" md="8" sm="8" cols="12">
-            <v-toolbar flat rounded prominent>
+            <v-sheet class="border">
+              <v-toolbar flat rounded prominent color="white">
               <v-spacer></v-spacer>
 
               <v-toolbar-title>
@@ -77,6 +81,8 @@
                 </p>
               </v-toolbar-title>
             </v-toolbar>
+            </v-sheet>
+            
           </v-col>
 
           <v-col lg="4" md="4" sm="4" cols="12">
@@ -202,6 +208,7 @@
                           align-content-space-between
                           align-center
                           column
+                          class="text-center"
                         >
                           <v-flex>
                             A continuación realizarás la evalucación, ¿estas
@@ -209,7 +216,7 @@
                             podrás ver el contenido de la lección.
                           </v-flex>
                           <v-flex>
-                            <v-btn block color="secondary" @click="test">
+                            <v-btn block color="primary" @click="test">
                               Confirmar
                             </v-btn>
                           </v-flex>
@@ -1068,4 +1075,9 @@ export default {
   overflow-y: scroll;
 }
 
+.border {
+  border-left: 4px solid purple;
+}
+
 </style>
+

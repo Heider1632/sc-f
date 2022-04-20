@@ -1,5 +1,5 @@
 <template>
-    <v-main class="grey lighten-3">
+    <v-main class="white">
         <app-bar></app-bar>
 
         <v-container fill-height >
