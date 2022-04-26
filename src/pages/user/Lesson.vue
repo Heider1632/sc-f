@@ -12,56 +12,33 @@
       </template>
       <template v-else>
         <v-row v-if="lesson">
-          <v-col md="12" sm="12">
-            <v-toolbar flat rounded color="primary">
-              <v-toolbar-title>
-                <p class="white--text font-weight-semibold mb-1">
-                  {{ lesson ? lesson.title : "" }}
-                </p>
-                <v-progress-linear
-                  color="white"
-                  buffer-value="20"
-                  stream
-                ></v-progress-linear>
-              </v-toolbar-title>
 
-              <v-divider class="mx-2" inset vertical></v-divider>
 
-              <div class="flex-grow-1"></div>
+         
 
-              <v-breadcrumbs :items="getLessons" class="hidden-sm-and-down">
-                <template v-slot:item="{ item }">
-                  <v-breadcrumbs-item
-                    :class="item._id == $route.params.lesson ? 'black--text' : 'white--text'"
-                    :disabled="item.isActive"
-                  >
-                    {{ item.title.split(".")[0] }}
-                  </v-breadcrumbs-item>
-                </template>
-              </v-breadcrumbs>
-            </v-toolbar>
+          <v-col lg="6" md="6" sm="6" cols="12">
+            <v-sheet>
+              <p class="subtitle">Resultados de aprendizaje: {{ lesson.hasObjectiveLesson }}</p>
+            </v-sheet>
+            
           </v-col>
-
-          <v-col lg="4" md="4" sm="4" cols="12">
-            <v-sheet class="border">
+        
+        <v-col lg="3" md="3" sm="3" cols="12">
+            <v-sheet>
+              
+            </v-sheet>
+            
+          </v-col>
+          <v-col lg="3" md="3" sm="3" cols="12">
+             <v-sheet class="border">
               <div class="mb-1">
                 <v-toolbar flat rounded prominent>
                   <v-layout column wrap align-content-space-around align-start>
-                    <v-flex shrink>
-                      <v-btn
-                        color="purple"
-                        dark
-                        elevation="0"
-                        class="mb-4 mt-4"
-                        @click="$router.go(-1)"
-                      >
-                        volver al area personal
-                        <v-icon small>mdi-arrow-left</v-icon>
-                      </v-btn>
-                    </v-flex>
+                      <h3>Componentes de conocimientos</h3>
 
-                    <v-flex> Tiempo: {{ time }} Segundos </v-flex>
-                    <v-flex> Intento N°: {{ attempts }} </v-flex>
+
+
+                  
                   </v-layout>
                 </v-toolbar>
             </div>
@@ -69,14 +46,7 @@
             
           </v-col>
 
-          <v-col lg="8" md="8" sm="8" cols="12">
-            <v-sheet>
-              <v-img :src="require('@/assets/images/Banner-Resultado-U4.jpeg')" />
-            </v-sheet>
-            
-          </v-col>
-
-          <v-col lg="4" md="4" sm="4" cols="12">
+          <v-col lg="3" md="3" sm="3" cols="12">
             <v-sheet rounded="lg">
               <v-list rounded color="transparent">
                 <v-list-item-group color="primary" v-model="inputIndex">
@@ -108,7 +78,7 @@
             </v-sheet>
           </v-col>
 
-          <v-col lg="8" md="8" sm="8" cols="12">
+          <v-col lg="6" md="6" sm="6" cols="12">
             <v-sheet min-height="60vh" rounded="lg">
 
               <v-container
@@ -392,6 +362,33 @@
                 </v-btn>
               </v-layout>
             </v-sheet>
+          </v-col>
+
+           <v-col lg="3" md="3" sm="3" cols="12">
+            <v-sheet class="border">
+              <div class="mb-1">
+                <v-toolbar flat rounded prominent>
+                  <v-layout column wrap align-content-space-around align-start>
+                    <v-flex shrink>
+                      <v-btn
+                        color="purple"
+                        dark
+                        elevation="0"
+                        class="mb-4 mt-4"
+                        @click="$router.go(-1)"
+                      >
+                        volver al area personal
+                        <v-icon small>mdi-arrow-left</v-icon>
+                      </v-btn>
+                    </v-flex>
+
+                    <v-flex> Tiempo: {{ time }} Segundos </v-flex>
+                    <v-flex> Intento N°: {{ attempts }} </v-flex>
+                  </v-layout>
+                </v-toolbar>
+            </div>
+            </v-sheet>
+            
           </v-col>
         </v-row>
       </template>
@@ -1084,7 +1081,7 @@ export default {
 }
 
 .border {
-  border-left: 4px solid purple;
+  border-left: 4px solid blue;
 }
 
 </style>

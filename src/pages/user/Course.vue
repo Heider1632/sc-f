@@ -3,31 +3,17 @@
     <app-bar></app-bar>
 
     <template v-if="loading">
-       <v-container fill-height >
-      <v-row justify="center" align="center">
-        <v-col cols="12" sm="4">
-          <material-loader></material-loader>
-        </v-col>
-      </v-row>
-       </v-container>
+      <v-container fill-height>
+        <v-row justify="center" align="center">
+          <v-col cols="12" sm="4">
+            <material-loader></material-loader>
+          </v-col>
+        </v-row>
+      </v-container>
     </template>
     <template v-esle>
       <v-container>
         <v-row>
-          <v-col cols="12" class="pt-6">
-            <v-toolbar flat rounded color="primary" >
-              <v-toolbar-title>
-                <p class="white--text font-weight-semibold display-5 mb-1">
-                  Panel Personal
-                </p>
-              </v-toolbar-title>
-
-              <v-divider class="mx-2" inset vertical></v-divider>
-
-              <div class="flex-grow-1"></div>
-            </v-toolbar>
-          </v-col>
-
           <v-col cols="6">
             <h1 class="pa-2 subtitle">
               Curso: {{ course ? course.name : "" }}
@@ -36,14 +22,22 @@
 
           <v-col cols="6">
             <v-sheet class="main-border">
-              <h1 class="pa-2 subtitle">Bienvenidos al tutor virtual</h1>
+              <h1 class="pa-2 subtitle">Acerca del curso</h1>
               <p class="pa-2 subtitle-2 text-justify">
-                El Sistema Tutor Inteligente Fichas y protocolos en salud te ofrecerá una secuencia de aprendizaje personalizada de acuerdo a tus estilos de aprendizaje detectados en el test anterior. Mediante esta herramienta accederás a los contenidos del curso Protocolos de atención para la detección temprana de sífilis gestacional y congénita, el cual se divide en cuatro unidades que podrás ver a continuación. 
-                El tiempo de dedicación al curso será de 24 horas mínimo. 
+                El Sistema Tutor Inteligente Fichas y protocolos en salud te
+                ofrecerá una secuencia de aprendizaje personalizada de acuerdo a
+                tus estilos de aprendizaje detectados en el test anterior.
+                Mediante esta herramienta accederás a los contenidos del curso
+                Protocolos de atención para la detección temprana de sífilis
+                gestacional y congénita, el cual se divide en cuatro unidades
+                que podrás ver a continuación. El tiempo de dedicación al curso
+                será de 24 horas mínimo.
               </p>
 
               <p class="pa-2 subtitle-2 text-justify">
-                Esperamos que disfrutes de esta experiencia de aprendizaje y que una vez terminada puedas poner en práctica los conocimientos adquiridos.
+                Esperamos que disfrutes de esta experiencia de aprendizaje y que
+                una vez terminada puedas poner en práctica los conocimientos
+                adquiridos.
               </p>
             </v-sheet>
           </v-col>
@@ -54,75 +48,57 @@
         <v-row class="mr-10 ml-10">
           <v-col md="8" sm="12">
             <v-sheet>
-              <v-list rounded color="transparent">
-                <v-list-item-group color="indigo">
-                  <v-list-item
-                    v-for="(lesson, index) in course ? course.lessons : []"
-                    :key="index"
-                    link
-                    :disabled="
-                      progress[index] &&
-                      progress.filter((x) => x.lesson == lesson._id)[0] &&
-                      progress.filter((x) => x.lesson == lesson._id)[0].isActive
-                    "
+              <v-row>
+                <v-col
+                  md="6"
+                  sm="12"
+                  v-for="(lesson, index) in course ? course.lessons : []"
+                  :key="index"
+                >
+                  <v-card
+                    class="mx-auto my-4"
+                    max-width="374"
+                    @click="goLesson(lesson._id)"
                   >
-                    <v-list-item-content>
-                      <v-list-item-icon
+                    <v-img
+                      height="100"
+                      src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
+                    >
+                      <v-chip
                         v-if="
                           progress[index] &&
                           progress.filter((x) => x.lesson == lesson._id)[0] &&
                           progress.filter((x) => x.lesson == lesson._id)[0]
                             .isActive
                         "
+                        color="green"
+                        class="ma-2"
                       >
-                        <v-icon>mdi-disable</v-icon>
-                      </v-list-item-icon>
-                      <v-list-item-title class="purple--text">
-                        {{ types[lesson.type] }}
-                      </v-list-item-title>
-                      <v-list-item-subtitle>
-                        {{ lesson.title }}
-                      </v-list-item-subtitle>
-                    </v-list-item-content>
+                        Completado
+                      </v-chip>
 
-                    <v-list-item-action>
-                      <v-btn icon @click="goLesson(lesson._id)">
-                        <v-icon
-                          v-if="
-                            progress[index] &&
-                            progress.filter((x) => x.lesson == lesson._id)[0] &&
-                            !progress.filter((x) => x.lesson == lesson._id)[0]
-                              .isActive
-                          "
-                          color="grey lighten-1"
-                          >mdi-arrow-right</v-icon
-                        >
-                        <v-icon v-else color="grey lighten-1">mdi-lock</v-icon>
-                      </v-btn>
-                    </v-list-item-action>
-                  </v-list-item>
-                </v-list-item-group>
+                      <v-chip class="ma-2" color="orange" v-else>
+                        Pendiente
+                      </v-chip>
+                    </v-img>
 
-                <v-divider class="my-2"></v-divider>
-
-                <v-list-item color="grey lighten-4" @click="getCourse">
-                  <v-list-item-icon>
-                    <v-icon>refresh</v-icon>
-                  </v-list-item-icon>
-                  <v-list-item-content>
-                    <v-list-item-title> Actualizar </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
+                    <v-card-text>
+                      {{ lesson.title }}
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </v-row>
             </v-sheet>
           </v-col>
 
           <v-col md="4" sm="12">
             <v-sheet class="border">
-              <v-list rounded color="transparent">
-                <v-list-item color="primary">
+              <v-list rounded>
+                <v-list-item class="tile">
                   <v-list-item-content>
-                    <v-list-item-title> Información general </v-list-item-title>
+                    <v-list-item-title class="white--text">
+                      Información general
+                    </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
 
@@ -175,14 +151,12 @@
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-
               </v-list>
             </v-sheet>
           </v-col>
         </v-row>
       </v-container>
     </template>
-
   </v-main>
 </template>
 <script>
@@ -268,14 +242,13 @@ export default {
       this.loading = false;
     },
     async goLesson(id) {
-
-      let r = await this.$http.get('/cycle/all', { params: {
-        stimulus: "click_structure",
-        id: this.user.id,
-        name: this.user.name           
-      }});
-
-      console.log(r);
+      let r = await this.$http.get("/cycle/all", {
+        params: {
+          stimulus: "click_structure",
+          id: this.user.id,
+          name: this.user.name,
+        },
+      });
 
       this.$router.push(`/course/${this.course._id}/lesson/${id}`);
     },
@@ -284,16 +257,21 @@ export default {
 </script>
 <style scoped>
 .border {
-  border-left: 3px solid purple;
+  border-left: 6px solid orange;
+}
+
+.tile {
+  margin: 5px;
+  border-radius: 4px;
+  background-color: #03a9f4;
+  color: white;
 }
 
 .main-border {
-  border-left: 3px solid #EBBF4B;
+  border-left: 8px solid orange;
 }
 
 .main-course {
-  background: linear-gradient(to bottom, rgba(255,255,255,0.3) 0%,rgba(255,255,255,0.3) 100%), url('~@/assets/images/fondo-u2.jpeg') left no-repeat;
-  background-size: 100%;
-  background-attachment: fixed;
+  background-color: rgb(177, 215, 244);
 }
 </style>
