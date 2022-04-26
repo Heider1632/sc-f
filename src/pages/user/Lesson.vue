@@ -70,17 +70,8 @@
           </v-col>
 
           <v-col lg="8" md="8" sm="8" cols="12">
-            <v-sheet class="border">
-              <v-toolbar flat rounded prominent color="white">
-              <v-spacer></v-spacer>
-
-              <v-toolbar-title>
-                <p class="subtitle-1 text-wrap">
-                  <strong>Resultados de Aprendizaje:</strong>
-                  {{ lesson.hasObjectiveLesson }}
-                </p>
-              </v-toolbar-title>
-            </v-toolbar>
+            <v-sheet>
+              <v-img :src="require('@/assets/images/Banner-Resultado-U4.jpeg')" />
             </v-sheet>
             
           </v-col>

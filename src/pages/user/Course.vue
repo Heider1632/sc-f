@@ -1,5 +1,5 @@
 <template>
-  <v-main class="grey lighten-2">
+  <v-main class="main-course">
     <app-bar></app-bar>
 
     <template v-if="loading">
@@ -35,23 +35,15 @@
           </v-col>
 
           <v-col cols="6">
-            <v-sheet class="border">
-              <h1 class="pa-2 subtitle">Acerca de este curso</h1>
+            <v-sheet class="main-border">
+              <h1 class="pa-2 subtitle">Bienvenidos al tutor virtual</h1>
               <p class="pa-2 subtitle-2 text-justify">
-                Laravel es un framework open source que nos ayuda a crear
-                aplicaciones mas rápido, fácil y seguro. Su principal objetivo
-                es desarrollar código PHP de forma elegante y simple pero
-                también se destaca por su integración, escalabilidad y facilidad
-                de mantenimiento. En este curso aprenderás a:
+                El Sistema Tutor Inteligente Fichas y protocolos en salud te ofrecerá una secuencia de aprendizaje personalizada de acuerdo a tus estilos de aprendizaje detectados en el test anterior. Mediante esta herramienta accederás a los contenidos del curso Protocolos de atención para la detección temprana de sífilis gestacional y congénita, el cual se divide en cuatro unidades que podrás ver a continuación. 
+                El tiempo de dedicación al curso será de 24 horas mínimo. 
               </p>
 
               <p class="pa-2 subtitle-2 text-justify">
-                Configurar el entorno de desarrollo Conectar Laravel con una
-                base de datos Usar Laravel Mix para compilar archivos CSS,
-                JavaScript, SASS, etc. Añadir componentes y vistas a la
-                autenticación con Laravel Breeze Subir a producción tu
-                aplicación Inscríbete ahora mismo ¡Las primeras clases son
-                gratis!
+                Esperamos que disfrutes de esta experiencia de aprendizaje y que una vez terminada puedas poner en práctica los conocimientos adquiridos.
               </p>
             </v-sheet>
           </v-col>
@@ -61,9 +53,9 @@
       <v-container fluid class="white">
         <v-row class="mr-10 ml-10">
           <v-col md="8" sm="12">
-            <v-sheet rounded="lg">
+            <v-sheet>
               <v-list rounded color="transparent">
-                <v-list-item-group>
+                <v-list-item-group color="indigo">
                   <v-list-item
                     v-for="(lesson, index) in course ? course.lessons : []"
                     :key="index"
@@ -85,7 +77,7 @@
                       >
                         <v-icon>mdi-disable</v-icon>
                       </v-list-item-icon>
-                      <v-list-item-title>
+                      <v-list-item-title class="purple--text">
                         {{ types[lesson.type] }}
                       </v-list-item-title>
                       <v-list-item-subtitle>
@@ -186,9 +178,6 @@
       </v-container>
     </template>
 
-    <v-footer>
-      <h1>Universidad de Cordoba</h1>
-    </v-footer>
   </v-main>
 </template>
 <script>
@@ -282,5 +271,15 @@ export default {
 <style scoped>
 .border {
   border-left: 3px solid purple;
+}
+
+.main-border {
+  border-left: 3px solid #EBBF4B;
+}
+
+.main-course {
+  background: linear-gradient(to bottom, rgba(255,255,255,0.3) 0%,rgba(255,255,255,0.3) 100%), url('~@/assets/images/fondo-u2.jpeg') left no-repeat;
+  background-size: 100%;
+  background-attachment: fixed;
 }
 </style>
