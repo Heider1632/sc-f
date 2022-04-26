@@ -3,19 +3,19 @@
     <app-bar></app-bar>
 
     <template v-if="loading">
-       <v-container fill-height >
-      <v-row justify="center" align="center">
-        <v-col cols="12" sm="4">
-          <material-loader></material-loader>
-        </v-col>
-      </v-row>
-       </v-container>
+      <v-container fill-height>
+        <v-row justify="center" align="center">
+          <v-col cols="12" sm="4">
+            <material-loader></material-loader>
+          </v-col>
+        </v-row>
+      </v-container>
     </template>
     <template v-esle>
       <v-container>
         <v-row>
           <v-col cols="12" class="pt-6">
-            <v-toolbar flat rounded color="primary" >
+            <v-toolbar flat rounded color="primary">
               <v-toolbar-title>
                 <p class="white--text font-weight-semibold display-5 mb-1">
                   Panel Personal
@@ -38,12 +38,20 @@
             <v-sheet class="main-border">
               <h1 class="pa-2 subtitle">Bienvenidos al tutor virtual</h1>
               <p class="pa-2 subtitle-2 text-justify">
-                El Sistema Tutor Inteligente Fichas y protocolos en salud te ofrecerá una secuencia de aprendizaje personalizada de acuerdo a tus estilos de aprendizaje detectados en el test anterior. Mediante esta herramienta accederás a los contenidos del curso Protocolos de atención para la detección temprana de sífilis gestacional y congénita, el cual se divide en cuatro unidades que podrás ver a continuación. 
-                El tiempo de dedicación al curso será de 24 horas mínimo. 
+                El Sistema Tutor Inteligente Fichas y protocolos en salud te
+                ofrecerá una secuencia de aprendizaje personalizada de acuerdo a
+                tus estilos de aprendizaje detectados en el test anterior.
+                Mediante esta herramienta accederás a los contenidos del curso
+                Protocolos de atención para la detección temprana de sífilis
+                gestacional y congénita, el cual se divide en cuatro unidades
+                que podrás ver a continuación. El tiempo de dedicación al curso
+                será de 24 horas mínimo.
               </p>
 
               <p class="pa-2 subtitle-2 text-justify">
-                Esperamos que disfrutes de esta experiencia de aprendizaje y que una vez terminada puedas poner en práctica los conocimientos adquiridos.
+                Esperamos que disfrutes de esta experiencia de aprendizaje y que
+                una vez terminada puedas poner en práctica los conocimientos
+                adquiridos.
               </p>
             </v-sheet>
           </v-col>
@@ -130,36 +138,12 @@
 
                 <v-list-item color="grey lighten-4">
                   <v-list-item-content>
-                    <v-list-item-title> Programa del curso </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-
-                <v-list-item color="grey lighten-4">
-                  <v-list-item-content>
-                    <v-list-item-title> Metodología </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-
-                <v-list-item color="grey lighten-4">
-                  <v-list-item-content>
-                    <v-list-item-title> Referencias </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-
-                <br />
-
-                <v-list-item color="primary">
-                  <v-list-item-content>
-                    <v-list-item-title> Estudiantes </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-
-                <v-divider class="my-2"></v-divider>
-
-                <v-list-item color="grey lighten-4">
-                  <v-list-item-content>
                     <v-list-item-title>
-                      ¿Necesitas ayuda con el sistema?
+                      <a
+                        href="https://drive.google.com/file/d/1AH6z8iTLcPaR7Az5WFtQNvC1ADTrPs5V/view"
+                        target="_blank"
+                        >Programa del curso</a
+                      >
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
@@ -167,23 +151,55 @@
                 <v-list-item color="grey lighten-4">
                   <v-list-item-content>
                     <v-list-item-title>
-                      Más recursos educativos
+                      <a
+                        href="https://drive.google.com/file/d/1CDaEfpfI3qyi14s-8k1AUnLhwE4hLw1W/view"
+                        target="_blank"
+                        >Metodología
+                      </a>
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
+
+                <v-list-item color="grey lighten-4">
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      <a
+                        href="https://drive.google.com/file/d/1xlQVt6ThDlHZiGsNE6fAYoh_mgwP29FP/view"
+                        target="_blank"
+                        >Evaluación
+                      </a>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item color="grey lighten-4">
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      <a
+                        href="https://drive.google.com/file/d/1ZW9T7WpjVVZLWU4vq0LFybeMez5rrREt/view"
+                        target="_blank"
+                        >Créditos
+                      </a>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+
               </v-list>
             </v-sheet>
           </v-col>
         </v-row>
       </v-container>
     </template>
-
   </v-main>
 </template>
 <script>
 import { mapMutations, mapState } from "vuex";
+import pdf from "vue-pdf";
 export default {
   name: "Course",
+  components: {
+    pdf,
+  },
   data: () => ({
     rating: 0,
     loading: false,
@@ -265,6 +281,10 @@ export default {
     goLesson(id) {
       this.$router.push(`/course/${this.course._id}/lesson/${id}`);
     },
+    openPdf() {
+      //window.open('/src/assets/info/Programa-curso-Protocolos.pdf', '_blank')
+      window.open("/src/assets/logo.png", "_blank");
+    },
   },
 };
 </script>
@@ -274,11 +294,16 @@ export default {
 }
 
 .main-border {
-  border-left: 3px solid #EBBF4B;
+  border-left: 3px solid #ebbf4b;
 }
 
 .main-course {
-  background: linear-gradient(to bottom, rgba(255,255,255,0.3) 0%,rgba(255,255,255,0.3) 100%), url('~@/assets/images/fondo-u2.jpeg') left no-repeat;
+  background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0.3) 100%
+    ),
+    url("~@/assets/images/fondo-u2.jpeg") left no-repeat;
   background-size: 100%;
   background-attachment: fixed;
 }
