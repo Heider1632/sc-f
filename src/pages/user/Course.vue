@@ -24,14 +24,13 @@
             <v-sheet class="main-border">
               <h1 class="pa-2 subtitle">Acerca del curso</h1>
               <p class="pa-2 subtitle-2 text-justify">
-                El Sistema Tutor Inteligente Fichas y protocolos en salud te
-                ofrecerá una secuencia de aprendizaje personalizada de acuerdo a
-                tus estilos de aprendizaje detectados en el test anterior.
-                Mediante esta herramienta accederás a los contenidos del curso
-                Protocolos de atención para la detección temprana de sífilis
-                gestacional y congénita, el cual se divide en cuatro unidades
-                que podrás ver a continuación. El tiempo de dedicación al curso
-                será de 24 horas mínimo.
+                El Sistema cognitivo te ofrecerá una secuencia de aprendizaje
+                personalizada de acuerdo a tus estilos de aprendizaje detectados
+                en el test anterior. Mediante esta herramienta accederás a los
+                contenidos del curso Protocolos de atención para la detección
+                temprana de sífilis gestacional y congénita, el cual se divide
+                en cuatro unidades que podrás ver a continuación. El tiempo de
+                dedicación al curso será de 24 horas mínimo.
               </p>
 
               <p class="pa-2 subtitle-2 text-justify">

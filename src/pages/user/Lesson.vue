@@ -2,50 +2,64 @@
   <v-main class="white">
     <app-bar></app-bar>
 
-    <v-container fill-height>
-      <template v-if="loading">
+    <template v-if="loading">
+      <v-container fill-height>
         <v-row justify="center" align="center">
           <v-col cols="12" sm="4">
             <material-loader></material-loader>
           </v-col>
         </v-row>
-      </template>
-      <template v-else>
-        <v-row v-if="lesson">
-
-
-         
-
-          <v-col lg="6" md="6" sm="6" cols="12">
+      </v-container>
+    </template>
+    <template v-else>
+      <v-container fluid class="main-course">
+        <v-row v-if="lesson" class="ml-16 mr-16">
+          <v-col lg="5" md="5" sm="5" cols="12">
             <v-sheet>
-              <p class="subtitle">Resultados de aprendizaje: {{ lesson.hasObjectiveLesson }}</p>
+              <p class="subtitle pa-4">
+                <strong>Resultados de aprendizaje:</strong>
+                {{ lesson.hasObjectiveLesson }}
+              </p>
             </v-sheet>
-            
           </v-col>
-        
-        <v-col lg="3" md="3" sm="3" cols="12">
-            <v-sheet>
-              
-            </v-sheet>
-            
-          </v-col>
+
           <v-col lg="3" md="3" sm="3" cols="12">
-             <v-sheet class="border">
-              <div class="mb-1">
-                <v-toolbar flat rounded prominent>
-                  <v-layout column wrap align-content-space-around align-start>
-                      <h3>Componentes de conocimientos</h3>
+            <v-sheet>
+              <h3 class="pa-2">Progreso del curso</h3>
+              <v-progress-linear color="green" value="80" height="20">
+                <template v-slot:default="{ value }">
+                  <strong>{{ Math.ceil(value) }}%</strong>
+                </template>
+              </v-progress-linear>
 
-
-
-                  
-                  </v-layout>
-                </v-toolbar>
-            </div>
+              <h3 class="pa-2">Progreso de la lección</h3>
+              <v-progress-linear color="orange" value="60" height="20">
+                <template v-slot:default="{ value }">
+                  <strong>{{ Math.ceil(value) }}%</strong>
+                </template>
+              </v-progress-linear>
             </v-sheet>
-            
           </v-col>
+          <v-col lg="4" md="4" sm="4" cols="12">
+            <v-sheet class="border white pa-2">
+                  <v-layout fill-height column>
+                    <v-flex>
+                      <h3>Componentes de conocimientos</h3>
+                    </v-flex>
+                    <v-flex v-for="kc in lesson.knowledgeComponent" :key="kc._id">
+                      <p class="text-wrap text-justify caption">
+                      {{ kc.name }}
+                      </p>
+                    </v-flex>
+                  </v-layout>
 
+            </v-sheet>
+          </v-col>
+        </v-row>
+      </v-container>
+
+      <v-container>
+        <v-row>
           <v-col lg="3" md="3" sm="3" cols="12">
             <v-sheet rounded="lg">
               <v-list rounded color="transparent">
@@ -80,7 +94,6 @@
 
           <v-col lg="6" md="6" sm="6" cols="12">
             <v-sheet min-height="60vh" rounded="lg">
-
               <v-container
                 fluid
                 fill-height
@@ -92,13 +105,16 @@
                     <v-layout column justify-center align-center>
                       <v-flex>
                         <v-alert type="success">
-                          Has alcanzado el 100% de la lección. Te invitamos a continuar desarrollando las siguientes unidades del curso.
+                          Has alcanzado el 100% de la lección. Te invitamos a
+                          continuar desarrollando las siguientes unidades del
+                          curso.
                         </v-alert>
-                       
                       </v-flex>
                       <hr />
                       <v-flex>
-                        <v-btn text color="purple" @click="goToCourse">Finalizar</v-btn>
+                        <v-btn text color="purple" @click="goToCourse"
+                          >Finalizar</v-btn
+                        >
                       </v-flex>
                     </v-layout>
                   </v-card-text>
@@ -161,7 +177,8 @@
                       v-if="
                         lesson.structure[inputIndex] &&
                         lesson.structure[inputIndex].type == 'evaluation' &&
-                        assessment && !getShowWin
+                        assessment &&
+                        !getShowWin
                       "
                     >
                       <template v-if="inputConfirm">
@@ -207,9 +224,9 @@
                               ]"
                               required
                             >
-                            <template v-slot:item="slotProps">
-                              {{slotProps.item.label}}
-                            </template>
+                              <template v-slot:item="slotProps">
+                                {{ slotProps.item.label }}
+                              </template>
                             </v-select>
                           </template>
                         </v-form>
@@ -364,35 +381,28 @@
             </v-sheet>
           </v-col>
 
-           <v-col lg="3" md="3" sm="3" cols="12">
-            <v-sheet class="border">
-              <div class="mb-1">
-                <v-toolbar flat rounded prominent>
-                  <v-layout column wrap align-content-space-around align-start>
-                    <v-flex shrink>
-                      <v-btn
-                        color="purple"
-                        dark
-                        elevation="0"
-                        class="mb-4 mt-4"
-                        @click="$router.go(-1)"
-                      >
-                        volver al area personal
-                        <v-icon small>mdi-arrow-left</v-icon>
-                      </v-btn>
-                    </v-flex>
-
-                    <v-flex> Tiempo: {{ time }} Segundos </v-flex>
-                    <v-flex> Intento N°: {{ attempts }} </v-flex>
-                  </v-layout>
-                </v-toolbar>
-            </div>
+          <v-col lg="3" md="3" sm="3" cols="12">
+            <v-sheet class="spa-6 d-flex align-content-center">
+              <v-btn text color="primary">Anterior</v-btn>
+              <v-divider inset vertical></v-divider>
+              <v-btn text color="primary">Siguiente</v-btn>
             </v-sheet>
-            
+
+            <v-sheet class="border">
+              <div class="mb-1 pa-6">
+                <v-flex> Tiempo: {{ time }} Segundos </v-flex>
+                <v-flex> Intento N°: {{ attempts }} </v-flex>
+              </div>
+            </v-sheet>
+
+            <v-sheet>
+              <p>¿Consideras que este recurso aporta a tu aprendizaje?</p>
+              <v-slider v-model="rating" max="5" min="1"></v-slider>
+            </v-sheet>
           </v-col>
         </v-row>
-      </template>
-    </v-container>
+      </v-container>
+    </template>
   </v-main>
 </template>
 <script>
@@ -617,13 +627,6 @@ export default {
             lesson: this.$route.params.lesson,
           }).then(
             (response) => {
-              // console.log(response);
-              // if (response.data.length > 0) {
-              //   let last = response.data[response.data.length - 1];
-              //   this.inputIndex = last.assessments.length;
-              // } else {
-              //   this.inputIndex = 0;
-              // }
               this.inputIndex = 0;
             },
             (error) => {
@@ -783,12 +786,13 @@ export default {
       let valid = this.$refs.forminterview.validate();
 
       if (valid) {
-
-        let r = await this.$http.get('/cycle/all', { params: {
-          stimulus: "click_finish_button",
-          id: this.user.id,
-          name: this.user.name         
-        }});
+        let r = await this.$http.get("/cycle/all", {
+          params: {
+            stimulus: "click_finish_button",
+            id: this.user.id,
+            name: this.user.name,
+          },
+        });
 
         console.log(r);
 
@@ -841,7 +845,6 @@ export default {
         });
 
         if (this.note == 5 && this.isValid) {
-
           await Promise.all(
             this.getProgress.map(async (p) => {
               if (p.index != 0) {
@@ -856,7 +859,7 @@ export default {
                 });
               }
             })
-          )
+          );
 
           this.$http
             .post("/metacore/review", {
@@ -897,7 +900,6 @@ export default {
                         isActive: false,
                       });
                     }
-                    
                   }
                 }
               }
@@ -906,7 +908,6 @@ export default {
               console.log(error);
             });
         } else if (this.note == 5) {
-
           await Promise.all(
             this.getProgress.map(async (p) => {
               if (p.index != 0) {
@@ -921,8 +922,8 @@ export default {
                 });
               }
             })
-          )
-          
+          );
+
           this.$http
             .post("/metacore/review", {
               id_case: this.getIdCase,
@@ -962,8 +963,6 @@ export default {
                         isActive: false,
                       });
                     }
-
-                    
                   }
                 }
               }
@@ -1004,11 +1003,13 @@ export default {
       this.setConfirm(true);
       this.showFeedback = false;
 
-      let r = await this.$http.get('/cycle/all', { params: {
-        stimulus: "click_finish_button",
-        id: this.user.id,
-        name: this.user.name           
-      }});
+      let r = await this.$http.get("/cycle/all", {
+        params: {
+          stimulus: "click_finish_button",
+          id: this.user.id,
+          name: this.user.name,
+        },
+      });
 
       console.log(r);
 
@@ -1063,10 +1064,10 @@ export default {
         this.setConfirm(false);
       });
     },
-    goToCourse(){
+    goToCourse() {
       this.setWin(false);
       this.$router.push(`/course/${this.$route.params.course}`);
-    }
+    },
   },
 };
 </script>
@@ -1081,8 +1082,10 @@ export default {
 }
 
 .border {
-  border-left: 4px solid blue;
+  border-left: 6px solid blue;
 }
 
+.main-course {
+  background-color: rgb(177, 215, 244);
+}
 </style>
-
