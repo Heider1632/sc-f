@@ -150,6 +150,7 @@
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
+
               </v-list>
             </v-sheet>
           </v-col>
@@ -160,8 +161,12 @@
 </template>
 <script>
 import { mapMutations, mapState } from "vuex";
+import pdf from "vue-pdf";
 export default {
   name: "Course",
+  components: {
+    pdf,
+  },
   data: () => ({
     rating: 0,
     loading: false,
@@ -252,6 +257,10 @@ export default {
       this.setResources(r.data[0]);
       this.$router.push(`/course/${this.course._id}/lesson/${id}`);
     },
+    openPdf() {
+      //window.open('/src/assets/info/Programa-curso-Protocolos.pdf', '_blank')
+      window.open("/src/assets/logo.png", "_blank");
+    },
   },
 };
 </script>
@@ -273,5 +282,20 @@ export default {
 
 .main-course {
   background-color: rgb(177, 215, 244);
+}
+
+.main-border {
+  border-left: 3px solid #ebbf4b;
+}
+
+.main-course {
+  background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0.3) 100%
+    ),
+    url("~@/assets/images/fondo-u2.jpeg") left no-repeat;
+  background-size: 100%;
+  background-attachment: fixed;
 }
 </style>

@@ -1,11 +1,10 @@
 <template>
   <v-footer
-    color="grey lighten-5"
+    color="#595959"
     absolute
     app
     height="auto"
     width="auto"
-    class="ma-0 pa-0"
     padless
   >
     <v-container>
