@@ -4,6 +4,7 @@ export default {
     id_case: null,
     index: 0,
     confirm: true,
+    resources: [],
     assessments: [],
     progress: [],
     showFinishButton: false,

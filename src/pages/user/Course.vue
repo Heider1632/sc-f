@@ -43,10 +43,10 @@
         </v-row>
       </v-container>
 
-      <v-container fluid class="white">
+      <v-container fluid class="white mb-9">
         <v-row class="mr-10 ml-10">
           <v-col md="8" sm="12">
-            <v-sheet>
+            <v-sheet >
               <v-row>
                 <v-col
                   md="6"
@@ -61,7 +61,7 @@
                   >
                     <v-img
                       height="100"
-                      src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
+                      :src="require(`@/assets/images/Unidad${index+1}.png`)"
                     >
                       <v-chip
                         v-if="
@@ -81,7 +81,7 @@
                       </v-chip>
                     </v-img>
 
-                    <v-card-text>
+                    <v-card-text style="height: 65px;" >
                       {{ lesson.title }}
                     </v-card-text>
                   </v-card>
@@ -182,7 +182,7 @@ export default {
     this.getCourse();
   },
   methods: {
-    ...mapMutations("lesson", ["setIdCase"]),
+    ...mapMutations("lesson", ["setIdCase", "setResources"]),
     ...mapMutations("course", ["setLessons"]),
     async getCourse() {
       this.loading = true;
@@ -244,11 +244,12 @@ export default {
       let r = await this.$http.get("/cycle/all", {
         params: {
           stimulus: "click_structure",
-          id: this.user.id,
-          name: this.user.name,
+          id: this.user.student_id,
+          lesson: id
         },
       });
 
+      this.setResources(r.data[0]);
       this.$router.push(`/course/${this.course._id}/lesson/${id}`);
     },
   },

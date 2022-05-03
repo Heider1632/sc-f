@@ -46,15 +46,14 @@
           <v-row class="mr-10 ml-10" align="center" justify="center">
             <v-card
               elevation="1"
-              height="100"
               flat
               rounded
               v-for="(course, index) in courses"
               :key="index"
               class="full-height pa-6 mt-16"
             >
-              <v-card-text class="full-height pa-2 d-flex flex-row">
-                <v-img width="150" src="" />
+              <v-card-text class="full-height pa-2 d-flex flex-row align-center">
+                <v-img width="150" :src="require('@/assets/images/imagen-inicio-sistemacog.png')" />
                 <h1 class="display-1 align-center">{{ course.name }}</h1>
                 <v-divider class="mx-4" vertical />
                 <v-btn

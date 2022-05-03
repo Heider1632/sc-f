@@ -4,6 +4,7 @@ export default {
     setIdCase: (state, id_case) => state.id_case = id_case,
     setIndex: (state, index) => state.index = index,
     setConfirm: (state, confirm) => state.confirm = confirm,
+    setResources: (state, resources) => state.resources = resources,
     setAssessments: (state, assessments) => state.assessments = assessments,
     pushAssessment: (state, assessment) => state.assessments.push(assessment),
     reorderProgress: (state) => state.progress = state.progress.sort((a,b) => { 
