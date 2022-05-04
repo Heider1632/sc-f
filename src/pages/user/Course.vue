@@ -48,46 +48,59 @@
         <v-row class="mr-10 ml-10">
           <v-col md="8" sm="12">
             <v-sheet>
-              <v-row>
-                <v-col
-                  md="6"
-                  sm="12"
-                  v-for="(lesson, index) in course ? course.lessons : []"
-                  :key="index"
-                >
-                  <v-card
-                    class="mx-auto my-4"
-                    max-width="374"
-                    @click="goLesson(lesson._id)"
+              <v-list rounded color="transparent">
+                <v-list-item-group color="indigo">
+                  <v-list-item
+                    v-for="(lesson, index) in course ? course.lessons : []"
+                    :key="index"
+                    link
+                    :disabled="
+                      progress[index] &&
+                      progress.filter((x) => x.lesson == lesson._id)[0] &&
+                      progress.filter((x) => x.lesson == lesson._id)[0].isActive
+                    "
                   >
-                    <v-img
-                      height="100"
-                      src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
-                    >
-                      <v-chip
-                        v-if="
-                          progress[index] &&
-                          progress.filter((x) => x.lesson == lesson._id)[0] &&
-                          progress.filter((x) => x.lesson == lesson._id)[0]
-                            .isActive
-                        "
-                        color="green"
-                        class="ma-2"
-                      >
-                        Completado
-                      </v-chip>
+                    <v-list-item-content>
+                      <v-list-item-icon>
+                        <v-icon>mdi-disable</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-title class="purple--text">
+                        {{ types[lesson.type] }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle>
+                        {{ lesson.title }}
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
 
-                      <v-chip class="ma-2" color="orange" v-else>
-                        Pendiente
-                      </v-chip>
-                    </v-img>
+                    <v-list-item-action>
+                      <v-btn icon @click="goLesson(lesson._id)">
+                        <v-icon
+                          v-if="
+                            progress[index] &&
+                            progress.filter((x) => x.lesson == lesson._id)[0] &&
+                            !progress.filter((x) => x.lesson == lesson._id)[0]
+                              .isActive
+                          "
+                          color="grey lighten-1"
+                          >mdi-arrow-right</v-icon
+                        >
+                        <v-icon v-else color="grey lighten-1">mdi-lock</v-icon>
+                      </v-btn>
+                    </v-list-item-action>
+                  </v-list-item>
+                </v-list-item-group>
 
-                    <v-card-text>
-                      {{ lesson.title }}
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-              </v-row>
+                <v-divider class="my-2"></v-divider>
+
+                <v-list-item color="grey lighten-4" @click="getCourse">
+                  <v-list-item-icon>
+                    <v-icon>refresh</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title> Actualizar </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
             </v-sheet>
           </v-col>
 
@@ -242,14 +255,6 @@ export default {
       this.loading = false;
     },
     async goLesson(id) {
-      let r = await this.$http.get("/cycle/all", {
-        params: {
-          stimulus: "click_structure",
-          id: this.user.id,
-          name: this.user.name,
-        },
-      });
-
       this.$router.push(`/course/${this.course._id}/lesson/${id}`);
     },
   },
@@ -257,7 +262,7 @@ export default {
 </script>
 <style scoped>
 .border {
-  border-left: 6px solid orange;
+  border-left: 6px solid purple;
 }
 
 .tile {
@@ -268,10 +273,17 @@ export default {
 }
 
 .main-border {
-  border-left: 8px solid orange;
+  border-left: 8px solid #ebbf4b;
 }
 
 .main-course {
-  background-color: rgb(177, 215, 244);
+  background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0.3) 100%
+    ),
+    url("~@/assets/images/fondo-u2.jpeg") left no-repeat;
+  background-size: 100%;
+  background-attachment: fixed;
 }
 </style>
