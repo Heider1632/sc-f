@@ -1,5 +1,5 @@
 <template>
-    <v-app-bar id="core-app-bar" fixed app elevate-on-scroll color="white" flat >
+    <v-app-bar id="core-app-bar" fixed app elevate-on-scroll color="blue" flat >
         <v-container class="py-0 fill-height">
 
             <img class="mr-3 hidden-sm-and-down" :src="require('@/assets/images/logo-its.png')" height="40"/>
@@ -10,7 +10,10 @@
 
             <v-menu>
                 <template v-slot:activator="{ on }">
-                    <v-btn text class="purple--text display-5" v-on="on">
+                    <v-btn text class="white--text display-5" v-on="on">
+                        <v-avatar color="orange" class="white--text ml-4" size="35">
+                            {{ name.split(' ')[0].charAt(0) }}{{ name.split(' ')[1].charAt(0) }}
+                        </v-avatar>
                         {{ name }}
                     </v-btn>
                 </template>

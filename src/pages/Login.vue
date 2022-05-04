@@ -54,15 +54,6 @@
               </div>
             </v-form>
           </validation-observer>
-          <!-- <div class="text-center">
-              <v-row>
-                <v-col cols="8">
-                  <v-btn class="signin-btn" type="submit" color="white" dark  @click="register">
-                    Sign In
-                  </v-btn>
-                </v-col>
-              </v-row>
-          </div> -->
         
         </v-col>
       </v-row>
@@ -151,15 +142,14 @@ export default {
 
         var filtered = Object.filter(this.$device, device => device == true);
         var device = Object.keys(filtered)[0]
+
         this.$http.post('/auth/signin', {
           email: this.email,
           password: this.password,
           device: device,
           userAgent: userAgent
         })
-        .then(response => {
-
-          console.log(response);
+        .then(async response => {
           
           if(response.status == 200){
             
@@ -170,6 +160,14 @@ export default {
               email: response.data.email,
               roles: response.data.roles
             })
+
+            let r = await this.$http.get('/cycle/all', { params: {
+                stimulus: "logging",
+                id: response.data.id,
+                name: response.data.name           
+            }});
+
+            console.log(r);
             
             this.loading = false;
             this.$store.dispatch("autoLogin");
