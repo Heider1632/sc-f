@@ -227,7 +227,7 @@ export default {
                 student: this.user.student_id,
                 course: this.$route.params.id,
                 lesson: lesson._id,
-                isActive: lesson.order == 4 ? false : true,
+                isActive: lesson.order == 1 ? false : true,
               });
 
               this.progress.push(progress.data);
