@@ -161,12 +161,8 @@
 </template>
 <script>
 import { mapMutations, mapState } from "vuex";
-import pdf from "vue-pdf";
 export default {
   name: "Course",
-  components: {
-    pdf,
-  },
   data: () => ({
     rating: 0,
     loading: false,
