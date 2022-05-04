@@ -2,103 +2,64 @@
   <v-main class="white">
     <app-bar></app-bar>
 
-    <v-container fill-height>
-      <template v-if="loading">
+    <template v-if="loading">
+      <v-container fill-height>
         <v-row justify="center" align="center">
           <v-col cols="12" sm="4">
             <material-loader></material-loader>
           </v-col>
         </v-row>
-      </template>
-      <template v-else>
-        <v-row v-if="lesson">
-          <v-col md="12" sm="12">
-            <v-toolbar flat rounded color="primary">
-              <v-toolbar-title>
-                <p class="white--text font-weight-semibold mb-1">
-                  {{ lesson ? lesson.title : "" }}
-                </p>
-                <v-progress-linear
-                  color="white"
-                  buffer-value="20"
-                  stream
-                ></v-progress-linear>
-              </v-toolbar-title>
+      </v-container>
+    </template>
+    <template v-else>
+      <v-container fluid class="main-course">
+        <v-row v-if="lesson" class="ml-16 mr-16">
+          <v-col lg="5" md="5" sm="5" cols="12">
+            <v-sheet>
+              <p class="subtitle pa-4">
+                <strong>Resultados de aprendizaje:</strong>
+                {{ lesson.hasObjectiveLesson }}
+              </p>
+            </v-sheet>
+          </v-col>
 
-              <v-divider class="mx-2" inset vertical></v-divider>
-
-              <div class="flex-grow-1"></div>
-
-              <v-breadcrumbs :items="getLessons" class="hidden-sm-and-down">
-                <template v-slot:item="{ item }">
-                  <v-breadcrumbs-item
-                    :class="
-                      item._id == $route.params.lesson
-                        ? 'black--text'
-                        : 'white--text'
-                    "
-                    :disabled="item.isActive"
-                  >
-                    {{ item.title.split(".")[0] }}
-                  </v-breadcrumbs-item>
+          <v-col lg="3" md="3" sm="3" cols="12">
+            <v-sheet>
+              <h3 class="pa-2">Progreso del curso</h3>
+              <v-progress-linear color="green" value="80" height="20">
+                <template v-slot:default="{ value }">
+                  <strong>{{ Math.ceil(value) }}%</strong>
                 </template>
-              </v-breadcrumbs>
-            </v-toolbar>
-          </v-col>
+              </v-progress-linear>
 
-           <v-col lg="4" md="4" sm="4" cols="12">
-            <v-sheet class="border">
-              <div class="mb-1">
-                <v-toolbar flat rounded prominent>
-                  <v-layout column wrap align-content-space-around align-start>
-                    <v-flex shrink>
-                      <v-btn
-                        color="purple"
-                        dark
-                        elevation="0"
-                        class="mb-4 mt-4"
-                        @click="$router.go(-1)"
-                      >
-                        volver al area personal
-                        <v-icon small>mdi-arrow-left</v-icon>
-                      </v-btn>
-                    </v-flex>
-
-                    <v-flex> Tiempo: {{ time }} Segundos </v-flex>
-                    <v-flex> Intento N°: {{ attempts }} </v-flex>
-                  </v-layout>
-                </v-toolbar>
-              </div>
+              <h3 class="pa-2">Progreso de la lección</h3>
+              <v-progress-linear color="orange" value="60" height="20">
+                <template v-slot:default="{ value }">
+                  <strong>{{ Math.ceil(value) }}%</strong>
+                </template>
+              </v-progress-linear>
             </v-sheet>
           </v-col>
-
-           <v-col lg="8" md="8" sm="4" cols="12">
-            <v-sheet class="border">
-              <div class="mb-1">
-                <v-toolbar flat rounded prominent>
-                  <v-layout column wrap align-content-space-around align-start>
-                    <v-flex shrink>
-                      <v-btn
-                        color="purple"
-                        dark
-                        elevation="0"
-                        class="mb-4 mt-4"
-                        @click="$router.go(-1)"
-                      >
-                        volver al area personal
-                        <v-icon small>mdi-arrow-left</v-icon>
-                      </v-btn>
+          <v-col lg="4" md="4" sm="4" cols="12">
+            <v-sheet class="border white pa-2">
+                  <v-layout fill-height column>
+                    <v-flex>
+                      <h3>Componentes de conocimientos</h3>
                     </v-flex>
-
-                    <v-flex> Tiempo: {{ time }} Segundos </v-flex>
-                    <v-flex> Intento N°: {{ attempts }} </v-flex>
+                    <v-flex v-for="kc in lesson.knowledgeComponent" :key="kc._id">
+                      <p class="text-wrap text-justify caption">
+                      {{ kc.name }}
+                      </p>
+                    </v-flex>
                   </v-layout>
-                </v-toolbar>
-              </div>
+
             </v-sheet>
           </v-col>
+        </v-row>
+      </v-container>
 
-
+      <v-container>
+        <v-row>
           <v-col lg="3" md="3" sm="3" cols="12">
             <v-sheet rounded="lg">
               <v-list rounded color="transparent">
@@ -420,10 +381,28 @@
             </v-sheet>
           </v-col>
 
-         
+          <v-col lg="3" md="3" sm="3" cols="12">
+            <v-sheet class="spa-6 d-flex align-content-center">
+              <v-btn text color="primary">Anterior</v-btn>
+              <v-divider inset vertical></v-divider>
+              <v-btn text color="primary">Siguiente</v-btn>
+            </v-sheet>
+
+            <v-sheet class="border">
+              <div class="mb-1 pa-6">
+                <v-flex> Tiempo: {{ time }} Segundos </v-flex>
+                <v-flex> Intento N°: {{ attempts }} </v-flex>
+              </div>
+            </v-sheet>
+
+            <v-sheet>
+              <p>¿Consideras que este recurso aporta a tu aprendizaje?</p>
+              <v-slider v-model="rating" max="5" min="1"></v-slider>
+            </v-sheet>
+          </v-col>
         </v-row>
-      </template>
-    </v-container>
+      </v-container>
+    </template>
   </v-main>
 </template>
 <script>
@@ -513,7 +492,6 @@ export default {
       } else {
         this.rating = 0;
       }
-
       if (val == 5) {
         this.setConfirm(true);
       }
@@ -581,17 +559,14 @@ export default {
     shuffle(array) {
       let currentIndex = array.length,
         randomIndex;
-
       while (currentIndex != 0) {
         randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex--;
-
         [array[currentIndex], array[randomIndex]] = [
           array[randomIndex],
           array[currentIndex],
         ];
       }
-
       return array;
     },
     async getAttempts() {
@@ -599,7 +574,6 @@ export default {
         let response = await this.$http.get(
           `/student/attempts?student=${this.user.student_id}&course=${this.$route.params.course}&lesson=${this.$route.params.lesson}`
         );
-
         this.attempts = response.data.count;
       } catch (error) {
         console.log(error.message);
@@ -607,19 +581,14 @@ export default {
     },
     async getLesson() {
       this.loading = true;
-
       this.setIdCase(null);
-
       try {
         let response = await this.$http.get(
           `/lesson/one?id=${this.$route.params.lesson}`
         );
-
         this.lesson = response.data;
-
         this.setProgress([]);
         this.setAssessments([]);
-
         Promise.all(
           this.lesson.structure.map(async (structure, index) => {
             this.getAsyncProgress({
@@ -648,42 +617,30 @@ export default {
             lesson: this.$route.params.lesson,
           }).then(
             (response) => {
-              // console.log(response);
-              // if (response.data.length > 0) {
-              //   let last = response.data[response.data.length - 1];
-              //   this.inputIndex = last.assessments.length;
-              // } else {
-              //   this.inputIndex = 0;
-              // }
               this.inputIndex = 0;
             },
             (error) => {
               console.log(error.message);
             }
           );
-
           await this.getResources();
           await this.getAssessment();
         });
       } catch (e) {
         console.log(e.message);
       }
-
       this.loading = false;
     },
     async getResources() {
       if (this.getIdCase == null) {
         let structureIds = this.lesson.structure.map((s) => s._id);
-
         let response = await this.$http.post("/metacore/initial", {
           id_student: this.user.student_id,
           id_course: this.$route.params.course,
           id_lesson: this.$route.params.lesson,
           structure: structureIds,
         });
-
         this.setIdCase(response.data.id_case);
-
         this.lesson.structure = this.lesson.structure.map((s, index) => {
           s.data = response.data.plan[index];
           return s;
@@ -692,13 +649,11 @@ export default {
         let response = await this.$http.get("/metacore/one", {
           id: this.getIdCase,
         });
-
         this.lesson.structure = this.lesson.structure.map((s, index) => {
           s.data = response.data.plan[index];
           return s;
         });
       }
-
       this.toggleTimer();
       this.toogleTotalTime();
     },
@@ -707,9 +662,7 @@ export default {
         let response = await this.$http.get(
           `/assessment/one?lesson=${this.$route.params.lesson}`
         );
-
         this.assessment = response.data;
-
         this.questions = this.assessment.questions;
       } catch (e) {
         console.log(e);
@@ -725,7 +678,6 @@ export default {
         if (this.inputIndex == 5) {
           this.setConfirm(true);
         }
-
         try {
           this.inputIndex = this.inputIndex - 1;
           console.log(this.inputIndex);
@@ -740,28 +692,22 @@ export default {
         if (this.inputIndex == 5) {
           this.setConfirm(true);
         }
-
         this.reorderProgress();
-
         if (this.lesson.structure[this.inputIndex].data.rating != 0) {
           try {
             if (this.lesson.structure[this.inputIndex].data) {
               this.lesson.structure[this.inputIndex].data.time_use += this.time;
-
               this.pushAssessment({
                 time_use: this.lesson.structure[this.inputIndex].data.time_use,
                 like: this.lesson.structure[this.inputIndex].data.rating,
               });
             }
-
             let resourcesIds = this.lesson.structure.map((s) => {
               if (s.data) {
                 return s.data.resource._id;
               }
             });
-
             resourcesIds = resourcesIds.filter((rs) => rs != undefined);
-
             if (this.getAssessments.length == 1) {
               let response = await this.$http.post("/trace/create", {
                 student: this.user.student_id,
@@ -771,7 +717,6 @@ export default {
                 assessments: this.getAssessments,
                 logs: this.logs,
               });
-
               if (response.status == 200) {
                 this.setTrace(response.data._id);
               }
@@ -783,13 +728,11 @@ export default {
                 logs: this.logs,
               });
             }
-
             //TODO: update in vuex
             this.setAsyncProgress({
               id: this.getProgress[this.inputIndex + 1]._id,
               index: this.inputIndex + 1,
             });
-
             this.rating = 0;
             this.toggleTimer();
             await this.skipProgress();
@@ -804,7 +747,6 @@ export default {
             submessage: "Debes calificar el recurso",
             pos: ["top", "center"],
           };
-
           this.loading = false;
           this.open(args);
         }
@@ -812,7 +754,6 @@ export default {
     },
     async finish() {
       let valid = this.$refs.forminterview.validate();
-
       if (valid) {
         let r = await this.$http.get("/cycle/all", {
           params: {
@@ -821,19 +762,14 @@ export default {
             name: this.user.name,
           },
         });
-
         console.log(r);
-
         let resourcesIds = this.lesson.structure.map((s) => {
           if (s.data) {
             return s.data;
           }
         });
-
         resourcesIds = resourcesIds.filter((ri) => ri != undefined);
-
         let sum = 0;
-
         this.questions.map((as) => {
           if (as.response == as.user) {
             let note = 5 / this.questions.length;
@@ -844,11 +780,8 @@ export default {
             }
           }
         });
-
         this.note = sum;
-
         this.percentage = (this.note * 100) / 5;
-
         this.getAssessments.forEach((as) => {
           if (as.time_use > 60 && as.like > 3) {
             this.isValid = true;
@@ -856,7 +789,6 @@ export default {
             this.isValid = false;
           }
         });
-
         await Promise.all([
           this.$http.post("/metacore/history", {
             id_case: this.getIdCase,
@@ -871,7 +803,6 @@ export default {
         ]).then((response) => {
           console.log(response);
         });
-
         if (this.note == 5 && this.isValid) {
           await Promise.all(
             this.getProgress.map(async (p) => {
@@ -888,7 +819,6 @@ export default {
               }
             })
           );
-
           this.$http
             .post("/metacore/review", {
               id_case: this.getIdCase,
@@ -900,29 +830,22 @@ export default {
               if (response.status == 200) {
                 this.toogleTotalTime();
                 this.setIdCase(null);
-
                 let currentLesson = this.getLessons.filter(
                   (gl) => gl._id == this.$route.params.lesson
                 );
-
                 if (currentLesson.length > 0) {
                   currentLesson = currentLesson[0];
-
                   let response = await this.$http.post("/progress/update", {
                     id: currentLesson._id,
                     isActive: true,
                   });
-
                   this.setWin(true);
                   this.setAssessments([]);
                   this.setProgress([]);
-
                   if (response.status == 200) {
                     //paso a activar la siguiente leccion
-
                     if (currentLesson.index < 4) {
                       let index = this.getLessons.indexOf(currentLesson);
-
                       await this.$http.post("/progress/update", {
                         id: this.getLessons[index + 1]._id,
                         isActive: false,
@@ -951,7 +874,6 @@ export default {
               }
             })
           );
-
           this.$http
             .post("/metacore/review", {
               id_case: this.getIdCase,
@@ -963,29 +885,22 @@ export default {
               if (response.status == 200) {
                 this.toogleTotalTime();
                 this.setIdCase(null);
-
                 let currentLesson = this.getLessons.filter(
                   (gl) => gl._id == this.$route.params.lesson
                 );
-
                 if (currentLesson.length > 0) {
                   currentLesson = currentLesson[0];
-
                   let response = await this.$http.post("/progress/update", {
                     id: currentLesson._id,
                     isActive: true,
                   });
-
                   this.setWin(true);
                   this.setAssessments([]);
                   this.setProgress([]);
-
                   if (response.status == 200) {
                     //paso a activar la siguiente leccion
-
                     if (currentLesson.index < 4) {
                       let index = this.getLessons.indexOf(currentLesson);
-
                       await this.$http.post("/progress/update", {
                         id: this.getLessons[index + 1]._id,
                         isActive: false,
@@ -1022,7 +937,6 @@ export default {
           submessage: "Debes completar todas las preguntas",
           pos: ["top", "center"],
         };
-
         this.loading = false;
         this.open(args);
       }
@@ -1030,7 +944,6 @@ export default {
     async rebuild() {
       this.setConfirm(true);
       this.showFeedback = false;
-
       let r = await this.$http.get("/cycle/all", {
         params: {
           stimulus: "click_finish_button",
@@ -1038,9 +951,7 @@ export default {
           name: this.user.name,
         },
       });
-
       console.log(r);
-
       await Promise.all(
         this.getProgress.map(async (p, index) => {
           if (p.index != 0) {
@@ -1088,7 +999,6 @@ export default {
             this.updateProgress({ index: r.data.index, isBlock: true });
           }
         });
-
         this.setConfirm(false);
       });
     },
@@ -1104,12 +1014,13 @@ export default {
   display: flex;
   flex-direction: column;
 }
-
 .scroll {
   overflow-y: scroll;
 }
-
 .border {
-  border-left: 4px solid purple;
+  border-left: 6px solid blue;
+}
+.main-course {
+  background-color: rgb(177, 215, 244);
 }
 </style>

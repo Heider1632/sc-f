@@ -23,14 +23,14 @@
               <v-sheet class="main-border">
                 <h1 class="pa-2 subtitle">Acerca del curso</h1>
                 <p class="pa-2 subtitle-2 text-justify">
-                  El Sistema Tutor Inteligente Fichas y protocolos en salud te
-                  ofrecerá una secuencia de aprendizaje personalizada de acuerdo
-                  a tus estilos de aprendizaje detectados en el test anterior.
-                  Mediante esta herramienta accederás a los contenidos del curso
-                  Protocolos de atención para la detección temprana de sífilis
-                  gestacional y congénita, el cual se divide en cuatro unidades
-                  que podrás ver a continuación. El tiempo de dedicación al
-                  curso será de 24 horas mínimo.
+                  El Sistema cognitivo te ofrecerá una secuencia de aprendizaje
+                  personalizada de acuerdo a tus estilos de aprendizaje
+                  detectados en el test anterior. Mediante esta herramienta
+                  accederás a los contenidos del curso Protocolos de atención
+                  para la detección temprana de sífilis gestacional y congénita,
+                  el cual se divide en cuatro unidades que podrás ver a
+                  continuación. El tiempo de dedicación al curso será de 24
+                  horas mínimo.
                 </p>
 
                 <p class="pa-2 subtitle-2 text-justify">
@@ -42,22 +42,25 @@
             </v-col>
           </v-row>
         </v-container>
-        <v-container fluid class="white" style="height: 50vh;">
+        <v-container fluid class="white" style="height: 50vh">
           <v-row class="mr-10 ml-10" align="center" justify="center">
             <v-card
-                elevation="1"
-                height="100"
+              elevation="1"
               flat
               rounded
               v-for="(course, index) in courses"
               :key="index"
               class="full-height pa-6 mt-16"
             >
-              <v-card-text class="full-height pa-2 d-flex flex-row">
-                <v-img width="150" src="" />
+              <v-card-text class="full-height pa-2 d-flex flex-row align-center">
+                <v-img width="150" :src="require('@/assets/images/imagen-inicio-sistemacog.png')" />
                 <h1 class="display-1 align-center">{{ course.name }}</h1>
                 <v-divider class="mx-4" vertical />
-                <v-btn elevation="0" class="white--text" @click="go(`/course/${course._id}`)" color="orange"
+                <v-btn
+                  elevation="0"
+                  class="white--text"
+                  @click="go(`/course/${course._id}`)"
+                  color="orange"
                   >ir al curso</v-btn
                 >
               </v-card-text>

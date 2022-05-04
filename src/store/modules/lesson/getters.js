@@ -4,6 +4,7 @@ export default {
     getIdCase: (state) => state.id_case,
     getIndex: (state) => state.index,
     getConfirm: (state) => state.confirm,
+    getResources: (state) => state.resources,
     getAssessments: (state) => state.assessments,
     getProgress: (state) => state.progress,
     getShowFinishButton: (state) => state.showFinishButton,

@@ -24,14 +24,13 @@
             <v-sheet class="main-border">
               <h1 class="pa-2 subtitle">Acerca del curso</h1>
               <p class="pa-2 subtitle-2 text-justify">
-                El Sistema Tutor Inteligente Fichas y protocolos en salud te
-                ofrecerá una secuencia de aprendizaje personalizada de acuerdo a
-                tus estilos de aprendizaje detectados en el test anterior.
-                Mediante esta herramienta accederás a los contenidos del curso
-                Protocolos de atención para la detección temprana de sífilis
-                gestacional y congénita, el cual se divide en cuatro unidades
-                que podrás ver a continuación. El tiempo de dedicación al curso
-                será de 24 horas mínimo.
+                El Sistema cognitivo te ofrecerá una secuencia de aprendizaje
+                personalizada de acuerdo a tus estilos de aprendizaje detectados
+                en el test anterior. Mediante esta herramienta accederás a los
+                contenidos del curso Protocolos de atención para la detección
+                temprana de sífilis gestacional y congénita, el cual se divide
+                en cuatro unidades que podrás ver a continuación. El tiempo de
+                dedicación al curso será de 24 horas mínimo.
               </p>
 
               <p class="pa-2 subtitle-2 text-justify">
@@ -44,7 +43,7 @@
         </v-row>
       </v-container>
 
-      <v-container fluid class="white">
+      <v-container fluid class="white mb-9">
         <v-row class="mr-10 ml-10">
           <v-col md="8" sm="12">
             <v-sheet>
@@ -164,6 +163,7 @@
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
+
               </v-list>
             </v-sheet>
           </v-col>
@@ -196,7 +196,7 @@ export default {
     this.getCourse();
   },
   methods: {
-    ...mapMutations("lesson", ["setIdCase"]),
+    ...mapMutations("lesson", ["setIdCase", "setResources"]),
     ...mapMutations("course", ["setLessons"]),
     async getCourse() {
       this.loading = true;
@@ -257,6 +257,10 @@ export default {
     async goLesson(id) {
       this.$router.push(`/course/${this.course._id}/lesson/${id}`);
     },
+    openPdf() {
+      //window.open('/src/assets/info/Programa-curso-Protocolos.pdf', '_blank')
+      window.open("/src/assets/logo.png", "_blank");
+    },
   },
 };
 </script>
@@ -274,6 +278,21 @@ export default {
 
 .main-border {
   border-left: 8px solid #ebbf4b;
+}
+
+.main-course {
+  background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0.3) 100%
+    ),
+    url("~@/assets/images/fondo-u2.jpeg") left no-repeat;
+  background-size: 100%;
+  background-attachment: fixed;
+}
+
+.main-border {
+  border-left: 3px solid #ebbf4b;
 }
 
 .main-course {
