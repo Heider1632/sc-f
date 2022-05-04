@@ -24,7 +24,7 @@
             <v-sheet class="main-border">
               <h1 class="pa-2 subtitle">Acerca del curso</h1>
               <p class="pa-2 subtitle-2 text-justify">
-                El Sistema cognitivo te ofrecerá una secuencia de aprendizaje
+                El Sistema tutor inteligente te ofrecerá una secuencia de aprendizaje
                 personalizada de acuerdo a tus estilos de aprendizaje detectados
                 en el test anterior. Mediante esta herramienta accederás a los
                 contenidos del curso Protocolos de atención para la detección

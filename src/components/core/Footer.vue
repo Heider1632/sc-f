@@ -15,10 +15,10 @@
           </p>
         </v-col>
         <v-col lg="6" md="6" sm="12" xs="12" class="d-flex align-center">
-          <h1 class="blue--text">EDUTLAN</h1>
-          <v-img width="60"  :src="require('@/assets/images/logo-huellas.png')" />
-          <v-img width="60"  :src="require('@/assets/images/logo-its.png')" />
-          <v-img width="60"  :src="require('@/assets/images/unicor.png')" />
+          <h2 class="blue--text">EDUTLAN</h2>
+          <v-img width="50" height="80"  :src="require('@/assets/images/logo-huellas.png')" />
+          <v-img width="30"  :src="require('@/assets/images/logo-its.png')" />
+          <v-img width="30"  :src="require('@/assets/images/unicor.png')" />
         </v-col>
       </v-row>
     </v-container>
