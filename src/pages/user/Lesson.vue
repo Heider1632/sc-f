@@ -773,7 +773,7 @@ export default {
           }
         });
         this.note = sum;
-        this.percentage = (this.note * 100) / 5;
+        this.percentage = ((this.note * 100) / 5).toFixed(2);
         this.getAssessments.forEach((as) => {
           if (as.time_use > 60 && as.like > 3) {
             this.isValid = true;
