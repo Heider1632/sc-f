@@ -219,8 +219,9 @@
                           class="mx-2"
                           lazy-validation
                         >
-                          <template v-for="(question, key) in questions">
+                          <template>
                             <p
+                              v-for="(question, key) in questions"
                               class="subtitle text-justify"
                               :key="`title-${key}`"
                             >
