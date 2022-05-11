@@ -22,6 +22,15 @@ export default [
     },
   },
   {
+    path: "/profile",
+    name: "Perfil del estudinate",
+    view: "Profile",
+    meta: {
+      Auth: true,
+      rol: ["ROLE_USER"],
+    },
+  },
+  {
     path: "/course/:id",
     name: "Mi Curso",
     view: "user/Course",
