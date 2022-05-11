@@ -32,7 +32,11 @@
               <v-breadcrumbs :items="getLessons" class="hidden-sm-and-down">
                 <template v-slot:item="{ item }">
                   <v-breadcrumbs-item
-                    :class="item._id == $route.params.lesson ? 'black--text' : 'white--text'"
+                    :class="
+                      item._id == $route.params.lesson
+                        ? 'black--text'
+                        : 'white--text'
+                    "
                     :disabled="item.isActive"
                   >
                     {{ item.title.split(".")[0] }}
@@ -64,16 +68,16 @@
                     <v-flex> Intento N°: {{ attempts }} </v-flex>
                   </v-layout>
                 </v-toolbar>
-            </div>
+              </div>
             </v-sheet>
-            
           </v-col>
 
           <v-col lg="8" md="8" sm="8" cols="12">
             <v-sheet>
-              <v-img :src="require('@/assets/images/Banner-Resultado-U4.jpeg')" />
+              <v-img
+                :src="require('@/assets/images/Banner-Resultado-U4.jpeg')"
+              />
             </v-sheet>
-            
           </v-col>
 
           <v-col lg="4" md="4" sm="4" cols="12">
@@ -110,7 +114,6 @@
 
           <v-col lg="8" md="8" sm="8" cols="12">
             <v-sheet min-height="60vh" rounded="lg">
-
               <v-container
                 fluid
                 fill-height
@@ -122,13 +125,16 @@
                     <v-layout column justify-center align-center>
                       <v-flex>
                         <v-alert type="success">
-                          Has alcanzado el 100% de la lección. Te invitamos a continuar desarrollando las siguientes unidades del curso.
+                          Has alcanzado el 100% de la lección. Te invitamos a
+                          continuar desarrollando las siguientes unidades del
+                          curso.
                         </v-alert>
-                       
                       </v-flex>
                       <hr />
                       <v-flex>
-                        <v-btn text color="purple" @click="goToCourse">Finalizar</v-btn>
+                        <v-btn text color="purple" @click="goToCourse"
+                          >Finalizar</v-btn
+                        >
                       </v-flex>
                     </v-layout>
                   </v-card-text>
@@ -191,7 +197,8 @@
                       v-if="
                         lesson.structure[inputIndex] &&
                         lesson.structure[inputIndex].type == 'evaluation' &&
-                        assessment && !getShowWin
+                        assessment &&
+                        !getShowWin
                       "
                     >
                       <template v-if="inputConfirm">
@@ -219,12 +226,11 @@
                           class="mx-2"
                           lazy-validation
                         >
-                          <template>
-                            <p
-                              v-for="(question, key) in questions"
-                              class="subtitle text-justify"
-                              :key="`title-${key}`"
-                            >
+                          <div
+                            v-for="(question, key) in questions"
+                            :key="`title-${key}`"
+                          >
+                            <p class="subtitle text-justify">
                               {{ question.name }}
                             </p>
                             <v-select
@@ -238,11 +244,11 @@
                               ]"
                               required
                             >
-                            <template v-slot:item="slotProps">
-                              {{slotProps.item.label}}
-                            </template>
+                              <template v-slot:item="slotProps">
+                                {{ slotProps.item.label }}
+                              </template>
                             </v-select>
-                          </template>
+                          </div>
                         </v-form>
                       </template>
                     </template>
@@ -506,6 +512,7 @@ export default {
       "setAssessments",
       "reorderProgress",
       "pushAssessment",
+      "pushAssessmentIndex",
       "setProgress",
       "pushProgress",
       "updateProgress",
@@ -697,11 +704,27 @@ export default {
         if (this.lesson.structure[this.inputIndex].data.rating != 0) {
           try {
             if (this.lesson.structure[this.inputIndex].data) {
-              this.lesson.structure[this.inputIndex].data.time_use += this.time;
-              this.pushAssessment({
-                time_use: this.lesson.structure[this.inputIndex].data.time_use,
-                like: this.lesson.structure[this.inputIndex].data.rating,
-              });
+              if (this.getAssessment[this.inputIndex]) {
+                this.lesson.structure[this.inputIndex].data.time_use +=
+                  this.time;
+
+                this.pushAssessmentIndex(
+                  {
+                    time_use:
+                      this.lesson.structure[this.inputIndex].data.time_use,
+                    like: this.lesson.structure[this.inputIndex].data.rating,
+                  },
+                  this.inputIndex
+                );
+              } else {
+                this.lesson.structure[this.inputIndex].data.time_use +=
+                  this.time;
+                this.pushAssessment({
+                  time_use:
+                    this.lesson.structure[this.inputIndex].data.time_use,
+                  like: this.lesson.structure[this.inputIndex].data.rating,
+                });
+              }
             }
             let resourcesIds = this.lesson.structure.map((s) => {
               if (s.data) {
@@ -811,7 +834,7 @@ export default {
                 });
               }
             })
-          )
+          );
           this.$http
             .post("/metacore/review", {
               id_case: this.getIdCase,
@@ -844,7 +867,6 @@ export default {
                         isActive: false,
                       });
                     }
-                    
                   }
                 }
               }
@@ -867,8 +889,8 @@ export default {
                 });
               }
             })
-          )
-          
+          );
+
           this.$http
             .post("/metacore/review", {
               id_case: this.getIdCase,
@@ -901,7 +923,6 @@ export default {
                         isActive: false,
                       });
                     }
-                    
                   }
                 }
               }
@@ -990,10 +1011,10 @@ export default {
         this.setConfirm(false);
       });
     },
-    goToCourse(){
+    goToCourse() {
       this.setWin(false);
       this.$router.push(`/course/${this.$route.params.course}`);
-    }
+    },
   },
 };
 </script>
