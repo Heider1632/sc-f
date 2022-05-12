@@ -631,15 +631,18 @@ export default {
 
                 $this.setCurrentAssessment(last);
 
-                if(last.assessments.length != 6){
+                console.log(last.assessments.length);
+
+                if(last.assessments.length != 5){
+
                   $this.setAssessments(last.assessments);
                   $this.setIndex(last.assessments.length)
                   this.forceRerender();
                 } else {
-                  this.inputIndex = 0;
+                  this.setIndex(0);
                 }
               } else {
-                this.inputIndex = 0;
+                this.setIndex(0);
               }
             },
             (error) => {
