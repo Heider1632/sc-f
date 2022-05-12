@@ -14,7 +14,7 @@
     <template v-esle>
       <v-container>
         <v-row>
-          <v-col cols="6">
+          <v-col cols="6" class="d-flex mt-12">
             <h1 class="pa-2 subtitle">
               Curso: {{ course ? course.name : "" }}
             </h1>
