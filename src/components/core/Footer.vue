@@ -10,13 +10,13 @@
     <v-container>
       <v-row>
         <v-col lg="6" md="6" sm="12" xs="12">
-          <p class="subtitle-1 black--text mt-8">
+          <p class="subtitle-1 white--text">
             Este sistema cognitivo es utilizado en el programa de enfermería de la Universidad de Córdoba-Colombia para el proceso de enseñanza de los protocolos asistenciales para el diagnóstico precoz de la sífilis gestacional y congénita.
           </p>
         </v-col>
         <v-col lg="6" md="6" sm="12" xs="12" class="d-flex align-center">
           <h2 class="blue--text">EDUTLAN</h2>
-          <v-img width="50" height="80"  :src="require('@/assets/images/logo-huellas.png')" />
+          <v-img width="30" height="80" :src="require('@/assets/images/logo-huellas.png')" />
           <v-img width="30"  :src="require('@/assets/images/logo-its.png')" />
           <v-img width="30"  :src="require('@/assets/images/unicor.png')" />
         </v-col>
