@@ -6,6 +6,7 @@ export default {
     setConfirm: (state, confirm) => state.confirm = confirm,
     setResources: (state, resources) => state.resources = resources,
     setAssessments: (state, assessments) => state.assessments = assessments,
+    setCurrentAssessment: (state, assessment) => state.currentAssessment = assessment,
     pushAssessment: (state, assessment) => state.assessments.push(assessment),
     pushAssessmentIndex: (state, assessment, index) => state.assessments[index] = assessment,
     reorderProgress: (state) => state.progress = state.progress.sort((a,b) => { 

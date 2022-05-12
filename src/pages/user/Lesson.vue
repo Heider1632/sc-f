@@ -82,7 +82,7 @@
 
           <v-col lg="4" md="4" sm="4" cols="12">
             <v-sheet rounded="lg">
-              <v-list rounded color="transparent">
+              <v-list rounded color="transparent" :key="componentKey">
                 <v-list-item-group color="primary" v-model="inputIndex">
                   <v-list-item
                     v-for="(structure, indice) in lesson
@@ -312,7 +312,7 @@
               </v-layout>
 
               <v-layout
-                class="mr-5 ml-5 mt-12"
+                class="mr-5 ml-5 mt-4"
                 row
                 wrap
                 align-center
@@ -410,6 +410,7 @@ import { mapState, mapMutations, mapGetters, mapActions } from "vuex";
 export default {
   name: "Lesson",
   data: () => ({
+    componentKey: 0,
     rating: 0,
     loading: false,
     lesson: null,
@@ -450,6 +451,7 @@ export default {
       "getIdCase",
       "getIndex",
       "getConfirm",
+      "getCurrentAssessment",
       "getAssessments",
       "getProgress",
       "getShowFinishButton",
@@ -509,6 +511,7 @@ export default {
       "setIdCase",
       "setIndex",
       "setConfirm",
+      "setCurrentAssessment",
       "setAssessments",
       "reorderProgress",
       "pushAssessment",
@@ -527,6 +530,10 @@ export default {
       "getAsyncTrace",
     ]),
     ...mapMutations("notification", ["open"]),
+    forceRerender() {
+        // Remove my-component from the DOM
+        this.componentKey += 1;
+      },
     toogleTotalTime() {
       if (this.isRunningTotal) {
         this.totalTime = 0;
@@ -581,6 +588,7 @@ export default {
       }
     },
     async getLesson() {
+      var $this = this;
       this.loading = true;
       this.setIdCase(null);
       try {
@@ -618,14 +626,21 @@ export default {
             lesson: this.$route.params.lesson,
           }).then(
             (response) => {
-              // console.log(response);
-              // if (response.data.length > 0) {
-              //   let last = response.data[response.data.length - 1];
-              //   this.inputIndex = last.assessments.length;
-              // } else {
-              //   this.inputIndex = 0;
-              // }
-              this.inputIndex = 0;
+              if (response.data.length > 0) {
+                let last = response.data[response.data.length - 1];
+
+                $this.setCurrentAssessment(last);
+
+                if(last.assessments.length != 6){
+                  $this.setAssessments(last.assessments);
+                  $this.setIndex(last.assessments.length)
+                  this.forceRerender();
+                } else {
+                  this.inputIndex = 0;
+                }
+              } else {
+                this.inputIndex = 0;
+              }
             },
             (error) => {
               console.log(error.message);
@@ -704,7 +719,16 @@ export default {
         if (this.lesson.structure[this.inputIndex].data.rating != 0) {
           try {
             if (this.lesson.structure[this.inputIndex].data) {
-              if (this.getAssessment[this.inputIndex]) {
+
+
+              //FIXME: 
+              console.log(this.inputIndex);
+              console.log(this.getAssessments[this.inputIndex])
+
+              if (this.getAssessments[this.inputIndex]) {
+
+                console.log('passo to push');
+
                 this.lesson.structure[this.inputIndex].data.time_use +=
                   this.time;
 
@@ -726,12 +750,16 @@ export default {
                 });
               }
             }
+            
             let resourcesIds = this.lesson.structure.map((s) => {
               if (s.data) {
                 return s.data.resource._id;
               }
             });
+
             resourcesIds = resourcesIds.filter((rs) => rs != undefined);
+
+
             if (this.getAssessments.length == 1) {
               let response = await this.$http.post("/trace/create", {
                 student: this.user.student_id,
@@ -844,17 +872,23 @@ export default {
             })
             .then(async (response) => {
               if (response.status == 200) {
+
                 this.toogleTotalTime();
                 this.setIdCase(null);
+                
                 let currentLesson = this.getLessons.filter(
                   (gl) => gl._id == this.$route.params.lesson
                 );
+                
                 if (currentLesson.length > 0) {
+                 
                   currentLesson = currentLesson[0];
+                  
                   let response = await this.$http.post("/progress/update", {
                     id: currentLesson._id,
                     isActive: true,
                   });
+
                   this.setWin(true);
                   this.setAssessments([]);
                   this.setProgress([]);
@@ -910,6 +944,7 @@ export default {
                   let response = await this.$http.post("/progress/update", {
                     id: currentLesson._id,
                     isActive: true,
+                    complete: true
                   });
                   this.setWin(true);
                   this.setAssessments([]);
@@ -999,7 +1034,6 @@ export default {
           }
         })
       ).then((response) => {
-        console.log(response);
         this.reorderProgress();
         response.map((r) => {
           if (r.data.index == 5) {

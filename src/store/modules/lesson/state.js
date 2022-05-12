@@ -5,6 +5,7 @@ export default {
     index: 0,
     confirm: true,
     resources: [],
+    currentAssessment: null,
     assessments: [],
     progress: [],
     showFinishButton: false,
