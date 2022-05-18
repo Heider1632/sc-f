@@ -882,7 +882,6 @@ export default {
                 this.toogleTotalTime();
                 this.setIdCase(null);
 
-                console.log("KJSCNKJSDNKJCD");
                 let currentLesson = this.getLessons.filter(
                   (gl) => gl._id == this.$route.params.lesson
                 );
@@ -941,24 +940,37 @@ export default {
                 let currentLesson = this.getLessons.filter(
                   (gl) => gl._id == this.$route.params.lesson
                 );
+
                 if (currentLesson.length > 0) {
                   currentLesson = currentLesson[0];
+
                   let response = await this.$http.post("/progress/update", {
                     id: currentLesson._id,
                     isActive: true,
                     complete: true,
                   });
+
                   this.setWin(true);
                   this.setAssessments([]);
                   this.setProgress([]);
+
                   if (response.status == 200) {
                     //paso a activar la siguiente leccion
-                    if (currentLesson.index < 4) {
-                      let index = this.getLessons.indexOf(currentLesson);
-                      await this.$http.post("/progress/update", {
-                        id: this.getLessons[index + 1]._id,
+                    if (currentLesson.order < 4) {
+                      let nextLesson = this.getLessons.filter(gl => gl.order == currentLesson.order + 1);
+
+                      let r = await this.$http.post("/progress/update", {
+                        id: nextLesson[0]._id,
                         isActive: false,
                       });
+
+                    } else {
+                      let response = await this.$http.post("/progress/update", {
+                        id: this.getLessons[0]._id,
+                        isActive: false,
+                      });
+
+                      console.log(response);
                     }
                   }
                 }

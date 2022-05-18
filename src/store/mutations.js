@@ -13,11 +13,6 @@ export default {
       if(rol == "ROLE_USER"){
         state.links = [
           {
-            name: "Notificaciones",
-            path: '/messages',
-            icon: 'mdi-bell'
-          },
-          {
             name: 'Perfil',
             path: '/profile',
             icon: 'mdi-account-circle'
@@ -48,11 +43,6 @@ export default {
             path: '/moderator/interview',
             icon: 'mdi-clipboard-list'
           },
-          // {
-          //   name: 'Perfil',
-          //   path: '/profile',
-          //   icon: 'mdi-account-circle'
-          // },
         ];
       }
     }
