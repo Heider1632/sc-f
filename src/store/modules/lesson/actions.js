@@ -42,6 +42,30 @@ export default {
             })
         })
     },
+    getLastAsyncTrace: async ({ commit }, params) => {
+        let token = localStorage.getItem('token');
+        return new Promise((resolve, reject) => {
+            axios.get("/assessment/student", {
+                params: {
+                    student: params.student,
+                    course: params.course,
+                    lesson: params.lesson
+                }
+            },{
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+              }
+            }).then(response => {
+                if (response.data.length > 0) {
+                    let last = response.data[response.data.length - 1];
+                    resolve(last);
+                }
+            }, error => {
+                reject(error);
+            })
+        })
+    },
     getAsyncProgress({ commit }, params) {
         let token = localStorage.getItem('token');
         return new Promise((resolve, reject) => {
