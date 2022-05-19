@@ -301,7 +301,7 @@ export default {
       rgba(255, 255, 255, 0.3) 0%,
       rgba(255, 255, 255, 0.3) 100%
     ),
-    url("~@/assets/images/Fondo-STI.jpeg") left no-repeat;
+    url("~@/assets/images/Fondo-STI-3.jpeg") left no-repeat;
   background-size: 100%;
   background-attachment: fixed;
 }
