@@ -75,7 +75,7 @@
           <v-col lg="8" md="8" sm="8" cols="12">
             <v-sheet>
               <v-img
-                :src="require('@/assets/images/Banner-Resultado-U4.jpeg')"
+                :src="require('@/assets/images/' + lesson.hasObjectiveLesson)"
               />
             </v-sheet>
           </v-col>
