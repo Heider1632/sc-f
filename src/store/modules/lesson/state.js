@@ -3,7 +3,7 @@ export default {
     trace: null,
     id_case: null,
     index: 0,
-    confirm: true,
+    confirm: false,
     resources: [],
     currentAssessment: null,
     assessments: [],
