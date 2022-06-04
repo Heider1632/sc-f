@@ -26,7 +26,11 @@
           <v-col lg="3" md="3" sm="3" cols="12">
             <v-sheet>
               <h3 class="pa-2">Progreso del curso</h3>
-              <v-progress-linear color="green" :value="percentageCourse" height="20">
+              <v-progress-linear
+                color="green"
+                :value="percentageCourse"
+                height="20"
+              >
                 <template v-slot:default="{ value }">
                   <strong>{{ Math.ceil(value) }}%</strong>
                 </template>
@@ -205,8 +209,9 @@
                           class="mx-2"
                           lazy-validation
                         >
-                          <template v-for="(question, key) in questions">
+                          <template>
                             <p
+                              v-for="(question, key) in questions"
                               class="subtitle text-justify"
                               :key="`title-${key}`"
                             >
@@ -265,6 +270,16 @@
                 color="purple"
                 dark
                 elevation="0"
+                @click="$router.go(-1)"
+              >
+                <v-icon>mdi-home</v-icon>
+              </v-btn>
+
+              <v-btn
+                class="mr-2"
+                color="purple"
+                dark
+                elevation="0"
                 @click="back"
                 v-if="
                   getProgress[inputIndex] &&
@@ -277,7 +292,7 @@
               </v-btn>
 
               <v-btn
-                class="mr-4"
+                class="mr-2"
                 color="purple"
                 dark
                 elevation="0"
@@ -294,7 +309,7 @@
               </v-btn>
 
               <v-btn
-                class="ml-4"
+                class="ml-2"
                 color="purple"
                 dark
                 elevation="0"
@@ -318,7 +333,9 @@
             </v-sheet>
 
             <v-sheet v-if="getResources[inputIndex]">
-              <p class="mb-10">¿Consideras que este recurso aporta a tu aprendizaje?</p>
+              <p class="mb-10">
+                ¿Consideras que este recurso aporta a tu aprendizaje?
+              </p>
               <v-slider
                 v-model="getResources[inputIndex].rating"
                 max="5"
@@ -338,6 +355,7 @@ import { mapState, mapMutations, mapGetters, mapActions } from "vuex";
 export default {
   name: "Lesson",
   data: () => ({
+    componentKey: 0,
     rating: 0,
     loading: false,
     lesson: null,
@@ -383,6 +401,7 @@ export default {
       "getConfirm",
       "getResources",
       "getAssessments",
+      "getCurrentAssessment",
       "getProgress",
       "getShowFinishButton",
       "getShowBackButton",
@@ -416,9 +435,12 @@ export default {
   },
   watch: {
     inputIndex(val) {
-
-      this.progress = (val / 6 * 100).toFixed(0);
-      if (this.getResources && this.getResources[val].data && this.getResources[val].rating != 0) {
+      this.progress = ((val / 6) * 100).toFixed(0);
+      if (
+        this.getResources &&
+        this.getResources[val].data &&
+        this.getResources[val].rating != 0
+      ) {
         this.rating = this.getResources[val].rating;
       } else {
         this.rating = 0;
@@ -444,6 +466,7 @@ export default {
       "setAssessments",
       "reorderProgress",
       "pushAssessment",
+      "pushAssessmentIndex",
       "setProgress",
       "pushProgress",
       "updateProgress",
@@ -458,6 +481,10 @@ export default {
       "getAsyncTrace",
     ]),
     ...mapMutations("notification", ["open"]),
+    forceRerender() {
+      // Remove my-component from the DOM
+      this.componentKey += 1;
+    },
     toogleTotalTime() {
       if (this.isRunningTotal) {
         this.totalTime = 0;
@@ -515,7 +542,7 @@ export default {
         console.log(error.message);
       }
     },
-     async getPercentageStudent() {
+    async getPercentageStudent() {
       try {
         let response = await this.$http.get(
           `/progress/percentage?student=${this.user.student_id}&course=${this.$route.params.course}&lesson=${this.$route.params.lesson}`
@@ -570,7 +597,21 @@ export default {
             lesson: this.$route.params.lesson,
           }).then(
             (response) => {
-              this.inputIndex = 0;
+              if (response.data.length > 0) {
+                let last = response.data[response.data.length - 1];
+
+                $this.setCurrentAssessment(last);
+
+                if (last.assessments.length != 5) {
+                  $this.setAssessments(last.assessments);
+                  $this.setIndex(last.assessments.length);
+                  this.forceRerender();
+                } else {
+                  this.setIndex(0);
+                }
+              } else {
+                this.setIndex(0);
+              }
             },
             (error) => {
               console.log(error.message);
@@ -629,17 +670,31 @@ export default {
         if (this.getResources[this.inputIndex].rating != 0) {
           try {
             if (this.getResources[this.inputIndex]) {
-              this.getResources[this.inputIndex].time_use += this.time;
+              if (this.getAssessments[this.inputIndex]) {
+                this.getResources[this.inputIndex].time_use +=
+                  this.time;
 
-              this.pushAssessment({
-                time_use: this.getResources[this.inputIndex].time_use,
-                like: this.getResources[this.inputIndex].rating,
-              });
+                this.pushAssessmentIndex(
+                  {
+                    time_use:
+                     this.getResources[this.inputIndex].time_use,
+                    like:this.getResources[this.inputIndex].rating,
+                  },
+                  this.inputIndex
+                );
+              } else {
+                this.getResources[this.inputIndex].time_use += this.time;
+
+                this.pushAssessment({
+                  time_use: this.getResources[this.inputIndex].time_use,
+                  like: this.getResources[this.inputIndex].rating,
+                });
+              }
             }
 
             let resourcesIds = this.getResources.map((s) => {
               if (s) {
-                return s.resource._id;
+                return s._id;
               }
             });
 
@@ -731,13 +786,28 @@ export default {
 
         this.percentage = ((this.note * 100) / 5).toFixed(2);
 
-        this.getAssessments.forEach((as) => {
-          if (as.time_use > 60 && as.like > 3) {
-            this.isValid = true;
+        //TODO: get assessment from server
+        let lastTrace = await this.getLastAsyncTrace({
+          student: this.user.student_id,
+          course: this.$route.params.course,
+          lesson: this.$route.params.lesson,
+        });
+
+        let counts = [];
+
+        lastTrace.assessments.forEach((as) => {
+          if (as.time_use < 60 && as.like < 3) {
+            counts.push(0);
           } else {
-            this.isValid = false;
+            counts.push(1);
           }
         });
+
+        if (counts.includes(0)) {
+          this.isValid = false;
+        } else {
+          this.isValid = true;
+        }
 
         if (this.note == 5 && this.isValid) {
           await Promise.all(
@@ -769,6 +839,7 @@ export default {
             let response = await this.$http.post("/progress/update", {
               id: currentLesson._id,
               isActive: true,
+              complete: true,
             });
 
             this.setWin(true);
@@ -777,14 +848,22 @@ export default {
 
             if (response.status == 200) {
               //paso a activar la siguiente leccion
+              if (currentLesson.order < 4) {
+                let nextLesson = this.getLessons.filter(
+                  (gl) => gl.order == currentLesson.order + 1
+                );
 
-              if (currentLesson.index < 4) {
-                let index = this.getLessons.indexOf(currentLesson);
-
-                await this.$http.post("/progress/update", {
-                  id: this.getLessons[index + 1]._id,
+                let r = await this.$http.post("/progress/update", {
+                  id: nextLesson[0]._id,
                   isActive: false,
                 });
+              } else {
+                let response = await this.$http.post("/progress/update", {
+                  id: this.getLessons[0]._id,
+                  isActive: false,
+                });
+
+                console.log(response);
               }
             }
           }
@@ -818,6 +897,7 @@ export default {
             let response = await this.$http.post("/progress/update", {
               id: currentLesson._id,
               isActive: true,
+              complete: true,
             });
 
             this.setWin(true);
@@ -826,14 +906,22 @@ export default {
 
             if (response.status == 200) {
               //paso a activar la siguiente leccion
+              if (currentLesson.order < 4) {
+                let nextLesson = this.getLessons.filter(
+                  (gl) => gl.order == currentLesson.order + 1
+                );
 
-              if (currentLesson.index < 4) {
-                let index = this.getLessons.indexOf(currentLesson);
-
-                await this.$http.post("/progress/update", {
-                  id: this.getLessons[index + 1]._id,
+                let r = await this.$http.post("/progress/update", {
+                  id: nextLesson[0]._id,
                   isActive: false,
                 });
+              } else {
+                let response = await this.$http.post("/progress/update", {
+                  id: this.getLessons[0]._id,
+                  isActive: false,
+                });
+
+                console.log(response);
               }
             }
           }

@@ -6,6 +6,7 @@ export default {
     getConfirm: (state) => state.confirm,
     getResources: (state) => state.resources,
     getAssessments: (state) => state.assessments,
+    getCurrentAssessment: (state) => state.currentAssessment,
     getProgress: (state) => state.progress,
     getShowFinishButton: (state) => state.showFinishButton,
     getShowBackButton: (state) => state.showBackButton,

@@ -15,8 +15,8 @@
       <template v-if="courses.length > 0">
         <v-container>
           <v-row>
-            <v-col cols="6">
-              <h1 class="pa-2 display-4">Bienvenido de nuevo</h1>
+            <v-col cols="6" align-self="center">
+              <h1 class="pa-2 display-3">Bienvenido de nuevo</h1>
             </v-col>
 
             <v-col cols="6">

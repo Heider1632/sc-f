@@ -14,7 +14,7 @@
     <template v-esle>
       <v-container>
         <v-row>
-          <v-col cols="6">
+          <v-col cols="6" align-self="center">
             <h1 class="pa-2 subtitle">
               Curso: {{ course ? course.name : "" }}
             </h1>
@@ -68,7 +68,7 @@
                           progress[index] &&
                           progress.filter((x) => x.lesson == lesson._id)[0] &&
                           progress.filter((x) => x.lesson == lesson._id)[0]
-                            .isActive
+                            .complete
                         "
                         color="green"
                         class="ma-2"
@@ -250,8 +250,10 @@ export default {
         },
       });
 
+      console.log(r.data[0]);
+
       this.setResources(r.data[0]);
-      this.$router.push(`/course/${this.course._id}/lesson/${id}`);
+      // this.$router.push(`/course/${this.course._id}/lesson/${id}`);
     },
     openPdf() {
       //window.open('/src/assets/info/Programa-curso-Protocolos.pdf', '_blank')
