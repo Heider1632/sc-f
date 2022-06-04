@@ -19,10 +19,10 @@
           <v-img width="20" height="60"  :src="require('@/assets/images/logo-huellas.png')" />
           <v-img width="20"  :src="require('@/assets/images/logo-its.png')" />
           <v-img width="20"  :src="require('@/assets/images/unicor.png')" />
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-footer>
+          </v-col>
+        </v-row>
+      </v-container>
+      </v-footer>
 </template>
 <script>
 export default {

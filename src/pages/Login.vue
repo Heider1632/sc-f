@@ -160,14 +160,6 @@ export default {
               email: response.data.email,
               roles: response.data.roles
             })
-
-            let r = await this.$http.get('/cycle/all', { params: {
-                stimulus: "logging",
-                id: response.data.id,
-                name: response.data.name           
-            }});
-
-            console.log(r);
             
             this.loading = false;
             this.$store.dispatch("autoLogin");

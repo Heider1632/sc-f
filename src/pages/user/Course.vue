@@ -24,7 +24,7 @@
             <v-sheet class="main-border">
               <h1 class="pa-2 subtitle">Acerca del curso</h1>
               <p class="pa-2 subtitle-2 text-justify">
-                El Sistema cognitivo te ofrecerá una secuencia de aprendizaje
+                El Sistema tutor inteligente te ofrecerá una secuencia de aprendizaje
                 personalizada de acuerdo a tus estilos de aprendizaje detectados
                 en el test anterior. Mediante esta herramienta accederás a los
                 contenidos del curso Protocolos de atención para la detección
@@ -46,18 +46,18 @@
       <v-container fluid class="white mb-9">
         <v-row class="mr-10 ml-10">
           <v-col md="8" sm="12">
-            <v-sheet >
-              <v-row>
-                <v-col
-                  md="6"
-                  sm="12"
-                  v-for="(lesson, index) in course ? course.lessons : []"
-                  :key="index"
-                >
-                  <v-card
-                    class="mx-auto my-4"
-                    max-width="374"
-                    @click="goLesson(lesson._id)"
+            <v-sheet>
+              <v-list rounded color="transparent">
+                <v-list-item-group color="indigo">
+                  <v-list-item
+                    v-for="(lesson, index) in course ? course.lessons : []"
+                    :key="index"
+                    link
+                    :disabled="
+                      progress[index] &&
+                      progress.filter((x) => x.lesson == lesson._id)[0] &&
+                      progress.filter((x) => x.lesson == lesson._id)[0].isActive
+                    "
                   >
                     <v-img
                       height="100"
@@ -76,17 +76,35 @@
                         Completado
                       </v-chip>
 
-                      <v-chip class="ma-2" color="orange" v-else>
-                        Pendiente
-                      </v-chip>
-                    </v-img>
+                    <v-list-item-action>
+                      <v-btn icon @click="goLesson(lesson._id)">
+                        <v-icon
+                          v-if="
+                            progress[index] &&
+                            progress.filter((x) => x.lesson == lesson._id)[0] &&
+                            !progress.filter((x) => x.lesson == lesson._id)[0]
+                              .isActive
+                          "
+                          color="grey lighten-1"
+                          >mdi-arrow-right</v-icon
+                        >
+                        <v-icon v-else color="grey lighten-1">mdi-lock</v-icon>
+                      </v-btn>
+                    </v-list-item-action>
+                  </v-list-item>
+                </v-list-item-group>
 
-                    <v-card-text style="height: 65px;" >
-                      {{ lesson.title }}
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-              </v-row>
+                <v-divider class="my-2"></v-divider>
+
+                <v-list-item color="grey lighten-4" @click="getCourse">
+                  <v-list-item-icon>
+                    <v-icon>refresh</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title> Actualizar </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
             </v-sheet>
           </v-col>
 
@@ -214,7 +232,7 @@ export default {
                 student: this.user.student_id,
                 course: this.$route.params.id,
                 lesson: lesson._id,
-                isActive: lesson.order == 4 ? false : true,
+                isActive: lesson.order == 1 ? false : true,
               });
 
               this.progress.push(progress.data);
@@ -242,18 +260,7 @@ export default {
       this.loading = false;
     },
     async goLesson(id) {
-      let r = await this.$http.get("/cycle/all", {
-        params: {
-          stimulus: "click_structure",
-          id: this.user.student_id,
-          lesson: id
-        },
-      });
-
-      console.log(r.data[0]);
-
-      this.setResources(r.data[0]);
-      // this.$router.push(`/course/${this.course._id}/lesson/${id}`);
+      this.$router.push(`/course/${this.course._id}/lesson/${id}`);
     },
     openPdf() {
       //window.open('/src/assets/info/Programa-curso-Protocolos.pdf', '_blank')
@@ -264,7 +271,7 @@ export default {
 </script>
 <style scoped>
 .border {
-  border-left: 6px solid orange;
+  border-left: 6px solid purple;
 }
 
 .tile {
@@ -275,11 +282,18 @@ export default {
 }
 
 .main-border {
-  border-left: 8px solid orange;
+  border-left: 8px solid #ebbf4b;
 }
 
 .main-course {
-  background-color: rgb(177, 215, 244);
+  background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0.3) 100%
+    ),
+    url("~@/assets/images/fondo-u2.jpeg") left no-repeat;
+  background-size: 100%;
+  background-attachment: fixed;
 }
 
 .main-border {
@@ -292,7 +306,7 @@ export default {
       rgba(255, 255, 255, 0.3) 0%,
       rgba(255, 255, 255, 0.3) 100%
     ),
-    url("~@/assets/images/fondo-u2.jpeg") left no-repeat;
+    url("~@/assets/images/Fondo-STI-3.jpeg") left no-repeat;
   background-size: 100%;
   background-attachment: fixed;
 }

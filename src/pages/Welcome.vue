@@ -10,7 +10,7 @@
     </v-toolbar>
     <v-container fluid>
       <v-row class="py-12 mx-auto">
-        <v-col cols="12" lg="6" md="6" sm="12">
+        <v-col cols="12" lg="6" md="6" sm="12" align-self="center">
           <h1 class="display-5">¡Bienvenidos a tu tutor virtual!</h1>
           <p class="justify-text">
             Fichas y protocolos en salud es un Sistema Tutor Inteligente (STI)
@@ -26,7 +26,7 @@
         <v-col cols="12" lg="6" md="6" sm="12">
           <video-embed
             css="embed-responsive-21by9"
-            src="https://www.youtube.com/watch?v=YBKB6Dusubo"
+            src="https://www.youtube.com/watch?v=XIzFFfoxd40"
           ></video-embed>
         </v-col>
       </v-row>

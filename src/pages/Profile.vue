@@ -5,7 +5,7 @@
         <v-flex xs12 mb-2>
           <v-toolbar dense flat>
             <v-btn
-              color="primary"
+              color="purple"
               dark
               elevation="0"
               class="mb-4 mt-4 mr-4"
@@ -19,12 +19,12 @@
         </v-flex>
 
         <v-flex xs12 sm12>
-          <v-card flat>
+          <v-card class="section-card" flat fill-width>
             <v-card-text>
-              <v-container fluid>
+              <v-container>
                 <v-layout row wrap>
-                  <v-flex xs12 sm12>
-                    <v-card flat color="primary">
+                  <v-flex xs12 sm6>
+                    <v-card class="section-card" flat color="primary">
                       <v-card-title>
                         <h1 class="headline white--text">
                           Información Personal
@@ -41,12 +41,12 @@
                         <p class="subtitle-2 white--text">
                           Correo: {{ user.email }}
                         </p>
-                        <p class="subtitle-2 white--text">Semestre: {{ user.semester ? user.semester : 'V' }}</p>
+                        <p class="subtitle-2 white--text">Semestre: V</p>
                         <p class="subtitle-2 white--text">
-                          Programa: {{ user.program ? user.program : 'Enfermería' }} 
+                          Programa: Enfermería
                         </p>
                         <p class="subtitle-2 white--text">
-                          Insitución: {{ user.institution ? user.institution : 'Universidad de Cordoba' }}  
+                          Insitución: Universidad de Cordoba
                         </p>
                       </v-card-text>
                     </v-card>
@@ -78,6 +78,7 @@
             </p>
           </v-toolbar>
         </v-flex>
+        
       </v-layout>
     </v-container>
   </v-main>

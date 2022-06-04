@@ -43,11 +43,6 @@ export default {
             path: '/moderator/interview',
             icon: 'mdi-clipboard-list'
           },
-          // {
-          //   name: 'Perfil',
-          //   path: '/profile',
-          //   icon: 'mdi-account-circle'
-          // },
         ];
       }
     }
