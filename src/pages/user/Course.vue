@@ -75,6 +75,7 @@
                       >
                         Completado
                       </v-chip>
+                    </v-img>
 
                     <v-list-item-action>
                       <v-btn icon @click="goLesson(lesson._id)">
