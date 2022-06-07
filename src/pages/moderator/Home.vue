@@ -19,7 +19,9 @@
         </v-col>
 
         <v-col class="mb-4" cols="4">
-            <v-btn flat color="primary" @click="downloadExcel" >Descargar Excel</v-btn>
+          <v-btn text color="primary" @click="downloadExcel"
+            >Descargar Excel</v-btn
+          >
         </v-col>
 
         <v-card flat rounded v-for="(course, index) in courses" :key="index">
@@ -73,7 +75,7 @@
 </template>
 <script>
 import { mapState } from "vuex";
-import zipcelx from 'zipcelx';
+import zipcelx from "zipcelx";
 
 export default {
   name: "HomeTeacher",
@@ -96,23 +98,21 @@ export default {
     searchCourse() {
       console.log("hola");
     },
-    async downloadExcel(){
-        
-        var response = await this.$http('/data/all');
+    async downloadExcel() {
+      var response = await this.$http("/data/all");
 
-        consoel.log(response);
+      console.log(response);
 
-        console.log(response);
+      if (response.data) {
         const config = {
-        filename: 'report',
-            sheet: {
-                data: [
-                  ...response.data
-                ]
-            }
+          filename: "report",
+          sheet: {
+            data: [...response.data],
+          },
         };
 
         zipcelx(config);
+      }
     },
     getCourses() {
       this.loading = true;
