@@ -101,22 +101,16 @@ export default {
         var response = await this.$http('/data/all');
 
         console.log(response);
-        // const config = {
-        // filename: 'general-ledger-Q1',
-        //     sheet: {
-        //         data: [
-        //             [{
-        //                 value: 'Income - Webshop',
-        //                 type: 'string'
-        //             }, {
-        //                 value: 1000,
-        //                 type: 'number'
-        //             }]
-        //         ]
-        //     }
-        // };
+        const config = {
+        filename: 'general-ledger-Q1',
+            sheet: {
+                data: [
+                  ...response.data
+                ]
+            }
+        };
 
-        // zipcelx(config);
+        zipcelx(config);
     },
     getCourses() {
       this.loading = true;
