@@ -100,9 +100,11 @@ export default {
         
         var response = await this.$http('/data/all');
 
+        consoel.log(response);
+
         console.log(response);
         const config = {
-        filename: 'general-ledger-Q1',
+        filename: 'report',
             sheet: {
                 data: [
                   ...response.data
