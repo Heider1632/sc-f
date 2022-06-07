@@ -107,7 +107,47 @@ export default {
         const config = {
           filename: "report",
           sheet: {
-            data: [...response.data],
+            data: [
+              [
+                { 
+                  value: "Nombre",
+                  type: "string"
+                },
+                { 
+                  value: "Curso",
+                  type: "string"
+                },
+                { 
+                  value: "Unidad",
+                  type: "string"
+                },
+                { 
+                  value: "Peso Euclideano",
+                  type: "string"
+                },
+                { 
+                  value: "Usos",
+                  type: "string"
+                },
+                { 
+                  value: "Exitoso",
+                  type: "string"
+                },
+                { 
+                  value: "Errado",
+                  type: "string"
+                },
+                { 
+                  value: "Caso",
+                  type: "string"
+                },
+                { 
+                  value: "Nota",
+                  type: "string"
+                }
+              ],
+              ...response.data
+            ],
           },
         };
 
