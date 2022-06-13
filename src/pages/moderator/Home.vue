@@ -121,6 +121,10 @@ export default {
                   value: "Unidad",
                   type: "string"
                 },
+                 { 
+                  value: "Id Caso",
+                  type: "string"
+                },
                 { 
                   value: "Peso Euclideano",
                   type: "string"
@@ -144,6 +148,10 @@ export default {
                 { 
                   value: "Nota",
                   type: "string"
+                },
+                { 
+                  value: "Tiempo",
+                  type: "number"
                 }
               ],
               ...response.data
