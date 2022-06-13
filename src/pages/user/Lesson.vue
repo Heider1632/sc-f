@@ -298,7 +298,7 @@ Latest commit b06a11f 10 days ago
                                 {{ slotProps.item.label }}
                               </template>
                             </v-select>
-                          </div>
+                          </template>
                         </v-form>
                       </template>
                     </template>
