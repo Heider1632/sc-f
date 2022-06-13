@@ -68,7 +68,7 @@
             </v-sheet>
           </v-col>
 
-          <v-col lg="7" md="7" sm="7" cols="12">
+          <v-col lg="5" md="5" sm="5" cols="12">
             <v-sheet>
               <v-img :src="lesson.hasObjectiveLesson" />
             </v-sheet>
