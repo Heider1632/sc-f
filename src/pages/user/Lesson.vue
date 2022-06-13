@@ -1,33 +1,3 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@Heider1632 
-Heider1632
-/
-sti-f
-Private
-Code
-Issues
-Pull requests
-Actions
-Projects
-Security
-Insights
-Settings
-sti-f/src/pages/user/Lesson.vue
-@Heider1632
-Heider1632 Merge branch 'master' of https://github.com/Heider1632/sti-f
-Latest commit b06a11f 10 days ago
- History
- 2 contributors
-@Heider1632@Heider97
-1118 lines (1064 sloc)  35 KB
-
-
 <template>
   <v-main class="white">
     <app-bar></app-bar>
@@ -97,6 +67,13 @@ Latest commit b06a11f 10 days ago
               </v-progress-linear>
             </v-sheet>
           </v-col>
+
+          <v-col lg="7" md="7" sm="7" cols="12">
+            <v-sheet>
+              <v-img :src="lesson.hasObjectiveLesson" />
+            </v-sheet>
+          </v-col>
+
           <v-col lg="4" md="4" sm="4" cols="12">
             <v-sheet class="border">
               <div class="mb-1">
@@ -123,11 +100,7 @@ Latest commit b06a11f 10 days ago
             </v-sheet>
           </v-col>
 
-          <v-col lg="8" md="8" sm="8" cols="12">
-            <v-sheet>
-              <v-img :src="lesson.hasObjectiveLesson" />
-            </v-sheet>
-          </v-col>
+         
 
           <v-col lg="4" md="4" sm="4" cols="12">
             <v-sheet rounded="lg">
