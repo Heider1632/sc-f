@@ -14,6 +14,7 @@
     <template v-esle>
       <v-container>
         <v-row>
+          
           <v-col cols="6" align-self="center">
             <h1 class="pa-2 subtitle">
               Curso: {{ course ? course.name : "" }}
@@ -24,7 +25,7 @@
             <v-sheet class="main-border">
               <h1 class="pa-2 subtitle">Acerca del curso</h1>
               <p class="pa-2 subtitle-2 text-justify">
-                El Sistema tutor inteligente te ofrecerá una secuencia de aprendizaje
+                El Sistema cognitivo te ofrecerá una secuencia de aprendizaje
                 personalizada de acuerdo a tus estilos de aprendizaje detectados
                 en el test anterior. Mediante esta herramienta accederás a los
                 contenidos del curso Protocolos de atención para la detección
@@ -47,21 +48,27 @@
         <v-row class="mr-10 ml-10">
           <v-col md="8" sm="12">
             <v-sheet>
-              <v-list rounded color="transparent">
-                <v-list-item-group color="indigo">
-                  <v-list-item
-                    v-for="(lesson, index) in course ? course.lessons : []"
-                    :key="index"
+              <v-layout row wrap>
+                <v-flex
+                  xs="6"
+                  v-for="(lesson, index) in course ? course.lessons : []"
+                  :key="index"
+                >
+                  <v-card
                     link
                     :disabled="
                       progress[index] &&
                       progress.filter((x) => x.lesson == lesson._id)[0] &&
                       progress.filter((x) => x.lesson == lesson._id)[0].isActive
                     "
+                    class="mx-auto my-12"
+                    height="220"
+                    max-width="374"
+                    @click.stop="goLesson(lesson._id)"
                   >
                     <v-img
                       height="100"
-                      :src="require(`@/assets/images/Unidad${index+1}.png`)"
+                      :src="require(`@/assets/images/Unidad${index + 1}.png`)"
                     >
                       <v-chip
                         v-if="
@@ -75,36 +82,17 @@
                       >
                         Completado
                       </v-chip>
+                      <v-chip v-else color="orange" class="ma-2">
+                        Pendiente
+                      </v-chip>
+                    </v-img>
 
-                    <v-list-item-action>
-                      <v-btn icon @click="goLesson(lesson._id)">
-                        <v-icon
-                          v-if="
-                            progress[index] &&
-                            progress.filter((x) => x.lesson == lesson._id)[0] &&
-                            !progress.filter((x) => x.lesson == lesson._id)[0]
-                              .isActive
-                          "
-                          color="grey lighten-1"
-                          >mdi-arrow-right</v-icon
-                        >
-                        <v-icon v-else color="grey lighten-1">mdi-lock</v-icon>
-                      </v-btn>
-                    </v-list-item-action>
-                  </v-list-item>
-                </v-list-item-group>
+                    <v-card-title>{{ lesson.title }}</v-card-title>
 
-                <v-divider class="my-2"></v-divider>
-
-                <v-list-item color="grey lighten-4" @click="getCourse">
-                  <v-list-item-icon>
-                    <v-icon>refresh</v-icon>
-                  </v-list-item-icon>
-                  <v-list-item-content>
-                    <v-list-item-title> Actualizar </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
+                   
+                  </v-card>
+                </v-flex>
+              </v-layout>
             </v-sheet>
           </v-col>
 
@@ -168,7 +156,6 @@
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-
               </v-list>
             </v-sheet>
           </v-col>
@@ -260,10 +247,20 @@ export default {
       this.loading = false;
     },
     async goLesson(id) {
-      this.$router.push(`/course/${this.course._id}/lesson/${id}`);
+      var response = this.$http.get("/cycle/all", {
+        params: {
+          stimulus: "click_structure",
+          id: this.user.student_id,
+          name: this.user.name,
+          lesson: id,
+        },
+      });
+
+      console.log(response);
+
+      //this.$router.push(`/course/${this.course._id}/lesson/${id}`);
     },
     openPdf() {
-      //window.open('/src/assets/info/Programa-curso-Protocolos.pdf', '_blank')
       window.open("/src/assets/logo.png", "_blank");
     },
   },

@@ -67,6 +67,14 @@
               </v-progress-linear>
             </v-sheet>
           </v-col>
+
+          <v-col lg="5" md="5" sm="5
+          " cols="12">
+            <v-sheet>
+              <v-img :src="lesson.hasObjectiveLesson" />
+            </v-sheet>
+          </v-col>
+
           <v-col lg="4" md="4" sm="4" cols="12">
             <v-sheet class="border">
               <div class="mb-1">
@@ -90,12 +98,6 @@
                   </v-layout>
                 </v-toolbar>
               </div>
-            </v-sheet>
-          </v-col>
-
-          <v-col lg="8" md="8" sm="8" cols="12">
-            <v-sheet>
-              <v-img :src="lesson.hasObjectiveLesson" />
             </v-sheet>
           </v-col>
 
@@ -268,7 +270,7 @@
                                 {{ slotProps.item.label }}
                               </template>
                             </v-select>
-                          </div>
+                          </template>
                         </v-form>
                       </template>
                     </template>
