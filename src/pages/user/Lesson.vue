@@ -68,8 +68,7 @@
             </v-sheet>
           </v-col>
 
-          <v-col lg="5" md="5" sm="5
-          " cols="12">
+          <v-col lg="5" md="5" sm="5" cols="12">
             <v-sheet>
               <v-img :src="lesson.hasObjectiveLesson" />
             </v-sheet>
@@ -650,11 +649,8 @@ export default {
             (response) => {
               if (response.data.length > 0) {
                 let last = response.data[response.data.length - 1];
-
                 $this.setCurrentAssessment(last);
-
                 console.log(this.inputConfirm);
-
                 if (this.inputConfirm) {
                   this.setIndex(5);
                 } else if (last.assessments.length != 5) {
@@ -738,7 +734,6 @@ export default {
     },
     async skip() {
       if (this.inputIndex < this.lesson.structure.length) {
-
         this.reorderProgress();
         if (this.lesson.structure[this.inputIndex].data.rating != 0) {
           try {
@@ -746,13 +741,10 @@ export default {
               //FIXME:
               console.log(this.inputIndex);
               console.log(this.getAssessments[this.inputIndex]);
-
               if (this.getAssessments[this.inputIndex]) {
                 console.log("passo to push");
-
                 this.lesson.structure[this.inputIndex].data.time_use +=
                   this.time;
-
                 this.pushAssessmentIndex(
                   {
                     time_use:
@@ -771,15 +763,12 @@ export default {
                 });
               }
             }
-
             let resourcesIds = this.lesson.structure.map((s) => {
               if (s.data) {
                 return s.data.resource._id;
               }
             });
-
             resourcesIds = resourcesIds.filter((rs) => rs != undefined);
-
             if (this.getAssessments.length == 1) {
               let response = await this.$http.post("/trace/create", {
                 student: this.user.student_id,
@@ -833,7 +822,6 @@ export default {
             return s.data;
           }
         });
-
         resourcesIds = resourcesIds.filter((ri) => ri != undefined);
         let sum = 0;
         this.questions.map((as) => {
@@ -846,20 +834,15 @@ export default {
             }
           }
         });
-
         this.note = sum;
-
         this.percentage = ((this.note * 100) / 5).toFixed(2);
-
         //TODO: get assessment from server
         let lastTrace = await this.getLastAsyncTrace({
           student: this.user.student_id,
           course: this.$route.params.course,
           lesson: this.$route.params.lesson,
         });
-
         let counts = [];
-
         lastTrace.assessments.forEach((as) => {
           if (as.time_use < 60 && as.like < 3) {
             counts.push(0);
@@ -867,13 +850,11 @@ export default {
             counts.push(1);
           }
         });
-
         if (counts.includes(0)) {
           this.isValid = false;
         } else {
           this.isValid = true;
         }
-
         await Promise.all([
           this.$http.post("/metacore/history", {
             id_case: this.getIdCase,
@@ -888,7 +869,6 @@ export default {
         ]).then((response) => {
           console.log(response);
         });
-
         if (this.note == 5 && this.isValid) {
           this.$http
             .post("/metacore/review", {
@@ -901,31 +881,25 @@ export default {
               if (response.status == 200) {
                 this.toogleTotalTime();
                 this.setIdCase(null);
-
                 let currentLesson = this.getLessons.filter(
                   (gl) => gl._id == this.$route.params.lesson
                 );
-
                 if (currentLesson.length > 0) {
                   currentLesson = currentLesson[0];
-
                   let response = await this.$http.post("/progress/update", {
                     id: currentLesson._id,
                     isActive: true,
                     complete: true,
                   });
-
                   this.setWin(true);
                   this.setAssessments([]);
                   this.setProgress([]);
-
                   if (response.status == 200) {
                     //paso a activar la siguiente leccion
                     if (currentLesson.order < 4) {
                       let nextLesson = this.getLessons.filter(
                         (gl) => gl.order == currentLesson.order + 1
                       );
-
                       let r = await this.$http.post("/progress/update", {
                         id: nextLesson[0]._id,
                         isActive: false,
@@ -935,7 +909,6 @@ export default {
                         id: this.getLessons[0]._id,
                         isActive: false,
                       });
-
                       console.log(response);
                     }
                   }
@@ -957,31 +930,25 @@ export default {
               if (response.status == 200) {
                 this.toogleTotalTime();
                 this.setIdCase(null);
-
                 let currentLesson = this.getLessons.filter(
                   (gl) => gl._id == this.$route.params.lesson
                 );
-
                 if (currentLesson.length > 0) {
                   currentLesson = currentLesson[0];
-
                   let response = await this.$http.post("/progress/update", {
                     id: currentLesson._id,
                     isActive: true,
                     complete: true,
                   });
-
                   this.setWin(true);
                   this.setAssessments([]);
                   this.setProgress([]);
-
                   if (response.status == 200) {
                     //paso a activar la siguiente leccion
                     if (currentLesson.order < 4) {
                       let nextLesson = this.getLessons.filter(
                         (gl) => gl.order == currentLesson.order + 1
                       );
-
                       let r = await this.$http.post("/progress/update", {
                         id: nextLesson[0]._id,
                         isActive: false,
@@ -991,7 +958,6 @@ export default {
                         id: this.getLessons[0]._id,
                         isActive: false,
                       });
-
                       console.log(response);
                     }
                   }
@@ -1084,7 +1050,6 @@ export default {
     async goToCourse() {
       this.setWin(false);
       this.setConfirm(false);
-
       await Promise.all(
         this.getProgress.map(async (p) => {
           if (p.index != 0) {
@@ -1118,3 +1083,15 @@ export default {
   border-left: 4px solid purple;
 }
 </style>
+© 2022 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
