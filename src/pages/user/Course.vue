@@ -247,7 +247,7 @@ export default {
       this.loading = false;
     },
     async goLesson(id) {
-      var response = this.$http.get("/cycle/all", {
+      var response = await this.$http.get("/cycle/all", {
         params: {
           stimulus: "click_structure",
           id: this.user.student_id,
@@ -256,9 +256,9 @@ export default {
         },
       });
 
-      console.log(response);
+      this.setResources(response.data[0]);
 
-      //this.$router.push(`/course/${this.course._id}/lesson/${id}`);
+      this.$router.push(`/course/${this.course._id}/lesson/${id}`);
     },
     openPdf() {
       window.open("/src/assets/logo.png", "_blank");
