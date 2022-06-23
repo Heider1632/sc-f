@@ -246,10 +246,11 @@
                           class="mx-2"
                           lazy-validation
                         >
-                          <div v-for="(question, key) in questions" :key="`title-${key}`"> 
-                            <p
-                              class="subtitle text-justify"
-                            >
+                          <div
+                            v-for="(question, key) in questions"
+                            :key="`title-${key}`"
+                          >
+                            <p class="subtitle text-justify">
                               {{ question.name }}
                             </p>
                             <v-select
@@ -650,12 +651,11 @@ export default {
 
                 this.progress = 16.6 * this.inputIndex;
               }
-
-              },
-              (error) => {
-                console.log(error.message);
-              }
-            );
+            },
+            (error) => {
+              console.log(error.message);
+            }
+          );
           this.toggleTimer();
           this.toogleTotalTime();
           await this.getAssessment();
@@ -683,8 +683,7 @@ export default {
     },
     async back() {
       if (this.inputIndex > 0 && this.inputIndex <= 5) {
-
-        this.progress-=16.6;
+        this.progress -= 16.6;
         if (this.inputIndex == 5) {
           this.setConfirm(true);
         }
@@ -698,14 +697,12 @@ export default {
       }
     },
     async skip() {
-      
       if (this.inputIndex < this.lesson.structure.length) {
         this.reorderProgress();
         if (this.getResources[this.inputIndex].rating != 0) {
           try {
             if (this.lesson.structure[this.inputIndex].data) {
-
-              this.progress+=16.6;
+              this.progress += 16.6;
               //FIXME:
               if (this.getAssessments[this.inputIndex]) {
                 this.getResources[this.inputIndex].time_use += this.time;
@@ -741,7 +738,7 @@ export default {
                 resources: resourcesIds,
                 assessments: this.getAssessments,
                 logs: this.logs,
-                case: this.getIdCase
+                case: this.getIdCase,
               });
 
               console.log(response);
@@ -813,18 +810,13 @@ export default {
         });
 
         let counts = [];
-        let content = [];
-        
+
         lastTrace.assessments.forEach((as, index) => {
           if (as.time_use < 60 && as.like < 3) {
             counts.push(0);
           } else {
             counts.push(1);
           }
-
-          let value = (as.time_use * as.like) / 100
-
-          content.push([this.user.key, lastTrace.resources[index].key, value ]);
         });
 
         if (counts.includes(0)) {
@@ -833,26 +825,28 @@ export default {
           this.isValid = true;
         }
 
-        console.log(content);
-
-
-        await this.$http.post("/data/history", {
-          id_student: this.user.student_id,
-          was: this.note == 5 ? "success" : "error",
-          note: this.note,
+        await Promise.all([
+          this.$http.post("/metacore/history", {
+            id_case: this.getIdCase,
+            id_student: this.user.student_id,
+            was: this.note == 5 ? "success" : "error",
+            note: this.note,
+          }),
+          this.$http.post("/metacore/update", {
+            id_case: this.getIdCase,
+            resources: resourcesIds,
+          }),
+        ]).then((response) => {
+          console.log(response);
         });
 
         if (this.note == 5 && this.isValid) {
           this.$http
-            .get("/cycle/all", {
-              params: {
-                stimulus: 'click_finish_button',
-                id: this.user.student_id,
-                key: this.user.key,
-                name: this.user.student_id + "-" + this.user.name,
-                lesson: this.lesson.id,
-                content: JSON.stringify(content),
-              }
+            .post("/metacore/review", {
+              id_case: this.getIdCase,
+              success: true,
+              errors: false,
+              time: this.totalTime,
             })
             .then(async (response) => {
               if (response.status == 200) {
@@ -897,15 +891,11 @@ export default {
             });
         } else if (this.note == 5) {
           this.$http
-            .get("/cycle/all", {
-              params: {
-                stimulus: 'click_finish_button',
-                id: this.user.student_id,
-                key: this.user.key,
-                name: this.user.student_id + "-" + this.user.name,
-                lesson: this.lesson.id,
-                content: JSON.stringify(content),
-              }
+            .post("/metacore/review", {
+              id_case: this.getIdCase,
+              success: false,
+              errors: true,
+              time: this.totalTime,
             })
             .then(async (response) => {
               if (response.status == 200) {
@@ -950,15 +940,11 @@ export default {
             });
         } else {
           this.$http
-            .get("/cycle/all", {
-              params: {
-                stimulus: 'click_finish_button',
-                id: this.user.student_id,
-                key: this.user.key,
-                name: this.user.student_id + "-" + this.user.name,
-                lesson: this.lesson.id,
-                content: JSON.stringify(content),
-              }
+            .post("/metacore/review", {
+              id_case: this.getIdCase,
+              success: false,
+              error: true,
+              time: this.totalTime,
             })
             .then(async (result) => {
               if (result.status == 200) {
