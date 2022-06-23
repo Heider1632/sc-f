@@ -70,7 +70,7 @@
 
           <v-col lg="5" md="5" sm="5" cols="12">
             <v-sheet>
-              <v-img :src="lesson.hasObjectiveLesson" />
+              <v-img :src="require(`@/assets/images/${lesson.hasObjectiveLesson}`)" />
             </v-sheet>
           </v-col>
 
@@ -246,11 +246,9 @@
                           class="mx-2"
                           lazy-validation
                         >
-                          <template>
+                          <div v-for="(question, key) in questions" :key="`title-${key}`"> 
                             <p
-                              v-for="(question, key) in questions"
                               class="subtitle text-justify"
-                              :key="`title-${key}`"
                             >
                               {{ question.name }}
                             </p>
@@ -269,7 +267,7 @@
                                 {{ slotProps.item.label }}
                               </template>
                             </v-select>
-                          </template>
+                          </div>
                         </v-form>
                       </template>
                     </template>
@@ -459,6 +457,7 @@ export default {
     interval: null,
     intervalTotal: null,
     percentage: 0,
+    progress: 0,
   }),
   created() {
     this.getAttempts();
@@ -720,6 +719,9 @@ export default {
     },
     async back() {
       if (this.inputIndex > 0 && this.inputIndex <= 5) {
+
+        this.progress-=16.6;
+
         if (this.inputIndex == 5) {
           this.setConfirm(true);
         }
@@ -738,6 +740,8 @@ export default {
         if (this.lesson.structure[this.inputIndex].data.rating != 0) {
           try {
             if (this.lesson.structure[this.inputIndex].data) {
+
+              this.progress+=16.6;
               //FIXME:
               console.log(this.inputIndex);
               console.log(this.getAssessments[this.inputIndex]);
@@ -777,6 +781,7 @@ export default {
                 resources: resourcesIds,
                 assessments: this.getAssessments,
                 logs: this.logs,
+                case: this.getIdCase
               });
               if (response.status == 200) {
                 this.setTrace(response.data._id);
