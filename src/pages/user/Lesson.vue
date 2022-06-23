@@ -100,8 +100,6 @@
             </v-sheet>
           </v-col>
 
-         
-
           <v-col lg="4" md="4" sm="4" cols="12">
             <v-sheet rounded="lg">
               <v-list rounded color="transparent" :key="componentKey">
@@ -248,12 +246,11 @@
                           class="mx-2"
                           lazy-validation
                         >
-                          <template>
-                            <p
-                              v-for="(question, key) in questions"
-                              class="subtitle text-justify"
-                              :key="`title-${key}`"
-                            >
+                          <div
+                            v-for="(question, key) in questions"
+                            :key="`title-${key}`"
+                          >
+                            <p class="subtitle text-justify">
                               {{ question.name }}
                             </p>
                             <v-select
@@ -271,7 +268,7 @@
                                 {{ slotProps.item.label }}
                               </template>
                             </v-select>
-                          </template>
+                          </div>
                         </v-form>
                       </template>
                     </template>
@@ -620,6 +617,7 @@ export default {
         this.lesson = response.data;
         this.setProgress([]);
         this.setAssessments([]);
+
         Promise.all(
           this.lesson.structure.map(async (structure, index) => {
             this.getAsyncProgress({
@@ -642,7 +640,10 @@ export default {
             );
           })
         ).then(async (_) => {
+          console.log("paso to reorder");
+
           this.reorderProgress();
+
           await this.getAsyncTrace({
             student: this.user.student_id,
             course: this.$route.params.course,
@@ -741,8 +742,7 @@ export default {
           try {
             if (this.lesson.structure[this.inputIndex].data) {
               //FIXME:
-              console.log(this.inputIndex);
-              console.log(this.getAssessments[this.inputIndex]);
+
               if (this.getAssessments[this.inputIndex]) {
                 console.log("passo to push");
                 this.lesson.structure[this.inputIndex].data.time_use +=
@@ -779,6 +779,7 @@ export default {
                 resources: resourcesIds,
                 assessments: this.getAssessments,
                 logs: this.logs,
+                case: this.getIdCase
               });
               if (response.status == 200) {
                 this.setTrace(response.data._id);
@@ -818,7 +819,6 @@ export default {
     async finish() {
       let valid = this.$refs.forminterview.validate();
       if (valid) {
-        
         let resourcesIds = this.lesson.structure.map((s) => {
           if (s.data) {
             return s.data;
@@ -1085,15 +1085,3 @@ export default {
   border-left: 4px solid purple;
 }
 </style>
-© 2022 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
