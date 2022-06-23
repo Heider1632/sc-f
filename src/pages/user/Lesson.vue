@@ -70,7 +70,7 @@
 
           <v-col lg="5" md="5" sm="5" cols="12">
             <v-sheet>
-              <v-img :src="require(`@/assets/images/${lesson.hasObjectiveLesson}`)" />
+              <v-img :src="lesson.hasObjectiveLesson" />
             </v-sheet>
           </v-col>
 
