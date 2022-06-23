@@ -70,13 +70,7 @@
 
           <v-col lg="5" md="5" sm="5" cols="12">
             <v-sheet>
-<<<<<<< HEAD
               <v-img :src="require(`@/assets/images/${lesson.hasObjectiveLesson}`)" />
-=======
-              <v-img
-                :src="require(`@/assets/images/${lesson.hasObjectiveLesson}`)"
-              />
->>>>>>> 691b45ed5a343451825df42dd819f06bb285468f
             </v-sheet>
           </v-col>
 
