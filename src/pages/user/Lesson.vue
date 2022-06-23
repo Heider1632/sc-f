@@ -70,7 +70,13 @@
 
           <v-col lg="5" md="5" sm="5" cols="12">
             <v-sheet>
+<<<<<<< HEAD
               <v-img :src="require(`@/assets/images/${lesson.hasObjectiveLesson}`)" />
+=======
+              <v-img
+                :src="require(`@/assets/images/${lesson.hasObjectiveLesson}`)"
+              />
+>>>>>>> 691b45ed5a343451825df42dd819f06bb285468f
             </v-sheet>
           </v-col>
 
@@ -274,22 +280,18 @@
                     <template v-else>
                       <video-embed
                         v-if="
-                          lesson.structure[inputIndex] &&
-                          lesson.structure[inputIndex].data &&
-                          lesson.structure[inputIndex].data.resource.format ==
-                            'video'
+                          getResources[inputIndex] &&
+                          getResources[inputIndex].resource.format == 'video'
                         "
                         :params="{ autoplay: 1 }"
-                        :src="lesson.structure[inputIndex].data.resource.url"
+                        :src="getResources[inputIndex].resource.url"
                       ></video-embed>
                       <div
                         v-else-if="
-                          lesson.structure[inputIndex] &&
-                          lesson.structure[inputIndex].data &&
-                          lesson.structure[inputIndex].data.resource.format ==
-                            'embed'
+                          getResources[inputIndex] &&
+                          getResources[inputIndex].resource.format == 'embed'
                         "
-                        v-html="lesson.structure[inputIndex].data.resource.url"
+                        v-html="getResources[inputIndex].resource.url"
                       ></div>
                       <div v-else>
                         {{ inputIndex }}
@@ -305,23 +307,16 @@
                   shrink
                   class="mr-5"
                   align-items-center
-                  v-if="
-                    lesson.structure[inputIndex] &&
-                    lesson.structure[inputIndex].data
-                  "
+                  v-if="getResources[inputIndex]"
                 >
                   <h4 class="display-5">
                     ¿Qué tal útil te parecio este recurso? 😊
                   </h4>
                 </v-flex>
 
-                <v-flex
-                  shrink
-                  v-if="lesson.structure[inputIndex].data"
-                  class="mb-4"
-                >
+                <v-flex shrink v-if="getResources[inputIndex]" class="mb-4">
                   <v-rating
-                    v-model="rating"
+                    v-model="getResources[inputIndex].rating"
                     background-color="orange lighten-3"
                     color="orange"
                     large
@@ -359,23 +354,16 @@
                     shrink
                     class="mr-5"
                     align-items-center
-                    v-if="
-                      lesson.structure[inputIndex] &&
-                      lesson.structure[inputIndex].data
-                    "
+                    v-if="getResources[inputIndex]"
                   >
                     <h4 class="display-5">
                       ¿Qué tal útil te parecio este recurso? 😊
                     </h4>
                   </v-flex>
 
-                  <v-flex
-                    shrink
-                    v-if="lesson.structure[inputIndex].data"
-                    class="mb-4"
-                  >
+                  <v-flex shrink v-if="getResources[inputIndex]" class="mb-4">
                     <v-rating
-                      v-model="rating"
+                      v-model="getResources[inputIndex].rating"
                       background-color="orange lighten-3"
                       color="orange"
                       large
@@ -457,6 +445,7 @@ export default {
     interval: null,
     intervalTotal: null,
     percentage: 0,
+    percentageCourse: 0,
     progress: 0,
   }),
   created() {
@@ -474,6 +463,7 @@ export default {
       "getCurrentAssessment",
       "getAssessments",
       "getCurrentAssessment",
+      "getResources",
       "getProgress",
       "getShowFinishButton",
       "getShowBackButton",
@@ -507,18 +497,15 @@ export default {
   },
   watch: {
     inputIndex(val) {
-      if (
-        this.lesson.structure[val].data &&
-        this.lesson.structure[val].data.rating != 0
-      ) {
-        this.rating = this.lesson.structure[val].data.rating;
+      if (this.getResources[val] && this.getResources[val].rating != 0) {
+        this.rating = this.getResources[val].rating;
       } else {
         this.rating = 0;
       }
     },
     rating(val) {
       if (val != 0) {
-        this.lesson.structure[this.inputIndex].data.rating = val;
+        this.getResources[this.inputIndex].rating = val;
       }
     },
   },
@@ -610,36 +597,43 @@ export default {
       var $this = this;
       this.loading = true;
       this.setIdCase(null);
+
       try {
         let response = await this.$http.get(
           `/lesson/one?id=${this.$route.params.lesson}`
         );
-        this.lesson = response.data;
-        this.setProgress([]);
-        this.setAssessments([]);
+
+        $this.lesson = response.data;
+        $this.setProgress([]);
+        $this.setAssessments([]);
         Promise.all(
-          this.lesson.structure.map(async (structure, index) => {
-            this.getAsyncProgress({
-              student: this.user.student_id,
-              course: this.$route.params.course,
-              lesson: this.$route.params.lesson,
-              structure: structure._id,
-            }).then(
-              (response) => {},
-              (error) => {
-                this.createAsyncProgress({
-                  student: this.user.student_id,
-                  course: this.$route.params.course,
-                  lesson: this.$route.params.lesson,
-                  structure: structure._id,
-                  isBlock: index == 0 ? false : true,
-                  index: index,
-                });
-              }
-            );
+          $this.lesson.structure.map(async (structure, index) => {
+            $this
+              .getAsyncProgress({
+                student: $this.user.student_id,
+                course: $this.$route.params.course,
+                lesson: $this.$route.params.lesson,
+                structure: structure._id,
+              })
+              .then(
+                (response) => {},
+                (error) => {
+                  this.createAsyncProgress({
+                    student: $this.user.student_id,
+                    course: $this.$route.params.course,
+                    lesson: $this.$route.params.lesson,
+                    structure: structure._id,
+                    isBlock: index == 0 ? false : true,
+                    index: index,
+                  });
+                }
+              );
           })
         ).then(async (_) => {
+          console.log("paso to reorder");
+
           this.reorderProgress();
+
           await this.getAsyncTrace({
             student: this.user.student_id,
             course: this.$route.params.course,
@@ -659,47 +653,23 @@ export default {
                 } else {
                   this.setIndex(0);
                 }
-              } else {
-                this.setIndex(0);
+
+                this.progress = 16.6 * this.inputIndex;
               }
-            },
-            (error) => {
-              console.log(error.message);
-            }
-          );
-          await this.getResources();
+
+              },
+              (error) => {
+                console.log(error.message);
+              }
+            );
+          this.toggleTimer();
+          this.toogleTotalTime();
           await this.getAssessment();
         });
       } catch (e) {
         console.log(e.message);
       }
       this.loading = false;
-    },
-    async getResources() {
-      if (this.getIdCase == null) {
-        let structureIds = this.lesson.structure.map((s) => s._id);
-        let response = await this.$http.post("/metacore/initial", {
-          id_student: this.user.student_id,
-          id_course: this.$route.params.course,
-          id_lesson: this.$route.params.lesson,
-          structure: structureIds,
-        });
-        this.setIdCase(response.data.id_case);
-        this.lesson.structure = this.lesson.structure.map((s, index) => {
-          s.data = response.data.plan[index];
-          return s;
-        });
-      } else {
-        let response = await this.$http.get("/metacore/one", {
-          id: this.getIdCase,
-        });
-        this.lesson.structure = this.lesson.structure.map((s, index) => {
-          s.data = response.data.plan[index];
-          return s;
-        });
-      }
-      this.toggleTimer();
-      this.toogleTotalTime();
     },
     async getAssessment() {
       try {
@@ -721,7 +691,6 @@ export default {
       if (this.inputIndex > 0 && this.inputIndex <= 5) {
 
         this.progress-=16.6;
-
         if (this.inputIndex == 5) {
           this.setConfirm(true);
         }
@@ -735,44 +704,41 @@ export default {
       }
     },
     async skip() {
+      
       if (this.inputIndex < this.lesson.structure.length) {
         this.reorderProgress();
-        if (this.lesson.structure[this.inputIndex].data.rating != 0) {
+        if (this.getResources[this.inputIndex].rating != 0) {
           try {
             if (this.lesson.structure[this.inputIndex].data) {
 
               this.progress+=16.6;
               //FIXME:
-              console.log(this.inputIndex);
-              console.log(this.getAssessments[this.inputIndex]);
               if (this.getAssessments[this.inputIndex]) {
-                console.log("passo to push");
-                this.lesson.structure[this.inputIndex].data.time_use +=
-                  this.time;
+                this.getResources[this.inputIndex].time_use += this.time;
                 this.pushAssessmentIndex(
                   {
-                    time_use:
-                      this.lesson.structure[this.inputIndex].data.time_use,
-                    like: this.lesson.structure[this.inputIndex].data.rating,
+                    time_use: this.getResources[this.inputIndex].time_use,
+                    like: this.getResources[this.inputIndex].rating,
                   },
                   this.inputIndex
                 );
               } else {
-                this.lesson.structure[this.inputIndex].data.time_use +=
-                  this.time;
+                this.getResources[this.inputIndex].time_use += this.time;
                 this.pushAssessment({
-                  time_use:
-                    this.lesson.structure[this.inputIndex].data.time_use,
-                  like: this.lesson.structure[this.inputIndex].data.rating,
+                  time_use: this.getResources[this.inputIndex].time_use,
+                  like: this.getResources[this.inputIndex].rating,
                 });
               }
             }
-            let resourcesIds = this.lesson.structure.map((s) => {
-              if (s.data) {
-                return s.data.resource._id;
+
+            let resourcesIds = this.getResources.map((s) => {
+              if (s) {
+                return s.resource._id;
               }
             });
+
             resourcesIds = resourcesIds.filter((rs) => rs != undefined);
+
             if (this.getAssessments.length == 1) {
               let response = await this.$http.post("/trace/create", {
                 student: this.user.student_id,
@@ -783,16 +749,21 @@ export default {
                 logs: this.logs,
                 case: this.getIdCase
               });
+
+              console.log(response);
+
               if (response.status == 200) {
                 this.setTrace(response.data._id);
               }
             } else {
-              await this.$http.post("/trace/update", {
+              let response = await this.$http.post("/trace/update", {
                 id: this.getTrace,
                 resources: resourcesIds,
                 assessments: this.getAssessments,
                 logs: this.logs,
               });
+
+              console.log(response);
             }
             //TODO: update in vuex
             this.setAsyncProgress({
@@ -821,7 +792,6 @@ export default {
     async finish() {
       let valid = this.$refs.forminterview.validate();
       if (valid) {
-        
         let resourcesIds = this.lesson.structure.map((s) => {
           if (s.data) {
             return s.data;
@@ -847,40 +817,48 @@ export default {
           course: this.$route.params.course,
           lesson: this.$route.params.lesson,
         });
+
         let counts = [];
-        lastTrace.assessments.forEach((as) => {
+        let content = [];
+        
+        lastTrace.assessments.forEach((as, index) => {
           if (as.time_use < 60 && as.like < 3) {
             counts.push(0);
           } else {
             counts.push(1);
           }
+
+          let value = (as.time_use * as.like) / 100
+
+          content.push([this.user.key, lastTrace.resources[index].key, value ]);
         });
+
         if (counts.includes(0)) {
           this.isValid = false;
         } else {
           this.isValid = true;
         }
-        await Promise.all([
-          this.$http.post("/metacore/history", {
-            id_case: this.getIdCase,
-            id_student: this.user.student_id,
-            was: this.note == 5 ? "success" : "error",
-            note: this.note,
-          }),
-          this.$http.post("/metacore/update", {
-            id_case: this.getIdCase,
-            resources: resourcesIds,
-          }),
-        ]).then((response) => {
-          console.log(response);
+
+        console.log(content);
+
+
+        await this.$http.post("/data/history", {
+          id_student: this.user.student_id,
+          was: this.note == 5 ? "success" : "error",
+          note: this.note,
         });
+
         if (this.note == 5 && this.isValid) {
           this.$http
-            .post("/metacore/review", {
-              id_case: this.getIdCase,
-              success: true,
-              errors: false,
-              time: this.totalTime,
+            .get("/cycle/all", {
+              params: {
+                stimulus: 'click_finish_button',
+                id: this.user.student_id,
+                key: this.user.key,
+                name: this.user.student_id + "-" + this.user.name,
+                lesson: this.lesson.id,
+                content: JSON.stringify(content),
+              }
             })
             .then(async (response) => {
               if (response.status == 200) {
@@ -925,11 +903,15 @@ export default {
             });
         } else if (this.note == 5) {
           this.$http
-            .post("/metacore/review", {
-              id_case: this.getIdCase,
-              success: false,
-              errors: true,
-              time: this.totalTime,
+            .get("/cycle/all", {
+              params: {
+                stimulus: 'click_finish_button',
+                id: this.user.student_id,
+                key: this.user.key,
+                name: this.user.student_id + "-" + this.user.name,
+                lesson: this.lesson.id,
+                content: JSON.stringify(content),
+              }
             })
             .then(async (response) => {
               if (response.status == 200) {
@@ -974,11 +956,15 @@ export default {
             });
         } else {
           this.$http
-            .post("/metacore/review", {
-              id_case: this.getIdCase,
-              success: false,
-              error: true,
-              time: this.totalTime,
+            .get("/cycle/all", {
+              params: {
+                stimulus: 'click_finish_button',
+                id: this.user.student_id,
+                key: this.user.key,
+                name: this.user.student_id + "-" + this.user.name,
+                lesson: this.lesson.id,
+                content: JSON.stringify(content),
+              }
             })
             .then(async (result) => {
               if (result.status == 200) {
@@ -1088,15 +1074,3 @@ export default {
   border-left: 4px solid purple;
 }
 </style>
-© 2022 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
