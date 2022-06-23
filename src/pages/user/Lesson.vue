@@ -658,8 +658,8 @@ export default {
               console.log(error.message);
             }
           );
-          this.toggleTimer();
-          this.toogleTotalTime();
+          
+          await this.getResources();
           await this.getAssessment();
         });
       } catch (e) {
@@ -677,6 +677,32 @@ export default {
       } catch (e) {
         console.log(e);
       }
+    },
+     async getResources() {
+      if (this.getIdCase == null) {
+        let structureIds = this.lesson.structure.map((s) => s._id);
+        let response = await this.$http.post("/metacore/initial", {
+          id_student: this.user.student_id,
+          id_course: this.$route.params.course,
+          id_lesson: this.$route.params.lesson,
+          structure: structureIds,
+        });
+        this.setIdCase(response.data.id_case);
+        this.lesson.structure = this.lesson.structure.map((s, index) => {
+          s.data = response.data.plan[index];
+          return s;
+        });
+      } else {
+        let response = await this.$http.get("/metacore/one", {
+          id: this.getIdCase,
+        });
+        this.lesson.structure = this.lesson.structure.map((s, index) => {
+          s.data = response.data.plan[index];
+          return s;
+        });
+      }
+      this.toggleTimer();
+      this.toogleTotalTime();
     },
     async skipProgress() {
       if (this.inputIndex >= 0 && this.inputIndex <= 5) {
