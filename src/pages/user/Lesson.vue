@@ -276,7 +276,7 @@
                       <video-embed
                         v-if="
                           lesson.structure[inputIndex] &&
-                          esson.structure[inputIndex].data &&
+                          lesson.structure[inputIndex].data &&
                           lesson.structure[inputIndex].data.resource.format == 'video'
                         "
                         :params="{ autoplay: 1 }"
