@@ -275,18 +275,20 @@
                     <template v-else>
                       <video-embed
                         v-if="
-                          getResources[inputIndex] &&
-                          getResources[inputIndex].resource.format == 'video'
+                          lesson.structure[inputIndex] &&
+                          esson.structure[inputIndex].data &&
+                          lesson.structure[inputIndex].data.resource.format == 'video'
                         "
                         :params="{ autoplay: 1 }"
-                        :src="getResources[inputIndex].resource.url"
+                        :src="lesson.structure[inputIndex].data.resource.url"
                       ></video-embed>
                       <div
                         v-else-if="
-                          getResources[inputIndex] &&
-                          getResources[inputIndex].resource.format == 'embed'
+                          lesson.structure[inputIndex] &&
+                          lesson.structure[inputIndex].data && 
+                          lesson.structure[inputIndex].data.resource.format == 'embed'
                         "
-                        v-html="getResources[inputIndex].resource.url"
+                        v-html="lesson.structure[inputIndex].data.resource.url"
                       ></div>
                       <div v-else>
                         {{ inputIndex }}

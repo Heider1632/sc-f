@@ -59,23 +59,17 @@
                       progress.filter((x) => x.lesson == lesson._id)[0].isActive
                     "
                   >
-                    <v-img
-                      height="100"
-                      :src="require(`@/assets/images/Unidad${index+1}.png`)"
-                    >
-                      <v-chip
-                        v-if="
-                          progress[index] &&
-                          progress.filter((x) => x.lesson == lesson._id)[0] &&
-                          progress.filter((x) => x.lesson == lesson._id)[0]
-                            .complete
-                        "
-                        color="green"
-                        class="ma-2"
-                      >
-                        Completado
-                      </v-chip>
-                    </v-img>
+                    <v-list-item-content>
+                      <v-list-item-icon>
+                        <v-icon>mdi-disable</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-title class="purple--text">
+                        {{ types[lesson.type] }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle>
+                        {{ lesson.title }}
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
 
                     <v-list-item-action>
                       <v-btn icon @click="goLesson(lesson._id)">
