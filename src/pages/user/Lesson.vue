@@ -304,16 +304,16 @@
                   shrink
                   class="mr-5"
                   align-items-center
-                  v-if="getResources[inputIndex]"
+                  v-if="lesson.structure[inputIndex] && lesson.structure[inputIndex].data"
                 >
                   <h4 class="display-5">
                     ¿Qué tal útil te parecio este recurso? 😊
                   </h4>
                 </v-flex>
 
-                <v-flex shrink v-if="getResources[inputIndex]" class="mb-4">
+                <v-flex shrink v-if="lesson.structure[inputIndex] && lesson.structure[inputIndex].data" class="mb-4">
                   <v-rating
-                    v-model="getResources[inputIndex].rating"
+                    v-model="lesson.structure[inputIndex].data.rating"
                     background-color="orange lighten-3"
                     color="orange"
                     large
@@ -351,16 +351,16 @@
                     shrink
                     class="mr-5"
                     align-items-center
-                    v-if="getResources[inputIndex]"
+                    v-if="lesson.structure[inputIndex] && lesson.structure[inputIndex].data"
                   >
                     <h4 class="display-5">
                       ¿Qué tal útil te parecio este recurso? 😊
                     </h4>
                   </v-flex>
 
-                  <v-flex shrink v-if="getResources[inputIndex]" class="mb-4">
+                  <v-flex shrink v-if="lesson.structure[inputIndex] && lesson.structure[inputIndex].data" class="mb-4">
                     <v-rating
-                      v-model="getResources[inputIndex].rating"
+                      v-model="lesson.structure[inputIndex].data.rating"
                       background-color="orange lighten-3"
                       color="orange"
                       large
@@ -460,7 +460,6 @@ export default {
       "getCurrentAssessment",
       "getAssessments",
       "getCurrentAssessment",
-      "getResources",
       "getProgress",
       "getShowFinishButton",
       "getShowBackButton",
@@ -494,15 +493,15 @@ export default {
   },
   watch: {
     inputIndex(val) {
-      if (this.getResources[val] && this.getResources[val].rating != 0) {
-        this.rating = this.getResources[val].rating;
+      if (this.lesson.structure[val].data && this.lesson.structure[val].data.rating != 0) {
+        this.rating = this.lesson.structure[val].data.rating;
       } else {
         this.rating = 0;
       }
     },
     rating(val) {
       if (val != 0) {
-        this.getResources[this.inputIndex].rating = val;
+        this.lesson.structure[this.inputIndex].data.rating = val;
       }
     },
   },
@@ -678,7 +677,7 @@ export default {
         console.log(e);
       }
     },
-     async getResources() {
+    async getResources() {
       if (this.getIdCase == null) {
         let structureIds = this.lesson.structure.map((s) => s._id);
         let response = await this.$http.post("/metacore/initial", {
@@ -727,32 +726,32 @@ export default {
     async skip() {
       if (this.inputIndex < this.lesson.structure.length) {
         this.reorderProgress();
-        if (this.getResources[this.inputIndex].rating != 0) {
+        if (this.lesson.structure[this.inputIndex].data.rating != 0) {
           try {
             if (this.lesson.structure[this.inputIndex].data) {
               this.progress += 16.6;
               //FIXME:
               if (this.getAssessments[this.inputIndex]) {
-                this.getResources[this.inputIndex].time_use += this.time;
+                this.lesson.structure[this.inputIndex].data.time_use += this.time;
                 this.pushAssessmentIndex(
                   {
-                    time_use: this.getResources[this.inputIndex].time_use,
-                    like: this.getResources[this.inputIndex].rating,
+                    time_use: this.lesson.structure[this.inputIndex].data.time_use,
+                    like: this.lesson.structure[this.inputIndex].data.rating,
                   },
                   this.inputIndex
                 );
               } else {
-                this.getResources[this.inputIndex].time_use += this.time;
+                this.lesson.structure[this.inputIndex].data.time_use += this.time;
                 this.pushAssessment({
-                  time_use: this.getResources[this.inputIndex].time_use,
-                  like: this.getResources[this.inputIndex].rating,
+                  time_use: this.lesson.structure[this.inputIndex].data.time_use,
+                  like: this.lesson.structure[this.inputIndex].data.rating,
                 });
               }
             }
 
-            let resourcesIds = this.getResources.map((s) => {
-              if (s) {
-                return s.resource._id;
+            let resourcesIds = this.lesson.structure.map((s) => {
+              if (s.data) {
+                return s.data.resource._id;
               }
             });
 
@@ -768,9 +767,6 @@ export default {
                 logs: this.logs,
                 case: this.getIdCase,
               });
-
-              console.log(response);
-
               if (response.status == 200) {
                 this.setTrace(response.data._id);
               }
