@@ -671,6 +671,10 @@ export default {
         let response = await this.$http.get(
           `/assessment/one?lesson=${this.$route.params.lesson}`
         );
+
+        
+        console.log(response.data);
+
         this.assessment = response.data;
         this.questions = this.assessment.questions;
       } catch (e) {
@@ -758,6 +762,7 @@ export default {
             resourcesIds = resourcesIds.filter((rs) => rs != undefined);
 
             if (this.getAssessments.length == 1) {
+              
               let response = await this.$http.post("/trace/create", {
                 student: this.user.student_id,
                 course: this.$route.params.course,
@@ -767,6 +772,7 @@ export default {
                 logs: this.logs,
                 case: this.getIdCase,
               });
+
               if (response.status == 200) {
                 this.setTrace(response.data._id);
               }
