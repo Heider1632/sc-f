@@ -626,8 +626,6 @@ export default {
               );
           })
         ).then(async (_) => {
-          console.log("paso to reorder");
-
           this.reorderProgress();
 
           await this.getAsyncTrace({
@@ -639,7 +637,6 @@ export default {
               if (response.data.length > 0) {
                 let last = response.data[response.data.length - 1];
                 $this.setCurrentAssessment(last);
-                console.log(this.inputConfirm);
                 if (this.inputConfirm) {
                   this.setIndex(5);
                 } else if (last.assessments.length != 5) {
@@ -736,6 +733,7 @@ export default {
               this.progress += 16.6;
               //FIXME:
               if (this.getAssessments[this.inputIndex]) {
+                
                 this.lesson.structure[this.inputIndex].data.time_use += this.time;
                 this.pushAssessmentIndex(
                   {
@@ -745,6 +743,7 @@ export default {
                   this.inputIndex
                 );
               } else {
+
                 this.lesson.structure[this.inputIndex].data.time_use += this.time;
                 this.pushAssessment({
                   time_use: this.lesson.structure[this.inputIndex].data.time_use,
@@ -776,6 +775,7 @@ export default {
               if (response.status == 200) {
                 this.setTrace(response.data._id);
               }
+              
             } else {
               let response = await this.$http.post("/trace/update", {
                 id: this.getTrace,
@@ -786,15 +786,18 @@ export default {
 
               console.log(response);
             }
+
             //TODO: update in vuex
             this.setAsyncProgress({
               id: this.getProgress[this.inputIndex + 1]._id,
               index: this.inputIndex + 1,
             });
+
             this.rating = 0;
             this.toggleTimer();
             await this.skipProgress();
             this.toggleTimer();
+
           } catch (e) {
             console.log(e);
           }
@@ -819,7 +822,9 @@ export default {
           }
         });
         resourcesIds = resourcesIds.filter((ri) => ri != undefined);
+
         let sum = 0;
+        
         this.questions.map((as) => {
           if (as.response == as.user) {
             let note = 5 / this.questions.length;
@@ -830,9 +835,11 @@ export default {
             }
           }
         });
+        
         this.note = sum;
         this.percentage = ((this.note * 100) / 5).toFixed(2);
         //TODO: get assessment from server
+        
         let lastTrace = await this.getLastAsyncTrace({
           student: this.user.student_id,
           course: this.$route.params.course,
@@ -874,6 +881,7 @@ export default {
           this.$http
             .post("/metacore/review", {
               id_case: this.getIdCase,
+              id_trace: lastTrace._id,
               success: true,
               errors: false,
               time: this.totalTime,
@@ -920,14 +928,20 @@ export default {
               console.log(error);
             });
         } else if (this.note == 5) {
+          
           this.$http
             .post("/metacore/review", {
               id_case: this.getIdCase,
+              id_trace: lastTrace._id,
               success: false,
               errors: true,
               time: this.totalTime,
             })
             .then(async (response) => {
+              
+              console.log('-------------');
+              console.log(response);
+
               if (response.status == 200) {
                 this.toogleTotalTime();
                 this.setIdCase(null);
@@ -968,10 +982,12 @@ export default {
             .catch((error) => {
               console.log(error);
             });
+
         } else {
           this.$http
             .post("/metacore/review", {
               id_case: this.getIdCase,
+              id_trace: lastTrace._id,
               success: false,
               error: true,
               time: this.totalTime,
@@ -1049,6 +1065,7 @@ export default {
       });
     },
     async goToCourse() {
+      this.setIndex(0);
       this.setWin(false);
       this.setConfirm(false);
       await Promise.all(
