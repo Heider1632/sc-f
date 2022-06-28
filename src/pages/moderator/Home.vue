@@ -152,6 +152,26 @@ export default {
                 { 
                   value: "Tiempo",
                   type: "number"
+                },
+                { 
+                  value: "Introducción",
+                  type: "string"
+                },
+                { 
+                  value: "Definición",
+                  type: "string"
+                },
+                { 
+                  value: "Descripción",
+                  type: "string"
+                },
+                { 
+                  value: "Ejemplo",
+                  type: "string"
+                },
+                { 
+                  value: "Actividad",
+                  type: "string"
                 }
               ],
               ...response.data
