@@ -121,26 +121,6 @@ export default {
                   value: "Unidad",
                   type: "string"
                 },
-                 { 
-                  value: "Id Caso",
-                  type: "string"
-                },
-                { 
-                  value: "Peso Euclideano",
-                  type: "string"
-                },
-                { 
-                  value: "Usos",
-                  type: "string"
-                },
-                { 
-                  value: "Exitoso",
-                  type: "string"
-                },
-                { 
-                  value: "Errado",
-                  type: "string"
-                },
                 { 
                   value: "Caso",
                   type: "string"
@@ -152,7 +132,27 @@ export default {
                 { 
                   value: "Tiempo",
                   type: "number"
-                }
+                },
+                { 
+                  value: "Introducción",
+                  type: "string"
+                },
+                { 
+                  value: "Definición",
+                  type: "string"
+                },
+                { 
+                  value: "Descripción",
+                  type: "string"
+                },
+                { 
+                  value: "Ejemplo",
+                  type: "string"
+                },
+                { 
+                  value: "Actividad",
+                  type: "string"
+                },
               ],
               ...response.data
             ],

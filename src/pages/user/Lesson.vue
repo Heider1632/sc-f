@@ -741,6 +741,7 @@ export default {
             resourcesIds = resourcesIds.filter((rs) => rs != undefined);
 
             if (this.getAssessments.length == 1) {
+              
               let response = await this.$http.post("/trace/create", {
                 student: this.user.student_id,
                 course: this.$route.params.course,
@@ -846,6 +847,7 @@ export default {
           id_student: this.user.student_id,
           was: this.note == 5 ? "success" : "error",
           note: this.note,
+          trace: lastTrace._id
         });
 
         if (this.note == 5 && this.isValid) {
