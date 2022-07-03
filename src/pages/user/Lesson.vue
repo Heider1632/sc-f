@@ -637,28 +637,26 @@ export default {
             })
             .then(
               (response) => {
-                console.log(response.data);
+                let last = response.data[response.data.length - 1];
 
-                if (response.data.length > 0) {
-                  let last = response.data[response.data.length - 1];
-                  $this.setCurrentAssessment(last);
-                  console.log(this.inputConfirm);
-                  if (this.inputConfirm) {
-                    this.setIndex(5);
-                  } else if (last.assessments.length != 5) {
-                    $this.setAssessments(last.assessments);
-                    $this.setIndex(last.assessments.length);
-                    this.forceRerender();
-                  } else {
-                    this.setIndex(0);
-                  }
-
+                $this.setCurrentAssessment(last);
+                if (last.evaluation) {
+                  this.setIndex(5);
+                  this.setConfirm(true);
+                } else if (this.inputConfirm) {
+                  this.setIndex(5);
+                } else if (last.assessments.length != 5) {
+                  $this.setTrace(last._id);
+                  $this.setAssessments(last.assessments);
+                  $this.setIndex(last.assessments.length);
+                  this.setConfirm(false);
+                  this.forceRerender();
                 } else {
+                  this.setConfirm(false);
                   this.setIndex(0);
                 }
 
                 this.progress = 16.6 * this.inputIndex;
-
               },
               (error) => {
                 console.log(error.message);
@@ -691,8 +689,7 @@ export default {
     },
     async back() {
       if (this.inputIndex > 0 && this.inputIndex <= 5) {
-
-        this.progress-=16.6;
+        this.progress -= 16.6;
         if (this.inputIndex == 5) {
           this.setConfirm(true);
         }
@@ -706,14 +703,13 @@ export default {
       }
     },
     async skip() {
-      
       if (this.inputIndex < this.lesson.structure.length) {
         this.reorderProgress();
         if (this.getResources[this.inputIndex].rating != 0) {
           try {
             if (this.getResources[this.inputIndex]) {
               //FIXME:
-              this.progress+=16.6;
+              this.progress += 16.6;
               if (this.getAssessments[this.inputIndex]) {
                 this.getResources[this.inputIndex].time_use += this.time;
                 this.pushAssessmentIndex(
@@ -741,7 +737,6 @@ export default {
             resourcesIds = resourcesIds.filter((rs) => rs != undefined);
 
             if (this.getAssessments.length == 1) {
-              
               let response = await this.$http.post("/trace/create", {
                 student: this.user.student_id,
                 course: this.$route.params.course,
@@ -819,9 +814,11 @@ export default {
           lesson: this.$route.params.lesson,
         });
 
+        this.setTrace(lastTrace._id);
+
         let counts = [];
         let content = [];
-        
+
         lastTrace.assessments.forEach((as, index) => {
           if (as.time_use < 60 && as.like < 3) {
             counts.push(0);
@@ -829,9 +826,9 @@ export default {
             counts.push(1);
           }
 
-          let value = (as.time_use * as.like) / 100
+          let value = (as.time_use * as.like) / 100;
 
-          content.push([this.user.key, lastTrace.resources[index].key, value ]);
+          content.push([this.user.key, lastTrace.resources[index].key, value]);
         });
 
         if (counts.includes(0)) {
@@ -840,27 +837,30 @@ export default {
           this.isValid = true;
         }
 
-        console.log(content);
-
-
-        await this.$http.post("/data/history", {
-          id_student: this.user.student_id,
-          was: this.note == 5 ? "success" : "error",
-          note: this.note,
-          trace: lastTrace._id
-        });
+        await Promise.all([
+          this.$http.post("/data/history", {
+            id_student: this.user.student_id,
+            was: this.note == 5 ? "success" : "error",
+            note: this.note,
+            trace: lastTrace._id,
+          }),
+          this.$http.post("/trace/update-evaluation", {
+            id: this.getTrace,
+            evaluation: false,
+          }),
+        ]);
 
         if (this.note == 5 && this.isValid) {
           this.$http
             .get("/cycle/all", {
               params: {
-                stimulus: 'click_finish_button',
+                stimulus: "click_finish_button",
                 id: this.user.student_id,
                 key: this.user.key,
                 name: this.user.student_id + "-" + this.user.name,
                 lesson: this.lesson.id,
                 content: JSON.stringify(content),
-              }
+              },
             })
             .then(async (response) => {
               if (response.status == 200) {
@@ -907,13 +907,13 @@ export default {
           this.$http
             .get("/cycle/all", {
               params: {
-                stimulus: 'click_finish_button',
+                stimulus: "click_finish_button",
                 id: this.user.student_id,
                 key: this.user.key,
                 name: this.user.student_id + "-" + this.user.name,
                 lesson: this.lesson.id,
                 content: JSON.stringify(content),
-              }
+              },
             })
             .then(async (response) => {
               if (response.status == 200) {
@@ -960,13 +960,13 @@ export default {
           this.$http
             .get("/cycle/all", {
               params: {
-                stimulus: 'click_finish_button',
+                stimulus: "click_finish_button",
                 id: this.user.student_id,
                 key: this.user.key,
                 name: this.user.student_id + "-" + this.user.name,
                 lesson: this.lesson.id,
                 content: JSON.stringify(content),
-              }
+              },
             })
             .then(async (result) => {
               if (result.status == 200) {
@@ -1028,7 +1028,7 @@ export default {
             });
           }
         })
-      ).then((response) => {
+      ).then(async (response) => {
         this.reorderProgress();
         response.map((r) => {
           if (r.data.index == 5) {
@@ -1037,6 +1037,12 @@ export default {
             this.updateProgress({ index: r.data.index, isBlock: true });
           }
         });
+
+        await this.$http.post("/trace/update-evaluation", {
+          id: this.getTrace,
+          evaluation: true
+        });
+        
         this.setConfirm(true);
       });
     },
