@@ -35,10 +35,6 @@ export default {
                     'Authorization': `Bearer ${token}`
               }
             }).then(response => {
-
-                console.log(response);
-                
-                // commit('setTrace', response.data);
                 resolve(response);
             }, error => {
                 reject(error);

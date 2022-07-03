@@ -428,10 +428,10 @@ export default {
       evaluation: "Evaluación",
     },
     isValid: false,
-    assessment: null,
     questions: [],
     feedbacks: [],
     logs: [],
+    assessment: null,
     note: 0,
     isLoading: false,
     showFeedback: false,
@@ -636,18 +636,28 @@ export default {
             (response) => {
               if (response.data.length > 0) {
                 let last = response.data[response.data.length - 1];
+
                 $this.setCurrentAssessment(last);
-                if (this.inputConfirm) {
+                if(last.evaluation){
+                  this.setIndex(5);
+                  this.setConfirm(true);
+                } else if ( this.inputConfirm) {
                   this.setIndex(5);
                 } else if (last.assessments.length != 5) {
+                  $this.setTrace(last._id);
                   $this.setAssessments(last.assessments);
                   $this.setIndex(last.assessments.length);
+                  this.setConfirm(false);
                   this.forceRerender();
                 } else {
+                  this.setConfirm(false);
                   this.setIndex(0);
                 }
 
                 this.progress = 16.6 * this.inputIndex;
+              } else {
+                this.setConfirm(false);
+                this.setIndex(0);
               }
             },
             (error) => {
@@ -668,9 +678,6 @@ export default {
         let response = await this.$http.get(
           `/assessment/one?lesson=${this.$route.params.lesson}`
         );
-
-        
-        console.log(response.data);
 
         this.assessment = response.data;
         this.questions = this.assessment.questions;
@@ -769,7 +776,7 @@ export default {
                 resources: resourcesIds,
                 assessments: this.getAssessments,
                 logs: this.logs,
-                case: this.getIdCase,
+                case: this.getIdCase
               });
 
               if (response.status == 200) {
@@ -846,6 +853,8 @@ export default {
           lesson: this.$route.params.lesson,
         });
 
+        this.setTrace(lastTrace._id);
+
         let counts = [];
 
         lastTrace.assessments.forEach((as, index) => {
@@ -862,6 +871,7 @@ export default {
           this.isValid = true;
         }
 
+      
         await Promise.all([
           this.$http.post("/metacore/history", {
             id_case: this.getIdCase,
@@ -873,6 +883,10 @@ export default {
             id_case: this.getIdCase,
             resources: resourcesIds,
           }),
+          this.$http.post("/trace/update-evaluation", {
+            id: this.getTrace,
+            evaluation: false
+          })
         ]).then((response) => {
           console.log(response);
         });
@@ -938,10 +952,7 @@ export default {
               time: this.totalTime,
             })
             .then(async (response) => {
-              
-              console.log('-------------');
-              console.log(response);
-
+            
               if (response.status == 200) {
                 this.toogleTotalTime();
                 this.setIdCase(null);
@@ -1052,7 +1063,9 @@ export default {
             });
           }
         })
-      ).then((response) => {
+      ).then(async (response)  => {
+
+
         this.reorderProgress();
         response.map((r) => {
           if (r.data.index == 5) {
@@ -1061,13 +1074,22 @@ export default {
             this.updateProgress({ index: r.data.index, isBlock: true });
           }
         });
+
+        await this.$http.post("/trace/update-evaluation", {
+          id: this.getTrace,
+          evaluation: true
+        });
+
         this.setConfirm(true);
       });
     },
     async goToCourse() {
+
       this.setIndex(0);
       this.setWin(false);
       this.setConfirm(false);
+
+      
       await Promise.all(
         this.getProgress.map(async (p) => {
           if (p.index != 0) {
