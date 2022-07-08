@@ -14,7 +14,6 @@
     <template v-esle>
       <v-container>
         <v-row>
-          
           <v-col cols="6" align-self="center">
             <h1 class="pa-2 subtitle">
               Curso: {{ course ? course.name : "" }}
@@ -88,8 +87,6 @@
                     </v-img>
 
                     <v-card-title>{{ lesson.title }}</v-card-title>
-
-                   
                   </v-card>
                 </v-flex>
               </v-layout>
@@ -268,7 +265,7 @@ export default {
 </script>
 <style scoped>
 .border {
-  border-left: 6px solid purple;
+  border-left: 6px solid #ebbf4b;
 }
 
 .tile {
@@ -294,17 +291,6 @@ export default {
 }
 
 .main-border {
-  border-left: 3px solid #ebbf4b;
-}
-
-.main-course {
-  background: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.3) 0%,
-      rgba(255, 255, 255, 0.3) 100%
-    ),
-    url("~@/assets/images/Fondo-STI-3.jpeg") left no-repeat;
-  background-size: 100%;
-  background-attachment: fixed;
+  border-left: 5px solid #ebbf4b;
 }
 </style>

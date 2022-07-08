@@ -83,7 +83,7 @@
                   <v-layout column wrap align-content-space-around align-start>
                     <v-flex shrink>
                       <v-btn
-                        color="purple"
+                        color="blue"
                         dark
                         elevation="0"
                         class="mb-4 mt-4"
@@ -636,16 +636,16 @@ export default {
               lesson: $this.$route.params.lesson,
             })
             .then(
-              (response) => {
+              async (response) => {
                 let last = response.data[response.data.length - 1];
 
                 $this.setCurrentAssessment(last);
-                if (last.evaluation) {
+                if (last && last.evaluation) {
                   this.setIndex(5);
                   this.setConfirm(true);
                 } else if (this.inputConfirm) {
                   this.setIndex(5);
-                } else if (last.assessments.length != 5) {
+                } else if (last && last.assessments.length != 5) {
                   $this.setTrace(last._id);
                   $this.setAssessments(last.assessments);
                   $this.setIndex(last.assessments.length);
@@ -657,14 +657,15 @@ export default {
                 }
 
                 this.progress = 16.6 * this.inputIndex;
+
+                this.toggleTimer();
+                this.toogleTotalTime();
+                await this.getAssessment();
               },
               (error) => {
                 console.log(error.message);
               }
             );
-          this.toggleTimer();
-          this.toogleTotalTime();
-          await this.getAssessment();
         });
       } catch (e) {
         console.log(e.message);
@@ -1040,9 +1041,9 @@ export default {
 
         await this.$http.post("/trace/update-evaluation", {
           id: this.getTrace,
-          evaluation: true
+          evaluation: true,
         });
-        
+
         this.setConfirm(true);
       });
     },
