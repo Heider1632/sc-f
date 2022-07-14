@@ -39,7 +39,7 @@ export default {
   name: 'App',
   metaInfo() {
     return {
-      title: 'ITS',
+      title: 'Sistema Tutor Inteligente',
     };
   },
   mounted(){

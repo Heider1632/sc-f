@@ -154,12 +154,6 @@ export default {
           if(response.status == 200){
             
             localStorage.setItem("token", response.data.accessToken);
-
-            this.setUser({
-              id: response.data.id,
-              email: response.data.email,
-              roles: response.data.roles
-            })
             
             this.loading = false;
             this.$store.dispatch("autoLogin");
