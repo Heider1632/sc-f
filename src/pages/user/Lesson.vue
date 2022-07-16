@@ -70,7 +70,7 @@
 
           <v-col lg="5" md="5" sm="5" cols="12">
             <v-sheet>
-              <v-img :src="lesson.hasObjectiveLesson" />
+              <v-img :src="require(`@/assets/images/${lesson.hasObjectiveLesson}`)" />
             </v-sheet>
           </v-col>
 
@@ -273,20 +273,12 @@
                       </template>
                     </template>
                     <template v-else>
-                      <video-embed
+                      <div
                         v-if="
                           lesson.structure[inputIndex] &&
-                          lesson.structure[inputIndex].data &&
-                          lesson.structure[inputIndex].data.resource.format == 'video'
-                        "
-                        :params="{ autoplay: 1 }"
-                        :src="lesson.structure[inputIndex].data.resource.url"
-                      ></video-embed>
-                      <div
-                        v-else-if="
-                          lesson.structure[inputIndex] &&
-                          lesson.structure[inputIndex].data && 
-                          lesson.structure[inputIndex].data.resource.format == 'embed'
+                          lesson.structure[inputIndex].data 
+                          //&& 
+                          //lesson.structure[inputIndex].data.resource.format == 'embed'
                         "
                         v-html="lesson.structure[inputIndex].data.resource.url"
                       ></div>
@@ -560,25 +552,6 @@ export default {
     incrementTotalTime() {
       this.totalTime = parseInt(this.totalTime) + 1;
     },
-    openSettings() {
-      this.$refs.stopwatch.openSettingsDialog();
-    },
-    openHelp() {
-      this.$refs.stopwatch.openHelpDialog();
-    },
-    shuffle(array) {
-      let currentIndex = array.length,
-        randomIndex;
-      while (currentIndex != 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-        [array[currentIndex], array[randomIndex]] = [
-          array[randomIndex],
-          array[currentIndex],
-        ];
-      }
-      return array;
-    },
     async getAttempts() {
       try {
         let response = await this.$http.get(
@@ -590,6 +563,7 @@ export default {
       }
     },
     async getLesson() {
+
       var $this = this;
       this.loading = true;
       this.setIdCase(null);
@@ -791,7 +765,6 @@ export default {
                 logs: this.logs,
               });
 
-              console.log(response);
             }
 
             //TODO: update in vuex
@@ -952,39 +925,60 @@ export default {
               time: this.totalTime,
             })
             .then(async (response) => {
+
+              console.log(response);
             
               if (response.status == 200) {
+
                 this.toogleTotalTime();
                 this.setIdCase(null);
                 let currentLesson = this.getLessons.filter(
                   (gl) => gl._id == this.$route.params.lesson
                 );
+
                 if (currentLesson.length > 0) {
+                  
                   currentLesson = currentLesson[0];
+                  
                   let response = await this.$http.post("/progress/update", {
                     id: currentLesson._id,
+                    student: this.user.student_id,
                     isActive: true,
                     complete: true,
                   });
+
+                  console.log(response);
+
                   this.setWin(true);
                   this.setAssessments([]);
                   this.setProgress([]);
+
                   if (response.status == 200) {
+
+                    console.log(currentLesson);
+
                     //paso a activar la siguiente leccion
                     if (currentLesson.order < 4) {
+
                       let nextLesson = this.getLessons.filter(
                         (gl) => gl.order == currentLesson.order + 1
                       );
                       let r = await this.$http.post("/progress/update", {
                         id: nextLesson[0]._id,
+                        student: this.user.student_id,
                         isActive: false,
+                        complete: false
                       });
+
+                      console.log(r);
+
                     } else {
                       let response = await this.$http.post("/progress/update", {
                         id: this.getLessons[0]._id,
+                        student: this.user.student_id,
                         isActive: false,
+                        complete: false
                       });
-                      console.log(response);
                     }
                   }
                 }
@@ -1045,7 +1039,7 @@ export default {
         this.setAssessments([]);
         this.setProgress([]);
         this.feedbacks = [];
-        this.$router.push(`/course/${this.$route.params.course}`);
+        //this.$router.push(`/course/${this.$route.params.course}`);
       });
     },
     async test() {
@@ -1105,7 +1099,7 @@ export default {
           }
         })
       ).then((_) => {
-        this.$router.push(`/course/${this.$route.params.course}`);
+        //this.$router.push(`/course/${this.$route.params.course}`);
       });
     },
   },
