@@ -321,6 +321,8 @@
                 align-center
                 justify-space-between
               >
+
+                <!-- TODO:: review why reason is showing in intro -->
                 <v-btn
                   class="ml-4"
                   color="purple"
@@ -600,7 +602,7 @@ export default {
               );
           })
         ).then(async (_) => {
-          this.reorderProgress();
+          await this.reorderProgress();
 
           await this.getAsyncTrace({
             student: this.user.student_id,
@@ -618,6 +620,12 @@ export default {
                 } else if ( this.inputConfirm) {
                   this.setIndex(5);
                 } else if (last.assessments.length != 5) {
+                  $this.setTrace(last._id);
+                  $this.setAssessments(last.assessments);
+                  $this.setIndex(last.assessments.length);
+                  this.setConfirm(false);
+                  this.forceRerender();
+                } else if(last.assessments.length == 5 && last.evaluation == null) {
                   $this.setTrace(last._id);
                   $this.setAssessments(last.assessments);
                   $this.setIndex(last.assessments.length);
@@ -707,7 +715,7 @@ export default {
     },
     async skip() {
       if (this.inputIndex < this.lesson.structure.length) {
-        this.reorderProgress();
+        await this.reorderProgress();
         if (this.lesson.structure[this.inputIndex].data.rating != 0) {
           try {
             if (this.lesson.structure[this.inputIndex].data) {
@@ -864,6 +872,8 @@ export default {
           console.log(response);
         });
 
+        //TODO:: review by console the output backend 
+
         if (this.note == 5 && this.isValid) {
           this.$http
             .post("/metacore/review", {
@@ -874,9 +884,16 @@ export default {
               time: this.totalTime,
             })
             .then(async (response) => {
+
+              console.log(response.status);
+
               if (response.status == 200) {
+                
+                console.log('paso a activar la siguiente leccion');
                 this.toogleTotalTime();
                 this.setIdCase(null);
+
+                //
                 let currentLesson = this.getLessons.filter(
                   (gl) => gl._id == this.$route.params.lesson
                 );
@@ -930,6 +947,8 @@ export default {
             
               if (response.status == 200) {
 
+                console.log('paso a activar la siguiente leccion');
+
                 this.toogleTotalTime();
                 this.setIdCase(null);
                 let currentLesson = this.getLessons.filter(
@@ -970,6 +989,7 @@ export default {
                         complete: false
                       });
 
+                       console.log("respuesta de el desbloqueo de la siguiente leccion");
                       console.log(r);
 
                     } else {
@@ -979,6 +999,9 @@ export default {
                         isActive: false,
                         complete: false
                       });
+
+                      console.log("respuesta de el desbloqueo de la siguiente leccion");
+                      console.log(response);
                     }
                   }
                 }
@@ -1060,7 +1083,7 @@ export default {
       ).then(async (response)  => {
 
 
-        this.reorderProgress();
+        await this.reorderProgress();
         response.map((r) => {
           if (r.data.index == 5) {
             this.updateProgress({ index: r.data.index, isBlock: false });
