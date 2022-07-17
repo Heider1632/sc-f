@@ -901,6 +901,7 @@ export default {
                   currentLesson = currentLesson[0];
                   let response = await this.$http.post("/progress/update", {
                     id: currentLesson._id,
+                    student: this.user.student_id,
                     isActive: true,
                     complete: true,
                   });
@@ -915,12 +916,16 @@ export default {
                       );
                       let r = await this.$http.post("/progress/update", {
                         id: nextLesson[0]._id,
+                        student: this.user.student_id,
                         isActive: false,
+                        complete: false
                       });
                     } else {
                       let response = await this.$http.post("/progress/update", {
                         id: this.getLessons[0]._id,
+                        student: this.user.student_id,
                         isActive: false,
+                        complete: false
                       });
                       console.log(response);
                     }
