@@ -839,7 +839,7 @@ export default {
         let counts = [];
 
         lastTrace.assessments.forEach((as, index) => {
-          if (as.time_use < 60 && as.like < 3) {
+          if (as.time_use < 10 && as.like < 3) {
             counts.push(0);
           } else {
             counts.push(1);
