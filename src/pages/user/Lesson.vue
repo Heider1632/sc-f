@@ -1039,7 +1039,7 @@ export default {
         this.setAssessments([]);
         this.setProgress([]);
         this.feedbacks = [];
-        //this.$router.push(`/course/${this.$route.params.course}`);
+        this.$router.push(`/course/${this.$route.params.course}`);
       });
     },
     async test() {
@@ -1099,7 +1099,7 @@ export default {
           }
         })
       ).then((_) => {
-        //this.$router.push(`/course/${this.$route.params.course}`);
+        this.$router.push(`/course/${this.$route.params.course}`);
       });
     },
   },
