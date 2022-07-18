@@ -277,8 +277,6 @@
                         v-if="
                           lesson.structure[inputIndex] &&
                           lesson.structure[inputIndex].data 
-                          //&& 
-                          //lesson.structure[inputIndex].data.resource.format == 'embed'
                         "
                         v-html="lesson.structure[inputIndex].data.resource.url"
                       ></div>
@@ -617,8 +615,10 @@ export default {
                 if(last.evaluation){
                   this.setIndex(5);
                   this.setConfirm(true);
+                  this.setShowFinishButton(false)
                 } else if ( this.inputConfirm) {
                   this.setIndex(5);
+
                 } else if (last.assessments.length != 5) {
                   $this.setTrace(last._id);
                   $this.setAssessments(last.assessments);
@@ -860,10 +860,10 @@ export default {
             was: this.note == 5 ? "success" : "error",
             note: this.note,
           }),
-          this.$http.post("/metacore/update", {
-            id_case: this.getIdCase,
-            resources: resourcesIds,
-          }),
+          // this.$http.post("/metacore/update", {
+          //   id_case: this.getIdCase,
+          //   resources: resourcesIds,
+          // }),
           this.$http.post("/trace/update-evaluation", {
             id: this.getTrace,
             evaluation: false
