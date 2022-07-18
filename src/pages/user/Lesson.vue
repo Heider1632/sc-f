@@ -93,7 +93,7 @@
                     </v-flex>
 
                     <v-flex> Tiempo: {{ time }} Segundos </v-flex>
-                    <v-flex> Intento N°: {{ attempts }} </v-flex>
+                    <v-flex> Intento Realizados: {{ attempts }} </v-flex>
                   </v-layout>
                 </v-toolbar>
               </div>
