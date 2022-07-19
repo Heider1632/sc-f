@@ -490,6 +490,8 @@ export default {
       } else {
         this.rating = 0;
       }
+
+     // this.skip();
     },
     rating(val) {
       if (val != 0) {
@@ -839,7 +841,7 @@ export default {
         let counts = [];
 
         lastTrace.assessments.forEach((as, index) => {
-          if (as.time_use < 10 && as.like < 3) {
+          if (lastTrace.resources[index] && as.time_use < lastTrace.resources[index].estimatedTime && as.like < 3) {
             counts.push(0);
           } else {
             counts.push(1);
