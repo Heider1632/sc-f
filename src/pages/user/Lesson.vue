@@ -437,7 +437,7 @@ export default {
     percentageCourse: 0,
     progress: 0,
   }),
-  created() {
+  mounted() {
     this.getAttempts();
     this.getLesson();
   },
@@ -927,7 +927,7 @@ export default {
                         id: this.getLessons[0]._id,
                         student: this.user.student_id,
                         isActive: false,
-                        complete: false
+                        complete: true
                       });
                       console.log(response);
                     }
@@ -1004,7 +1004,7 @@ export default {
                         id: this.getLessons[0]._id,
                         student: this.user.student_id,
                         isActive: false,
-                        complete: false
+                        complete: true
                       });
 
                       console.log("respuesta de el desbloqueo de la siguiente leccion");

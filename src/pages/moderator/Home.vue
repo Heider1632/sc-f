@@ -142,7 +142,7 @@ export default {
                   type: "string"
                 },
                 { 
-                  value: "Caso",
+                  value: "Evaluación",
                   type: "string"
                 },
                 { 
