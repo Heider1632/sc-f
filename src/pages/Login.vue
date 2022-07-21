@@ -3,23 +3,34 @@
     <v-container fill-height fluid class="section-container">
       <v-row class="signin">
         <v-col lg="6" md="6" class="pa-0 ma-0" v-if="!responsive">
-          <v-img :src="require('@/assets/images/sifilis.jpg')" class="full-height-img" ></v-img>
+          <v-img
+            :src="require('@/assets/images/sifilis.jpg')"
+            class="full-height-img"
+          ></v-img>
         </v-col>
         <v-col lg="6" md="6" sm="12" class="right">
           <validation-observer ref="observerLogin">
-            <v-form @submit.prevent="submit" >
-              <validation-provider v-slot="{ errors }" name="Name" rules="required|email">
+            <v-form @submit.prevent="submit">
+              <validation-provider
+                v-slot="{ errors }"
+                name="Name"
+                rules="required|email"
+              >
                 <v-text-field
                   v-model="email"
                   :error-messages="errors"
                   label="Correo"
                   required
-                  solo 
+                  solo
                   type="email"
                   autocomplete="username"
                 ></v-text-field>
               </validation-provider>
-              <validation-provider v-slot="{ errors }" name="email" rules="required">
+              <validation-provider
+                v-slot="{ errors }"
+                name="email"
+                rules="required"
+              >
                 <v-text-field
                   v-model="password"
                   :error-messages="errors"
@@ -36,25 +47,30 @@
               </validation-provider>
               <div class="text-center">
                 <v-row>
-                    <v-col cols="12">
-                      <v-btn class="signin-btn" :disabled="loading" type="submit" color="white" dark>
-                        <template v-if="!loading">
-                          Continuar
-                          <v-icon color="#3f51b5">mdi-arrow-right</v-icon>
-                        </template>
-                        <template v-else>
-                          <v-progress-circular
-                            indeterminate
-                            color="primary"
-                          ></v-progress-circular>
-                        </template>
-                      </v-btn>
-                    </v-col>
+                  <v-col cols="12">
+                    <v-btn
+                      class="signin-btn"
+                      :disabled="loading"
+                      type="submit"
+                      color="white"
+                      dark
+                    >
+                      <template v-if="!loading">
+                        Continuar
+                        <v-icon color="#3f51b5">mdi-arrow-right</v-icon>
+                      </template>
+                      <template v-else>
+                        <v-progress-circular
+                          indeterminate
+                          color="primary"
+                        ></v-progress-circular>
+                      </template>
+                    </v-btn>
+                  </v-col>
                 </v-row>
               </div>
             </v-form>
           </validation-observer>
-        
         </v-col>
       </v-row>
     </v-container>
@@ -62,39 +78,44 @@
 </template>
 
 <script>
-import { required, email } from 'vee-validate/dist/rules'
-import { extend, ValidationProvider, setInteractionMode, ValidationObserver } from 'vee-validate'
+import { required, email } from "vee-validate/dist/rules";
+import {
+  extend,
+  ValidationProvider,
+  setInteractionMode,
+  ValidationObserver,
+} from "vee-validate";
 import { mapMutations } from "vuex";
-setInteractionMode('eager')
+setInteractionMode("eager");
 
-extend('required', {
+extend("required", {
   ...required,
-  message: '{_field_} can not be empty'
-})
+  message: "{_field_} can not be empty",
+});
 
-extend('email', {
+extend("email", {
   ...email,
-  message: 'Email must be valid'
-})
+  message: "Email must be valid",
+});
 
 export default {
-  name: 'Login',
+  name: "Login",
   components: {
     ValidationProvider,
-    ValidationObserver
+    ValidationObserver,
   },
   data: () => ({
     responsive: false,
     loading: false,
-    username: '',
-    email: '',
+    username: "",
+    email: "",
     password: null,
     showPass: false,
     fieldTypes: {
-      password: 'text',
-    }
+      password: "text",
+    },
   }),
-  mounted(){
+  mounted() {
     this.onResponsiveInverted();
     window.addEventListener("resize", this.onResponsiveInverted);
   },
@@ -105,13 +126,13 @@ export default {
     params() {
       return {
         email: this.email,
-        password: this.password
-      }
-    }
+        password: this.password,
+      };
+    },
   },
   methods: {
-    ...mapMutations('notification', ['open']),
-    ...mapMutations(['setUser']),
+    ...mapMutations("notification", ["open"]),
+    ...mapMutations(["setUser"]),
     onResponsiveInverted() {
       if (window.innerWidth < 960) {
         this.responsive = true;
@@ -123,74 +144,73 @@ export default {
       const { srcElement, type } = event;
       const { name, value } = srcElement;
 
-      if(type === 'blur' && !value) {
-        this.fieldTypes[name] = 'text'
+      if (type === "blur" && !value) {
+        this.fieldTypes[name] = "text";
       } else {
-        this.fieldTypes[name] = 'password'
+        this.fieldTypes[name] = "password";
       }
     },
     async submit() {
-      const valid = await this.$refs.observerLogin.validate()
+      const valid = await this.$refs.observerLogin.validate();
       if (valid) {
         this.loading = true;
         let userAgent = navigator.userAgent;
 
-        Object.filter = (obj, predicate) => 
+        Object.filter = (obj, predicate) =>
           Object.keys(obj)
-            .filter( key => predicate(obj[key]) )
-            .reduce( (res, key) => (res[key] = obj[key], res), {});
+            .filter((key) => predicate(obj[key]))
+            .reduce((res, key) => ((res[key] = obj[key]), res), {});
 
-        var filtered = Object.filter(this.$device, device => device == true);
-        var device = Object.keys(filtered)[0]
+        var filtered = Object.filter(this.$device, (device) => device == true);
+        var device = Object.keys(filtered)[0];
 
-        this.$http.post('/auth/signin', {
-          email: this.email,
-          password: this.password,
-          device: device,
-          userAgent: userAgent
-        })
-        .then(async response => {
-          
-          if(response.status == 200){
-            
-            localStorage.setItem("token", response.data.accessToken);
-            
-            this.loading = false;
-            this.$store.dispatch("autoLogin");
-          } else {  
+        this.$http
+          .post("/auth/signin", {
+            email: this.email,
+            password: this.password,
+            device: device,
+            userAgent: userAgent,
+          })
+          .then(async (response) => {
+            if (response.status == 200) {
+              localStorage.setItem("token", response.data.accessToken);
+
+              this.loading = false;
+              this.$store.dispatch("autoLogin");
+            } else {
+              let args = {
+                color: "error",
+                message: "Error!",
+                submessage: "algo sucedio mal",
+                pos: ["top", "center"],
+              };
+              this.loading = false;
+              this.open(args);
+            }
+          })
+          .catch((error) => {
             let args = {
               color: "error",
               message: "Error!",
-              submessage: "algo sucedio mal",
-              pos: ["top", "center"]
+              submessage: error.response.data.message,
+              pos: ["top", "center"],
             };
             this.loading = false;
             this.open(args);
-          }
-        })
-        .catch(error => {
-          let args = {
-            color: "error",
-            message: "Error!",
-            submessage: error.response.data.message,
-            pos: ["top", "center"]
-          };
-          this.loading = false;
-          this.open(args);
-        });
+          });
       }
     },
     clear() {
       // you can use this method to clear login form
-      this.email = ''
-      this.password = null
-      this.$refs.observerLogin.reset()
+      this.email = "";
+      this.password = null;
+      this.$refs.observerLogin.reset();
     },
-    register(){
-      this.$router.push('/register')
-    }
-  }
-}
+    register() {
+      this.$router.push("/register");
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -221,8 +241,8 @@ export default {
   }
 }
 
-.full-height-img{
-  width:100%; 
-  height:100%; 
+.full-height-img {
+  width: 100%;
+  height: 100%;
 }
 </style>

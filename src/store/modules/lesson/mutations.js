@@ -7,16 +7,16 @@ export default {
     setResources: (state, resources) => state.resources = resources,
     setAssessments: (state, assessments) => state.assessments = assessments,
     setCurrentAssessment: (state, assessment) => state.currentAssessment = assessment,
+    setProgress: (state, progress) => state.progress = progress,
     pushAssessment: (state, assessment) => state.assessments.push(assessment),
     pushAssessmentIndex: (state, assessment, index) => state.assessments[index] = assessment,
+    pushProgress: (state, progress) => state.progress.push(progress),
     reorderProgress: (state) => state.progress = state.progress.sort((a,b) => { 
         if(a.index > b.index) return 1;
         if(a.index < b.index) return -1;
         return 0;
-     }),
-    setProgress: (state, progress) => state.progress = progress,
+    }),
     updateProgress: (state, { index, isBlock }) => state.progress[index].isBlock = isBlock,
-    pushProgress: (state, progress) => state.progress.push(progress),
     setShowFinishButton: (state, finish) => state.showFinishButton = finish,
     setShowBackButton: (state, back) => state.showBackButton = back,
     setWin: (state, win) => state.win = win

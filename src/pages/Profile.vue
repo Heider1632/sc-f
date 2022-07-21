@@ -34,9 +34,9 @@
                         <p class="subtitle-2 white--text">
                           Nombre: {{ user.name }} {{ user.lastname }}
                         </p>
-                        <p class="subtitle-2 white--text">
+                        <p class="subtitle-2 white--text" v-if="student">
                           Estilo de Aprendizaje:
-                          {{ learningStyle(user.learningStyleDimensions) }}
+                          {{ learningStyle(student.learningStyleDimensions) }}
                         </p>
                         <p class="subtitle-2 white--text">
                           Correo: {{ user.email }}
@@ -88,6 +88,7 @@ import { mapState } from "vuex";
 export default {
   name: "Profile",
   data: () => ({
+    student: null,
     total: 0,
     headers: [
       {
@@ -117,12 +118,14 @@ export default {
       },
     ],
   }),
-  computed: {
-    ...mapState(["user"]),
-  },
   mounted() {
     this.lessons();
+    this.getUser();
     this.totalStudent();
+
+  },
+  computed: {
+    ...mapState(['user'])
   },
   methods: {
     learningStyle(learningStyleDimensions) {
@@ -163,6 +166,13 @@ export default {
         .get("/trace/total/", { params: { student: this.user.student_id } })
         .then((response) => {
           this.total = this.convertHMS(response.data.total);
+        });
+    },
+    getUser(){
+      this.$http
+        .get("/student/one/", { params: { id: this.user.student_id } })
+        .then((response) => {
+          this.student = response.data;
         });
     },
     lessons() {

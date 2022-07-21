@@ -105,12 +105,10 @@
               <v-list rounded color="transparent" :key="componentKey">
                 <v-list-item-group color="primary" v-model="inputIndex">
                   <v-list-item
-                    v-for="(structure, indice) in lesson
-                      ? lesson.structure
-                      : []"
+                    v-for="(structure, i) in lesson ? lesson.structure : []"
                     :key="structure.id"
                     :disabled="
-                      getProgress[indice] &&
+                      getProgress[i] &&
                       getProgress.filter(
                         (x) => x.structure == structure._id
                       )[0] &&
@@ -134,11 +132,12 @@
 
           <v-col lg="8" md="8" sm="8" cols="12">
             <v-sheet min-height="60vh" rounded="lg">
+              <!-- card complete -->
               <v-container
                 fluid
                 fill-height
                 class="grey lighten-4"
-                v-if="getShowWin"
+                v-if="getCurrentAssessment && getCurrentAssessment.complete"
               >
                 <v-card elevation="0">
                   <v-card-text>
@@ -161,11 +160,14 @@
                 </v-card>
               </v-container>
 
+              <!-- card feedback -->
               <v-container
                 fluid
                 fill-height
                 class="grey lighten-4"
-                v-else-if="showFeedback"
+                v-else-if="
+                  getCurrentAssessment && getCurrentAssessment.feedback
+                "
               >
                 <v-card elevation="0">
                   <v-card-text>
@@ -199,48 +201,28 @@
                 </v-card>
               </v-container>
 
-              <v-card
-                elevation="0"
-                :height="
-                  getProgress[inputIndex] && getProgress[inputIndex].index === 5
-                    ? '65vh'
-                    : !getConfirm
-                    ? '50vh'
-                    : '70vh'
-                "
-                class="d-flex flex-column scroll"
-                v-else
+              <!-- card evaluation -->
+              <v-container
+                fluid
+                fill-height
+                class="grey lighten-4"
+                v-else-if="getCurrentAssessment && getCurrentAssessment.confirm"
               >
-                <v-card-text class="justify-center">
-                  <div class="text-center">
-                    <template
-                      v-if="
-                        lesson.structure[inputIndex] &&
-                        lesson.structure[inputIndex].type == 'evaluation' &&
-                        assessment &&
-                        !getShowWin
-                      "
-                    >
-                      <template v-if="!inputConfirm">
-                        <v-layout
-                          align-content-space-between
-                          align-center
-                          column
-                          class="text-center"
-                        >
-                          <v-flex>
-                            A continuación realizarás la evalucación, ¿estas
-                            seguro de iniciarla? A partir de que confirmes no
-                            podrás ver el contenido de la lección.
-                          </v-flex>
-                          <v-flex>
-                            <v-btn block color="primary" @click="test">
-                              Confirmar
-                            </v-btn>
-                          </v-flex>
-                        </v-layout>
-                      </template>
-                      <template v-else>
+                <v-card
+                  elevation="0"
+                  :height="
+                    getProgress[inputIndex] &&
+                    getProgress[inputIndex].index === 5
+                      ? '65vh'
+                      : !getConfirm
+                      ? '50vh'
+                      : '70vh'
+                  "
+                  class="d-flex flex-column scroll"
+                >
+                  <v-card-text class="justify-center">
+                    <div class="text-center">
+                      <template v-if="getCurrentAssessment.evaluation">
                         <v-form
                           ref="forminterview"
                           class="mx-2"
@@ -270,13 +252,53 @@
                             </v-select>
                           </div>
                         </v-form>
+                        
                       </template>
-                    </template>
-                    <template v-else>
+                      <template v-else>
+                        <v-layout
+                          align-content-space-between
+                          align-center
+                          column
+                          class="text-center"
+                        >
+                          <v-flex>
+                            A continuación realizarás la evalucación, ¿estas
+                            seguro de iniciarla? A partir de que confirmes no
+                            podrás ver el contenido de la lección.
+                          </v-flex>
+                          <v-flex>
+                            <v-btn block color="primary" @click="test">
+                              Confirmar
+                            </v-btn>
+                          </v-flex>
+                        </v-layout>
+                      </template>
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </v-container>
+
+              <!-- card resources -->
+
+              <v-card
+                elevation="0"
+                :height="
+                  getProgress[inputIndex] && getProgress[inputIndex].index === 5
+                    ? '65vh'
+                    : !getConfirm
+                    ? '50vh'
+                    : '70vh'
+                "
+                class="d-flex flex-column scroll"
+                v-else
+              >
+                <v-card-text class="justify-center">
+                  <div class="text-center">
+                    <template>
                       <div
                         v-if="
                           lesson.structure[inputIndex] &&
-                          lesson.structure[inputIndex].data 
+                          lesson.structure[inputIndex].data
                         "
                         v-html="lesson.structure[inputIndex].data.resource.url"
                       ></div>
@@ -289,29 +311,6 @@
                 </v-card-text>
               </v-card>
 
-              <v-layout column wrap align-center class="hidden-md-and-up">
-                <v-flex
-                  shrink
-                  class="mr-5"
-                  align-items-center
-                  v-if="lesson.structure[inputIndex] && lesson.structure[inputIndex].data"
-                >
-                  <h4 class="display-5">
-                    ¿Qué tal útil te parecio este recurso? 😊
-                  </h4>
-                </v-flex>
-
-                <v-flex shrink v-if="lesson.structure[inputIndex] && lesson.structure[inputIndex].data" class="mb-4">
-                  <v-rating
-                    v-model="lesson.structure[inputIndex].data.rating"
-                    background-color="orange lighten-3"
-                    color="orange"
-                    large
-                  >
-                  </v-rating>
-                </v-flex>
-              </v-layout>
-
               <v-layout
                 class="mr-5 ml-5 mt-4"
                 row
@@ -319,8 +318,6 @@
                 align-center
                 justify-space-between
               >
-
-                <!-- TODO:: review why reason is showing in intro -->
                 <v-btn
                   class="ml-4"
                   color="purple"
@@ -330,29 +327,39 @@
                   v-if="
                     getProgress[inputIndex] &&
                     getProgress[inputIndex].index != 0 &&
-                    getProgress[inputIndex].index != 5 &&
-                    !inputConfirm
+                    getCurrentAssessment && 
+                    getCurrentAssessment.confirm == false
                   "
                 >
                   <v-icon>mdi-arrow-left</v-icon>
                   Anterior
                 </v-btn>
 
-                <v-layout column wrap align-center class="hidden-sm-and-down">
+                <v-layout column wrap align-center>
                   <v-flex
                     shrink
                     class="mr-5"
                     align-items-center
-                    v-if="lesson.structure[inputIndex] && lesson.structure[inputIndex].data"
+                    v-if="
+                      lesson.structure[inputIndex] &&
+                      lesson.structure[inputIndex].data
+                    "
                   >
                     <h4 class="display-5">
                       ¿Qué tal útil te parecio este recurso? 😊
                     </h4>
                   </v-flex>
 
-                  <v-flex shrink v-if="lesson.structure[inputIndex] && lesson.structure[inputIndex].data" class="mb-4">
+                  <v-flex
+                    shrink
+                    v-if="
+                      lesson.structure[inputIndex] &&
+                      lesson.structure[inputIndex].data
+                    "
+                    class="mb-4"
+                  >
                     <v-rating
-                      v-model="lesson.structure[inputIndex].data.rating"
+                      v-model="rating"
                       background-color="orange lighten-3"
                       color="orange"
                       large
@@ -367,12 +374,7 @@
                   dark
                   elevation="0"
                   @click="finish"
-                  v-if="
-                    getProgress[inputIndex] &&
-                    getProgress[inputIndex].index === 5 &&
-                    inputConfirm &&
-                    !showFeedback
-                  "
+                  v-if="getCurrentAssessment && getCurrentAssessment.evaluation"
                 >
                   Finalizar
                   <v-icon>mdi-check</v-icon>
@@ -407,7 +409,6 @@ export default {
   name: "Lesson",
   data: () => ({
     componentKey: 0,
-    rating: 0,
     loading: false,
     lesson: null,
     attempts: 0,
@@ -436,9 +437,11 @@ export default {
     percentage: 0,
     percentageCourse: 0,
     progress: 0,
+    rating: 0,
   }),
   mounted() {
     this.getAttempts();
+    this.getPercentageCourse();
     this.getLesson();
   },
   computed: {
@@ -484,20 +487,22 @@ export default {
     },
   },
   watch: {
-    inputIndex(val) {
-      if (this.lesson.structure[val].data && this.lesson.structure[val].data.rating != 0) {
-        this.rating = this.lesson.structure[val].data.rating;
-      } else {
-        this.rating = 0;
-      }
+    inputIndex: {
+      handler(newValue, oldValue) {
+        this.reorderProgress();
 
-     // this.skip();
+        this.navigation(newValue, oldValue);
+
+        if(this.lesson.structure[newValue].data && this.lesson.structure[newValue].data.rating){
+          this.rating = this.lesson.structure[newValue].data.rating;
+        }
+      },
     },
-    rating(val) {
-      if (val != 0) {
+    rating(val){
+      if(this.lesson.structure[this.inputIndex].data){
         this.lesson.structure[this.inputIndex].data.rating = val;
       }
-    },
+    }
   },
   methods: {
     ...mapMutations("lesson", [
@@ -557,15 +562,26 @@ export default {
     async getAttempts() {
       try {
         let response = await this.$http.get(
-          `/student/attempts?student=${this.user.student_id}&course=${this.$route.params.course}&lesson=${this.$route.params.lesson}`
+          `/student/attempts?student=${this.user.student_id}&course=${this.$route.params.course}
+          `
         );
         this.attempts = response.data.count;
       } catch (error) {
         console.log(error.message);
       }
     },
+    async getPercentageCourse() {
+      try {
+        let response = await this.$http.get(
+          `/progress/percentage?student=${this.user.student_id}&course=${this.$route.params.course}&lesson=${this.$route.params.lesson}`
+        );
+        console.log(response);
+        this.percentageCourse = response.data.count;
+      } catch (error) {
+        console.log(error.message);
+      }
+    },
     async getLesson() {
-
       var $this = this;
       this.loading = true;
       this.setIdCase(null);
@@ -602,6 +618,8 @@ export default {
               );
           })
         ).then(async (_) => {
+          console.log(_);
+
           await this.reorderProgress();
 
           await this.getAsyncTrace({
@@ -609,30 +627,44 @@ export default {
             course: this.$route.params.course,
             lesson: this.$route.params.lesson,
           }).then(
-            (response) => {
+            async (response) => {
               if (response.data.length > 0) {
                 let last = response.data[response.data.length - 1];
 
+                console.log(last);
+                $this.setTrace(last._id);
                 $this.setCurrentAssessment(last);
-                if(last.evaluation){
+                $this.setAssessments(last.assessments);
+
+                if (last.evaluation) {
                   this.setIndex(5);
                   this.setConfirm(true);
-                  this.setShowFinishButton(false)
-                } else if ( this.inputConfirm) {
+                  this.setShowFinishButton(false);
+                } else if (last.confirm) {
                   this.setIndex(5);
-
                 } else if (last.assessments.length != 5) {
-                  $this.setTrace(last._id);
-                  $this.setAssessments(last.assessments);
+
                   $this.setIndex(last.assessments.length);
                   this.setConfirm(false);
                   this.forceRerender();
-                } else if(last.assessments.length == 5 && last.evaluation == null) {
-                  $this.setTrace(last._id);
-                  $this.setAssessments(last.assessments);
+                } else if (
+                  last.assessments.length == 5 &&
+                  last.evaluation == false
+                ) {
+
                   $this.setIndex(last.assessments.length);
                   this.setConfirm(false);
                   this.forceRerender();
+
+                  let response = await this.$http.post(
+                    "/trace/update-confirm",
+                    {
+                      id: this.getTrace,
+                      confirm: true,
+                    }
+                  );
+
+                  console.log(response);
                 } else {
                   this.setConfirm(false);
                   this.setIndex(0);
@@ -648,7 +680,7 @@ export default {
               console.log(error.message);
             }
           );
-          
+
           await this.getResources();
           await this.getAssessment();
         });
@@ -695,112 +727,159 @@ export default {
       this.toggleTimer();
       this.toogleTotalTime();
     },
-    async skipProgress() {
+    async skip() {
       if (this.inputIndex >= 0 && this.inputIndex <= 5) {
         this.inputIndex = this.inputIndex + 1;
       }
     },
     async back() {
       if (this.inputIndex > 0 && this.inputIndex <= 5) {
-        this.progress -= 16.6;
-        if (this.inputIndex == 5) {
-          this.setConfirm(true);
-        }
         try {
           this.inputIndex = this.inputIndex - 1;
-          console.log(this.inputIndex);
-          this.rating = this.lesson.structure[this.inputIndex].data.rating;
         } catch (e) {
           console.log(e);
         }
       }
     },
-    async skip() {
-      if (this.inputIndex < this.lesson.structure.length) {
-        await this.reorderProgress();
-        if (this.lesson.structure[this.inputIndex].data.rating != 0) {
-          try {
-            if (this.lesson.structure[this.inputIndex].data) {
-              this.progress += 16.6;
-              //FIXME:
-              if (this.getAssessments[this.inputIndex]) {
-                
-                this.lesson.structure[this.inputIndex].data.time_use += this.time;
-                this.pushAssessmentIndex(
-                  {
-                    time_use: this.lesson.structure[this.inputIndex].data.time_use,
-                    like: this.lesson.structure[this.inputIndex].data.rating,
-                  },
-                  this.inputIndex
-                );
-              } else {
+    async navigation(newIndex, oldIndex) {
+      console.log(newIndex, oldIndex);
+      console.log(this.lesson.structure.length);
+      try {
+        if (newIndex < this.lesson.structure.length) {
+          console.log("paso la validacion del indice");
+            
+          if (
+              newIndex < oldIndex ||
+              this.lesson.structure[oldIndex].data.rating != 0
+            ) {
+              console.log("paso la validacion del rating");
 
-                this.lesson.structure[this.inputIndex].data.time_use += this.time;
-                this.pushAssessment({
-                  time_use: this.lesson.structure[this.inputIndex].data.time_use,
-                  like: this.lesson.structure[this.inputIndex].data.rating,
-                });
-              }
-            }
-
-            let resourcesIds = this.lesson.structure.map((s) => {
-              if (s.data) {
-                return s.data.resource._id;
-              }
-            });
-
-            resourcesIds = resourcesIds.filter((rs) => rs != undefined);
-
-            if (this.getAssessments.length == 1) {
-              
-              let response = await this.$http.post("/trace/create", {
+              let lastTrace = await this.getLastAsyncTrace({
                 student: this.user.student_id,
                 course: this.$route.params.course,
                 lesson: this.$route.params.lesson,
-                resources: resourcesIds,
-                assessments: this.getAssessments,
-                logs: this.logs,
-                case: this.getIdCase
               });
 
-              if (response.status == 200) {
-                this.setTrace(response.data._id);
+              console.log("last trace");
+              console.log(lastTrace);
+
+              if (lastTrace) {
+                this.setTrace(lastTrace._id);
+
+                if (
+                  lastTrace.complete == false ||
+                  lastTrace.evaluation == null
+                ) {
+                  this.setAssessments(lastTrace.assessments);
+                }
               }
-              
-            } else {
-              let response = await this.$http.post("/trace/update", {
-                id: this.getTrace,
-                resources: resourcesIds,
-                assessments: this.getAssessments,
-                logs: this.logs,
+
+              if (this.lesson.structure[oldIndex].data) {
+                if (this.getAssessments[oldIndex]) {
+                  this.lesson.structure[oldIndex].data.time_use += this.time;
+
+                  this.pushAssessmentIndex(
+                    {
+                      time_use: this.lesson.structure[oldIndex].data.time_use,
+                      like: this.lesson.structure[oldIndex].data.rating,
+                    },
+                    oldIndex
+                  );
+                } else {
+                  this.lesson.structure[oldIndex].data.time_use += this.time;
+
+                  this.pushAssessment({
+                    time_use: this.lesson.structure[oldIndex].data.time_use,
+                    like: this.lesson.structure[oldIndex].data.rating,
+                  });
+                }
+              }
+
+              let resourcesIds = this.lesson.structure.map((s) => {
+                if (s.data) {
+                  return s.data.resource._id;
+                }
               });
 
+              resourcesIds = resourcesIds.filter((rs) => rs != undefined);
+
+              if (lastTrace == null) {
+                let response = await this.$http.post("/trace/create", {
+                  student: this.user.student_id,
+                  course: this.$route.params.course,
+                  lesson: this.$route.params.lesson,
+                  resources: resourcesIds,
+                  assessments: this.getAssessments,
+                  logs: this.logs,
+                  case: this.getIdCase,
+                  index: newIndex,
+                });
+
+                if (response.status == 200) {
+                  console.log(response.data);
+                  this.setTrace(response.data._id);
+                  this.setCurrentAssessment(response.data);
+                }
+              } else {
+                let response = await this.$http.post("/trace/update", {
+                  id: this.getTrace,
+                  resources: resourcesIds,
+                  assessments: this.getAssessments,
+                  logs: this.logs,
+                  case: this.getIdCase,
+                  confirm: false,
+                  index: newIndex,
+                });
+
+                if (response.status == 200) {
+                  console.log(response.data);
+                  this.setTrace(response.data._id);
+                  this.setCurrentAssessment(response.data);
+                }
+              }
+
+              //TODO: update in vuex
+              this.setAsyncProgress({
+                id: this.getProgress[newIndex]._id,
+                index: newIndex,
+              });
+
+
+              if(this.lesson.structure[newIndex].data){
+                this.rating = this.lesson.structure[newIndex].data.rating;
+              }
+              this.toggleTimer();
+              this.toggleTimer();
+            } else {
+              let args = {
+                color: "error",
+                message: "Error!",
+                submessage: "Debes calificar el recurso",
+                pos: ["top", "center"],
+              };
+              this.loading = false;
+              this.open(args);
+              this.inputIndex = oldIndex;
             }
-
-            //TODO: update in vuex
-            this.setAsyncProgress({
-              id: this.getProgress[this.inputIndex + 1]._id,
-              index: this.inputIndex + 1,
-            });
-
-            this.rating = 0;
-            this.toggleTimer();
-            await this.skipProgress();
-            this.toggleTimer();
-
-          } catch (e) {
-            console.log(e);
-          }
-        } else {
-          let args = {
-            color: "error",
-            message: "Error!",
-            submessage: "Debes calificar el recurso",
-            pos: ["top", "center"],
-          };
-          this.loading = false;
-          this.open(args);
         }
+
+        if (newIndex == 5) {
+          this.toggleTimer();
+
+          console.log("llego a la evaluacion");
+          let response = await this.$http.post("/trace/update-confirm", {
+            id: this.getTrace,
+            confirm: true,
+          });
+
+          if (response.status == 200) {
+            console.log(response.data);
+            this.setTrace(response.data._id);
+            this.setCurrentAssessment(response.data);
+          }
+        } 
+      } catch (e) {
+        console.log(e);
       }
     },
     async finish() {
@@ -814,7 +893,7 @@ export default {
         resourcesIds = resourcesIds.filter((ri) => ri != undefined);
 
         let sum = 0;
-        
+
         this.questions.map((as) => {
           if (as.response == as.user) {
             let note = 5 / this.questions.length;
@@ -825,11 +904,11 @@ export default {
             }
           }
         });
-        
+
         this.note = sum;
         this.percentage = ((this.note * 100) / 5).toFixed(2);
         //TODO: get assessment from server
-        
+
         let lastTrace = await this.getLastAsyncTrace({
           student: this.user.student_id,
           course: this.$route.params.course,
@@ -841,7 +920,11 @@ export default {
         let counts = [];
 
         lastTrace.assessments.forEach((as, index) => {
-          if (lastTrace.resources[index] && as.time_use < lastTrace.resources[index].estimatedTime && as.like < 3) {
+          if (
+            lastTrace.resources[index] &&
+            as.time_use < lastTrace.resources[index].estimatedTime &&
+            as.like < 3
+          ) {
             counts.push(0);
           } else {
             counts.push(1);
@@ -854,7 +937,6 @@ export default {
           this.isValid = true;
         }
 
-      
         await Promise.all([
           this.$http.post("/metacore/history", {
             id_case: this.getIdCase,
@@ -862,19 +944,23 @@ export default {
             was: this.note == 5 ? "success" : "error",
             note: this.note,
           }),
-          // this.$http.post("/metacore/update", {
-          //   id_case: this.getIdCase,
-          //   resources: resourcesIds,
-          // }),
           this.$http.post("/trace/update-evaluation", {
             id: this.getTrace,
-            evaluation: false
-          })
+            evaluation: false,
+          }),
+          this.$http.post("/trace/update-feedback", {
+            id: this.getTrace,
+            feedback: true,
+          }),
         ]).then((response) => {
+          
           console.log(response);
-        });
 
-        //TODO:: review by console the output backend 
+          if(response[2].status == 200){
+            this.setTrace(response[2].data._id);
+            this.setCurrentAssessment(response[2].data);
+          }
+        });
 
         if (this.note == 5 && this.isValid) {
           this.$http
@@ -886,12 +972,8 @@ export default {
               time: this.totalTime,
             })
             .then(async (response) => {
-
-              console.log(response.status);
-
               if (response.status == 200) {
-                
-                console.log('paso a activar la siguiente leccion');
+                console.log("paso a activar la siguiente leccion");
                 this.toogleTotalTime();
                 this.setIdCase(null);
 
@@ -920,14 +1002,14 @@ export default {
                         id: nextLesson[0]._id,
                         student: this.user.student_id,
                         isActive: false,
-                        complete: false
+                        complete: false,
                       });
                     } else {
                       let response = await this.$http.post("/progress/update", {
                         id: this.getLessons[0]._id,
                         student: this.user.student_id,
                         isActive: false,
-                        complete: true
+                        complete: true,
                       });
                       console.log(response);
                     }
@@ -939,7 +1021,6 @@ export default {
               console.log(error);
             });
         } else if (this.note == 5) {
-          
           this.$http
             .post("/metacore/review", {
               id_case: this.getIdCase,
@@ -949,12 +1030,10 @@ export default {
               time: this.totalTime,
             })
             .then(async (response) => {
-
               console.log(response);
-            
-              if (response.status == 200) {
 
-                console.log('paso a activar la siguiente leccion');
+              if (response.status == 200) {
+                console.log("paso a activar la siguiente leccion");
 
                 this.toogleTotalTime();
                 this.setIdCase(null);
@@ -963,9 +1042,8 @@ export default {
                 );
 
                 if (currentLesson.length > 0) {
-                  
                   currentLesson = currentLesson[0];
-                  
+
                   let response = await this.$http.post("/progress/update", {
                     id: currentLesson._id,
                     student: this.user.student_id,
@@ -980,12 +1058,10 @@ export default {
                   this.setProgress([]);
 
                   if (response.status == 200) {
-
                     console.log(currentLesson);
 
                     //paso a activar la siguiente leccion
                     if (currentLesson.order < 4) {
-
                       let nextLesson = this.getLessons.filter(
                         (gl) => gl.order == currentLesson.order + 1
                       );
@@ -993,21 +1069,24 @@ export default {
                         id: nextLesson[0]._id,
                         student: this.user.student_id,
                         isActive: false,
-                        complete: false
+                        complete: false,
                       });
 
-                       console.log("respuesta de el desbloqueo de la siguiente leccion");
+                      console.log(
+                        "respuesta de el desbloqueo de la siguiente leccion"
+                      );
                       console.log(r);
-
                     } else {
                       let response = await this.$http.post("/progress/update", {
                         id: this.getLessons[0]._id,
                         student: this.user.student_id,
                         isActive: false,
-                        complete: true
+                        complete: true,
                       });
 
-                      console.log("respuesta de el desbloqueo de la siguiente leccion");
+                      console.log(
+                        "respuesta de el desbloqueo de la siguiente leccion"
+                      );
                       console.log(response);
                     }
                   }
@@ -1017,7 +1096,6 @@ export default {
             .catch((error) => {
               console.log(error);
             });
-
         } else {
           this.$http
             .post("/metacore/review", {
@@ -1064,7 +1142,13 @@ export default {
             });
           }
         })
-      ).then((_) => {
+      ).then(async (_) => {
+        let response = await this.$http.post("/trace/update-complete", {
+          id: this.getTrace,
+          complete: true,
+        });
+
+
         this.setConfirm(false);
         this.setAssessments([]);
         this.setProgress([]);
@@ -1087,9 +1171,7 @@ export default {
             });
           }
         })
-      ).then(async (response)  => {
-
-
+      ).then(async (response) => {
         await this.reorderProgress();
         response.map((r) => {
           if (r.data.index == 5) {
@@ -1099,21 +1181,25 @@ export default {
           }
         });
 
-        await this.$http.post("/trace/update-evaluation", {
+        let r = await this.$http.post("/trace/update-evaluation", {
           id: this.getTrace,
-          evaluation: true
+          evaluation: true,
         });
 
-        this.setConfirm(true);
+        if(r.status == 200){
+          console.log(r);
+          this.setTrace(r.data._id);
+          this.setCurrentAssessment(r.data);
+        }
+
+
       });
     },
     async goToCourse() {
-
       this.setIndex(0);
       this.setWin(false);
       this.setConfirm(false);
 
-      
       await Promise.all(
         this.getProgress.map(async (p) => {
           if (p.index != 0) {
@@ -1129,6 +1215,11 @@ export default {
           }
         })
       ).then((_) => {
+        this.$http.post("/trace/update-complete", {
+          id: this.getTrace,
+          complete: true,
+        });
+
         this.$router.push(`/course/${this.$route.params.course}`);
       });
     },

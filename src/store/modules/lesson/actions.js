@@ -59,6 +59,8 @@ export default {
                 if (response.data.length > 0) {
                     let last = response.data[response.data.length - 1];
                     resolve(last);
+                } else {
+                    resolve(null)
                 }
             }, error => {
                 reject(error);
@@ -112,6 +114,4 @@ export default {
             })
         })
     }
-
-
 }
