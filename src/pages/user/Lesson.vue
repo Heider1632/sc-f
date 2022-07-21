@@ -638,13 +638,19 @@ export default {
 
               if (response.data?.length > 0) {
 
-
                 let last = response.data[response.data.length - 1];
 
                 console.log(last);
                 $this.setTrace(last._id);
                 $this.setCurrentAssessment(last);
                 $this.setAssessments(last.assessments);
+
+                last.assessments.map((as, index) => {
+                  if(as){
+                    this.lesson.structure[index].data.rating = as.like;
+                    this.lesson.structure[index].data.time_use = as.time_use;
+                  }
+                });
 
                 if (last.evaluation) {
                   this.setIndex(5);
@@ -845,6 +851,7 @@ export default {
 
 
               if(this.lesson.structure[newIndex].data){
+                console.log('set rating');
                 this.rating = this.lesson.structure[newIndex].data.rating;
               }
               this.toggleTimer();
