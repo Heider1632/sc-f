@@ -675,14 +675,9 @@ export default {
                   );
 
                   console.log(response);
-                } else {
-                  this.setConfirm(false);
-                  this.setIndex(0);
                 }
 
                 this.progress = 16.6 * this.inputIndex;
-              } else {
-                this.setIndex(0);
               }
             },
             (error) => {
