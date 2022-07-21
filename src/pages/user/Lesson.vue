@@ -488,8 +488,11 @@ export default {
   },
   watch: {
     inputIndex: {
-      handler(newValue, oldValue) {
-        this.reorderProgress();
+      async handler(newValue, oldValue){
+
+        console.log(newValue, oldValue);
+
+        await this.reorderProgress();
 
         this.navigation(newValue, oldValue);
 
@@ -594,6 +597,9 @@ export default {
         $this.lesson = response.data;
         $this.setProgress([]);
         $this.setAssessments([]);
+        await this.getResources();
+        await this.getAssessment();
+
         Promise.all(
           $this.lesson.structure.map(async (structure, index) => {
             $this
@@ -618,17 +624,23 @@ export default {
               );
           })
         ).then(async (_) => {
-          console.log(_);
-
+          console.log('paso a reorganizar el progreso');
           await this.reorderProgress();
+          
 
+          console.log('paso a buscar la ultima traza');
           await this.getAsyncTrace({
             student: this.user.student_id,
             course: this.$route.params.course,
             lesson: this.$route.params.lesson,
           }).then(
             async (response) => {
-              if (response.data.length > 0) {
+
+              console.log(response);
+
+              if (response.data?.length > 0) {
+
+
                 let last = response.data[response.data.length - 1];
 
                 console.log(last);
@@ -638,8 +650,6 @@ export default {
 
                 if (last.evaluation) {
                   this.setIndex(5);
-                  this.setConfirm(true);
-                  this.setShowFinishButton(false);
                 } else if (last.confirm) {
                   this.setIndex(5);
                 } else if (last.assessments.length != 5) {
@@ -672,7 +682,6 @@ export default {
 
                 this.progress = 16.6 * this.inputIndex;
               } else {
-                this.setConfirm(false);
                 this.setIndex(0);
               }
             },
@@ -681,8 +690,8 @@ export default {
             }
           );
 
-          await this.getResources();
-          await this.getAssessment();
+          
+          
         });
       } catch (e) {
         console.log(e.message);
@@ -937,6 +946,28 @@ export default {
           this.isValid = true;
         }
 
+        let r = null;
+
+        if(this.note == 5){
+          r = await this.$http.post("/trace/update-complete", {
+            id: this.getTrace,
+            complete: true,
+          });
+        } else {
+          r = await this.$http.post("/trace/update-feedback", {
+            id: this.getTrace,
+            feedback: true,
+          });
+        }
+
+        console.log('response update trace');
+        console.log(r);
+
+        if(r.status == 200){
+          this.setTrace(r.data._id);
+          this.setCurrentAssessment(r.data);
+        }
+
         await Promise.all([
           this.$http.post("/metacore/history", {
             id_case: this.getIdCase,
@@ -948,18 +979,12 @@ export default {
             id: this.getTrace,
             evaluation: false,
           }),
-          this.$http.post("/trace/update-feedback", {
-            id: this.getTrace,
-            feedback: true,
-          }),
         ]).then((response) => {
-          
-          console.log(response);
 
-          if(response[2].status == 200){
-            this.setTrace(response[2].data._id);
-            this.setCurrentAssessment(response[2].data);
-          }
+          if(response[1].status == 200){
+          this.setTrace(response[1].data._id);
+          this.setCurrentAssessment(response[1].data);
+        }
         });
 
         if (this.note == 5 && this.isValid) {
@@ -1148,7 +1173,6 @@ export default {
           complete: true,
         });
 
-
         this.setConfirm(false);
         this.setAssessments([]);
         this.setProgress([]);
@@ -1215,11 +1239,6 @@ export default {
           }
         })
       ).then((_) => {
-        this.$http.post("/trace/update-complete", {
-          id: this.getTrace,
-          complete: true,
-        });
-
         this.$router.push(`/course/${this.$route.params.course}`);
       });
     },
