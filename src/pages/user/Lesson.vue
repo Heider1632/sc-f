@@ -388,8 +388,7 @@
                   @click="skip"
                   v-if="
                     getProgress[inputIndex] &&
-                    getProgress[inputIndex].index != 5 &&
-                    !inputConfirm
+                    getProgress[inputIndex].index != 5
                   "
                 >
                   Siguiente
@@ -1165,6 +1164,7 @@ export default {
         });
         
         this.setAssessments([]);
+        this.setCurrentAssessment(null);
         this.setProgress([]);
         this.feedbacks = [];
         this.setIndex(0);
@@ -1227,6 +1227,7 @@ export default {
         })
       ).then((_) => {
         this.setIndex(0);
+         this.setCurrentAssessment(null);
         this.$router.push(`/course/${this.$route.params.course}`);
       });
     },
