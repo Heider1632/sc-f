@@ -627,7 +627,6 @@ export default {
           console.log('paso a reorganizar el progreso');
           await this.reorderProgress();
           
-
           console.log('paso a buscar la ultima traza');
           await this.getAsyncTrace({
             student: this.user.student_id,
@@ -652,10 +651,8 @@ export default {
                   this.setIndex(5);
                 } else if (last.confirm) {
                   this.setIndex(5);
-                } else if (last.assessments.length != 5) {
-
-                  $this.setIndex(last.assessments.length);
-                  this.setConfirm(false);
+                } else if (last.index != 0) {
+                  $this.setIndex(last.index);
                   this.forceRerender();
                 } else if (
                   last.assessments.length == 5 &&
@@ -663,7 +660,6 @@ export default {
                 ) {
 
                   $this.setIndex(last.assessments.length);
-                  this.setConfirm(false);
                   this.forceRerender();
 
                   let response = await this.$http.post(
@@ -1163,15 +1159,15 @@ export default {
           }
         })
       ).then(async (_) => {
-        let response = await this.$http.post("/trace/update-complete", {
+        await this.$http.post("/trace/update-complete", {
           id: this.getTrace,
           complete: true,
         });
-
-        this.setConfirm(false);
+        
         this.setAssessments([]);
         this.setProgress([]);
         this.feedbacks = [];
+        this.setIndex(0);
         this.$router.push(`/course/${this.$route.params.course}`);
       });
     },
@@ -1215,10 +1211,6 @@ export default {
       });
     },
     async goToCourse() {
-      this.setIndex(0);
-      this.setWin(false);
-      this.setConfirm(false);
-
       await Promise.all(
         this.getProgress.map(async (p) => {
           if (p.index != 0) {
@@ -1234,6 +1226,7 @@ export default {
           }
         })
       ).then((_) => {
+        this.setIndex(0);
         this.$router.push(`/course/${this.$route.params.course}`);
       });
     },
