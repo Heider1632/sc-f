@@ -564,7 +564,7 @@ export default {
     async getAttempts() {
       try {
         let response = await this.$http.get(
-          `/student/attempts?student=${this.user.student_id}&course=${this.$route.params.course}
+          `/student/attempts?student=${this.user.student_id}&course=${this.$route.params.course}&lesson=${this.$route.params.lesson}
           `
         );
         this.attempts = response.data.count;
@@ -734,12 +734,14 @@ export default {
     },
     async skip() {
       if (this.inputIndex >= 0 && this.inputIndex <= 5) {
+        this.progress+=16.6;
         this.inputIndex = this.inputIndex + 1;
       }
     },
     async back() {
       if (this.inputIndex > 0 && this.inputIndex <= 5) {
         try {
+          this.progress-=16.6;
           this.inputIndex = this.inputIndex - 1;
         } catch (e) {
           console.log(e);
