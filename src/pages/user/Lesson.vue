@@ -923,27 +923,47 @@ export default {
           lesson: this.$route.params.lesson,
         });
 
+        console.log(lastTrace);
+
         this.setTrace(lastTrace._id);
 
         let counts = [];
 
         lastTrace.assessments.forEach((as, index) => {
+          
+          console.log('resource');
+          console.log(lastTrace.resources[index]);
+
+
+          console.log('assessment');
+          console.log(as);
+          
           if (
             lastTrace.resources[index] &&
-            as.time_use < lastTrace.resources[index].estimatedTime &&
-            as.like < 3
+            as.time_use > lastTrace.resources[index].estimatedTime &&
+            as.like > 3
           ) {
+
+            console.log('es valido');
             counts.push(0);
           } else {
+
+            console.log('no es valido');
             counts.push(1);
           }
         });
 
-        if (counts.includes(0)) {
+        if (counts.includes(1)) {
           this.isValid = false;
         } else {
           this.isValid = true;
         }
+
+
+        console.log(counts);
+
+        console.log('validacion del caso');
+        console.log(this.isValid);
 
         let r = null;
 
@@ -992,8 +1012,7 @@ export default {
               id_case: this.getIdCase,
               id_trace: lastTrace._id,
               success: true,
-              errors: false,
-              time: this.totalTime,
+              error: false
             })
             .then(async (response) => {
               if (response.status == 200) {
@@ -1050,8 +1069,7 @@ export default {
               id_case: this.getIdCase,
               id_trace: lastTrace._id,
               success: false,
-              errors: true,
-              time: this.totalTime,
+              error: true
             })
             .then(async (response) => {
               console.log(response);
@@ -1126,8 +1144,7 @@ export default {
               id_case: this.getIdCase,
               id_trace: lastTrace._id,
               success: false,
-              error: true,
-              time: this.totalTime,
+              error: true
             })
             .then(async (result) => {
               if (result.status == 200) {
