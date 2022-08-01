@@ -252,7 +252,6 @@
                             </v-select>
                           </div>
                         </v-form>
-                        
                       </template>
                       <template v-else>
                         <v-layout
@@ -327,7 +326,7 @@
                   v-if="
                     getProgress[inputIndex] &&
                     getProgress[inputIndex].index != 0 &&
-                    getCurrentAssessment && 
+                    getCurrentAssessment &&
                     getCurrentAssessment.confirm == false
                   "
                 >
@@ -448,7 +447,6 @@ export default {
     ...mapGetters("lesson", [
       "getCurrentFeedback",
       "getTrace",
-      "getIdCase",
       "getIndex",
       "getConfirm",
       "getCurrentAssessment",
@@ -487,24 +485,24 @@ export default {
   },
   watch: {
     inputIndex: {
-      async handler(newValue, oldValue){
-
-        console.log(newValue, oldValue);
-
+      async handler(newValue, oldValue) {
         await this.reorderProgress();
 
         this.navigation(newValue, oldValue);
 
-        if(this.lesson.structure[newValue].data && this.lesson.structure[newValue].data.rating){
+        if (
+          this.lesson.structure[newValue].data &&
+          this.lesson.structure[newValue].data.rating
+        ) {
           this.rating = this.lesson.structure[newValue].data.rating;
         }
       },
     },
-    rating(val){
-      if(this.lesson.structure[this.inputIndex].data){
+    rating(val) {
+      if (this.lesson.structure[this.inputIndex].data) {
         this.lesson.structure[this.inputIndex].data.rating = val;
       }
-    }
+    },
   },
   methods: {
     ...mapMutations("lesson", [
@@ -577,7 +575,7 @@ export default {
         let response = await this.$http.get(
           `/progress/percentage?student=${this.user.student_id}&course=${this.$route.params.course}&lesson=${this.$route.params.lesson}`
         );
-        console.log(response);
+
         this.percentageCourse = response.data.count;
       } catch (error) {
         console.log(error.message);
@@ -623,21 +621,15 @@ export default {
               );
           })
         ).then(async (_) => {
-          console.log('paso a reorganizar el progreso');
           await this.reorderProgress();
-          
-          console.log('paso a buscar la ultima traza');
+
           await this.getAsyncTrace({
             student: this.user.student_id,
             course: this.$route.params.course,
             lesson: this.$route.params.lesson,
           }).then(
             async (response) => {
-
-              console.log(response);
-
               if (response.data?.length > 0) {
-
                 let last = response.data[response.data.length - 1];
 
                 console.log(last);
@@ -646,7 +638,7 @@ export default {
                 $this.setAssessments(last.assessments);
 
                 last.assessments.map((as, index) => {
-                  if(as){
+                  if (as) {
                     this.lesson.structure[index].data.rating = as.like;
                     this.lesson.structure[index].data.time_use = as.time_use;
                   }
@@ -663,7 +655,6 @@ export default {
                   last.assessments.length == 5 &&
                   last.evaluation == false
                 ) {
-
                   $this.setIndex(last.assessments.length);
                   this.forceRerender();
 
@@ -685,9 +676,6 @@ export default {
               console.log(error.message);
             }
           );
-
-          
-          
         });
       } catch (e) {
         console.log(e.message);
@@ -707,41 +695,32 @@ export default {
       }
     },
     async getResources() {
-      if (this.getIdCase == null) {
-        let structureIds = this.lesson.structure.map((s) => s._id);
-        let response = await this.$http.post("/metacore/initial", {
-          id_student: this.user.student_id,
-          id_course: this.$route.params.course,
-          id_lesson: this.$route.params.lesson,
-          structure: structureIds,
-        });
-        this.setIdCase(response.data.id_case);
-        this.lesson.structure = this.lesson.structure.map((s, index) => {
-          s.data = response.data.plan[index];
-          return s;
-        });
-      } else {
-        let response = await this.$http.get("/metacore/one", {
-          id: this.getIdCase,
-        });
-        this.lesson.structure = this.lesson.structure.map((s, index) => {
-          s.data = response.data.plan[index];
-          return s;
-        });
-      }
+      let structureIds = this.lesson.structure.map((s) => s._id);
+      let response = await this.$http.post("/metacore/initial", {
+        id_student: this.user.student_id,
+        id_course: this.$route.params.course,
+        id_lesson: this.$route.params.lesson,
+        structure: structureIds,
+      });
+
+      this.lesson.structure = this.lesson.structure.map((s, index) => {
+        s.data = response.data[index];
+        return s;
+      });
+
       this.toggleTimer();
       this.toogleTotalTime();
     },
     async skip() {
       if (this.inputIndex >= 0 && this.inputIndex <= 5) {
-        this.progress+=16.6;
+        this.progress += 16.6;
         this.inputIndex = this.inputIndex + 1;
       }
     },
     async back() {
       if (this.inputIndex > 0 && this.inputIndex <= 5) {
         try {
-          this.progress-=16.6;
+          this.progress -= 16.6;
           this.inputIndex = this.inputIndex - 1;
         } catch (e) {
           console.log(e);
@@ -749,126 +728,109 @@ export default {
       }
     },
     async navigation(newIndex, oldIndex) {
-      console.log(newIndex, oldIndex);
-      console.log(this.lesson.structure.length);
       try {
         if (newIndex < this.lesson.structure.length) {
-          console.log("paso la validacion del indice");
-            
           if (
-              newIndex < oldIndex ||
-              this.lesson.structure[oldIndex].data.rating != 0
-            ) {
-              console.log("paso la validacion del rating");
+            newIndex < oldIndex ||
+            this.lesson.structure[oldIndex].data.rating != 0
+          ) {
+            let lastTrace = await this.getLastAsyncTrace({
+              student: this.user.student_id,
+              course: this.$route.params.course,
+              lesson: this.$route.params.lesson,
+            });
 
-              let lastTrace = await this.getLastAsyncTrace({
+            if (lastTrace) {
+              this.setTrace(lastTrace._id);
+
+              if (lastTrace.complete == false || lastTrace.evaluation == null) {
+                this.setAssessments(lastTrace.assessments);
+              }
+            }
+
+            if (this.lesson.structure[oldIndex].data) {
+              if (this.getAssessments[oldIndex]) {
+                this.lesson.structure[oldIndex].data.time_use += this.time;
+
+                this.pushAssessmentIndex(
+                  {
+                    time_use: this.lesson.structure[oldIndex].data.time_use,
+                    like: this.lesson.structure[oldIndex].data.rating,
+                  },
+                  oldIndex
+                );
+              } else {
+                this.lesson.structure[oldIndex].data.time_use += this.time;
+
+                this.pushAssessment({
+                  time_use: this.lesson.structure[oldIndex].data.time_use,
+                  like: this.lesson.structure[oldIndex].data.rating,
+                });
+              }
+            }
+
+            let resourcesIds = this.lesson.structure.map((s) => {
+              if (s.data) {
+                return s.data.resource._id;
+              }
+            });
+
+            resourcesIds = resourcesIds.filter((rs) => rs != undefined);
+
+            if (lastTrace == null) {
+              let response = await this.$http.post("/trace/create", {
                 student: this.user.student_id,
                 course: this.$route.params.course,
                 lesson: this.$route.params.lesson,
-              });
-
-              console.log("last trace");
-              console.log(lastTrace);
-
-              if (lastTrace) {
-                this.setTrace(lastTrace._id);
-
-                if (
-                  lastTrace.complete == false ||
-                  lastTrace.evaluation == null
-                ) {
-                  this.setAssessments(lastTrace.assessments);
-                }
-              }
-
-              if (this.lesson.structure[oldIndex].data) {
-                if (this.getAssessments[oldIndex]) {
-                  this.lesson.structure[oldIndex].data.time_use += this.time;
-
-                  this.pushAssessmentIndex(
-                    {
-                      time_use: this.lesson.structure[oldIndex].data.time_use,
-                      like: this.lesson.structure[oldIndex].data.rating,
-                    },
-                    oldIndex
-                  );
-                } else {
-                  this.lesson.structure[oldIndex].data.time_use += this.time;
-
-                  this.pushAssessment({
-                    time_use: this.lesson.structure[oldIndex].data.time_use,
-                    like: this.lesson.structure[oldIndex].data.rating,
-                  });
-                }
-              }
-
-              let resourcesIds = this.lesson.structure.map((s) => {
-                if (s.data) {
-                  return s.data.resource._id;
-                }
-              });
-
-              resourcesIds = resourcesIds.filter((rs) => rs != undefined);
-
-              if (lastTrace == null) {
-                let response = await this.$http.post("/trace/create", {
-                  student: this.user.student_id,
-                  course: this.$route.params.course,
-                  lesson: this.$route.params.lesson,
-                  resources: resourcesIds,
-                  assessments: this.getAssessments,
-                  logs: this.logs,
-                  case: this.getIdCase,
-                  index: newIndex,
-                });
-
-                if (response.status == 200) {
-                  console.log(response.data);
-                  this.setTrace(response.data._id);
-                  this.setCurrentAssessment(response.data);
-                }
-              } else {
-                let response = await this.$http.post("/trace/update", {
-                  id: this.getTrace,
-                  resources: resourcesIds,
-                  assessments: this.getAssessments,
-                  logs: this.logs,
-                  case: this.getIdCase,
-                  confirm: false,
-                  index: newIndex,
-                });
-
-                if (response.status == 200) {
-                  console.log(response.data);
-                  this.setTrace(response.data._id);
-                  this.setCurrentAssessment(response.data);
-                }
-              }
-
-              //TODO: update in vuex
-              this.setAsyncProgress({
-                id: this.getProgress[newIndex]._id,
+                resources: resourcesIds,
+                assessments: this.getAssessments,
+                logs: this.logs,
                 index: newIndex,
               });
 
-
-              if(this.lesson.structure[newIndex].data){
-                console.log('set rating');
-                this.rating = this.lesson.structure[newIndex].data.rating;
+              if (response.status == 200) {
+                this.setTrace(response.data._id);
+                this.setCurrentAssessment(response.data);
               }
-              this.toggleTimer();
-              this.toggleTimer();
             } else {
-              let args = {
-                color: "error",
-                message: "Error!",
-                submessage: "Debes calificar el recurso",
-                pos: ["top", "center"],
-              };
-              this.loading = false;
-              this.open(args);
-              this.inputIndex = oldIndex;
+              let response = await this.$http.post("/trace/update", {
+                id: this.getTrace,
+                resources: resourcesIds,
+                assessments: this.getAssessments,
+                logs: this.logs,
+                confirm: false,
+                index: newIndex,
+              });
+
+              if (response.status == 200) {
+                this.setTrace(response.data._id);
+                this.setCurrentAssessment(response.data);
+              }
             }
+
+            //TODO: update in vuex
+            this.setAsyncProgress({
+              id: this.getProgress[newIndex]._id,
+              index: newIndex,
+            });
+
+            if (this.lesson.structure[newIndex].data) {
+              this.rating = this.lesson.structure[newIndex].data.rating;
+            }
+
+            this.toggleTimer();
+            this.toggleTimer();
+          } else {
+            let args = {
+              color: "error",
+              message: "Error!",
+              submessage: "Debes calificar el recurso",
+              pos: ["top", "center"],
+            };
+            this.loading = false;
+            this.open(args);
+            this.inputIndex = oldIndex;
+          }
         }
 
         if (newIndex == 5) {
@@ -885,7 +847,7 @@ export default {
             this.setTrace(response.data._id);
             this.setCurrentAssessment(response.data);
           }
-        } 
+        }
       } catch (e) {
         console.log(e);
       }
@@ -923,32 +885,18 @@ export default {
           lesson: this.$route.params.lesson,
         });
 
-        console.log(lastTrace);
-
         this.setTrace(lastTrace._id);
 
         let counts = [];
 
         lastTrace.assessments.forEach((as, index) => {
-          
-          console.log('resource');
-          console.log(lastTrace.resources[index]);
-
-
-          console.log('assessment');
-          console.log(as);
-          
           if (
             lastTrace.resources[index] &&
             as.time_use > lastTrace.resources[index].estimatedTime &&
             as.like > 3
           ) {
-
-            console.log('es valido');
             counts.push(0);
           } else {
-
-            console.log('no es valido');
             counts.push(1);
           }
         });
@@ -959,15 +907,9 @@ export default {
           this.isValid = true;
         }
 
-
-        console.log(counts);
-
-        console.log('validacion del caso');
-        console.log(this.isValid);
-
         let r = null;
 
-        if(this.note == 5){
+        if (this.note == 5) {
           r = await this.$http.post("/trace/update-complete", {
             id: this.getTrace,
             complete: true,
@@ -979,17 +921,14 @@ export default {
           });
         }
 
-        console.log('response update trace');
-        console.log(r);
-
-        if(r.status == 200){
+        if (r.status == 200) {
           this.setTrace(r.data._id);
           this.setCurrentAssessment(r.data);
         }
 
         await Promise.all([
           this.$http.post("/metacore/history", {
-            id_case: this.getIdCase,
+            id_trace: this.getTrace,
             id_student: this.user.student_id,
             was: this.note == 5 ? "success" : "error",
             note: this.note,
@@ -999,20 +938,18 @@ export default {
             evaluation: false,
           }),
         ]).then((response) => {
-
-          if(response[1].status == 200){
-          this.setTrace(response[1].data._id);
-          this.setCurrentAssessment(response[1].data);
-        }
+          if (response[1].status == 200) {
+            this.setTrace(response[1].data._id);
+            this.setCurrentAssessment(response[1].data);
+          }
         });
 
         if (this.note == 5 && this.isValid) {
           this.$http
             .post("/metacore/review", {
-              id_case: this.getIdCase,
+              id_student: this.user.student_id,
               id_trace: lastTrace._id,
-              success: true,
-              error: false
+              note: this.note
             })
             .then(async (response) => {
               if (response.status == 200) {
@@ -1066,10 +1003,9 @@ export default {
         } else if (this.note == 5) {
           this.$http
             .post("/metacore/review", {
-              id_case: this.getIdCase,
+              iid_student: this.user.student_id,
               id_trace: lastTrace._id,
-              success: false,
-              error: true
+              note: this.note
             })
             .then(async (response) => {
               console.log(response);
@@ -1093,15 +1029,11 @@ export default {
                     complete: true,
                   });
 
-                  console.log(response);
-
                   this.setWin(true);
                   this.setAssessments([]);
                   this.setProgress([]);
 
                   if (response.status == 200) {
-                    console.log(currentLesson);
-
                     //paso a activar la siguiente leccion
                     if (currentLesson.order < 4) {
                       let nextLesson = this.getLessons.filter(
@@ -1113,11 +1045,6 @@ export default {
                         isActive: false,
                         complete: false,
                       });
-
-                      console.log(
-                        "respuesta de el desbloqueo de la siguiente leccion"
-                      );
-                      console.log(r);
                     } else {
                       let response = await this.$http.post("/progress/update", {
                         id: this.getLessons[0]._id,
@@ -1125,11 +1052,6 @@ export default {
                         isActive: false,
                         complete: true,
                       });
-
-                      console.log(
-                        "respuesta de el desbloqueo de la siguiente leccion"
-                      );
-                      console.log(response);
                     }
                   }
                 }
@@ -1141,10 +1063,9 @@ export default {
         } else {
           this.$http
             .post("/metacore/review", {
-              id_case: this.getIdCase,
+              id_student: this.user.student_id,
               id_trace: lastTrace._id,
-              success: false,
-              error: true
+              note: this.note
             })
             .then(async (result) => {
               if (result.status == 200) {
@@ -1188,7 +1109,7 @@ export default {
           id: this.getTrace,
           complete: true,
         });
-        
+
         this.setAssessments([]);
         this.setCurrentAssessment(null);
         this.setProgress([]);
@@ -1227,13 +1148,11 @@ export default {
           evaluation: true,
         });
 
-        if(r.status == 200){
+        if (r.status == 200) {
           console.log(r);
           this.setTrace(r.data._id);
           this.setCurrentAssessment(r.data);
         }
-
-
       });
     },
     async goToCourse() {
@@ -1253,7 +1172,7 @@ export default {
         })
       ).then((_) => {
         this.setIndex(0);
-         this.setCurrentAssessment(null);
+        this.setCurrentAssessment(null);
         this.$router.push(`/course/${this.$route.params.course}`);
       });
     },
