@@ -42,7 +42,7 @@ const router = new Router({
 Vue.use(Meta);
 
 router.beforeEach((to, from, next) => {
-  document.title = 'Sistema Tutor Inteligente'
+  document.title = 'Sistema Tutor Inteligente 2'
   if (to.meta.Auth && state.isLoggedIn === false) {
     next({ path: '/login' })
   } else {
