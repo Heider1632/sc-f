@@ -121,18 +121,6 @@ export default {
                   value: "Unidad",
                   type: "string"
                 },
-                 { 
-                  value: "Id Caso",
-                  type: "string"
-                },
-                { 
-                  value: "Peso Euclideano",
-                  type: "string"
-                },
-                { 
-                  value: "Usos",
-                  type: "string"
-                },
                 { 
                   value: "Exitoso",
                   type: "string"
@@ -154,6 +142,10 @@ export default {
                   type: "number"
                 },
                 { 
+                  value: "User key",
+                  type: "number"
+                },
+                { 
                   value: "Introducción",
                   type: "string"
                 },
@@ -172,7 +164,47 @@ export default {
                 { 
                   value: "Actividad",
                   type: "string"
-                }
+                },
+                { 
+                  value: "US 1",
+                  type: "number"
+                },
+                { 
+                  value: "US 2",
+                  type: "number"
+                },
+                { 
+                  value: "US 3",
+                  type: "number"
+                },
+                { 
+                  value: "US 4",
+                  type: "number"
+                },
+                { 
+                  value: "US 5",
+                  type: "number"
+                },
+                { 
+                  value: "US 6",
+                  type: "number"
+                },
+                { 
+                  value: "US 7",
+                  type: "number"
+                },
+                { 
+                  value: "US 6",
+                  type: "number"
+                },
+                { 
+                  value: "US 9",
+                  type: "number"
+                },
+                { 
+                  value: "US 10",
+                  type: "number"
+                },
               ],
               ...response.data
             ],
