@@ -11,7 +11,7 @@
       <v-row>
         <v-col lg="6" md="6" sm="12" xs="12">
           <p class="subtitle-1 white--text mt-8">
-            Este sistema cognitivo es utilizado en el programa de enfermería de la Universidad de Córdoba-Colombia para el proceso de enseñanza de los protocolos asistenciales para el diagnóstico precoz de la sífilis gestacional y congénita.
+            Este sistema recomendador es utilizado en el programa de enfermería de la Universidad de Córdoba-Colombia para el proceso de enseñanza de los protocolos asistenciales para el diagnóstico precoz de la sífilis gestacional y congénita.
           </p>
         </v-col>
         <v-col lg="6" md="6" sm="12" xs="12" class="d-flex align-center justify-content-center">
