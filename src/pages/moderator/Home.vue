@@ -122,14 +122,6 @@ export default {
                   type: "string"
                 },
                 { 
-                  value: "Exitoso",
-                  type: "string"
-                },
-                { 
-                  value: "Errado",
-                  type: "string"
-                },
-                { 
                   value: "Evaluación",
                   type: "string"
                 },
