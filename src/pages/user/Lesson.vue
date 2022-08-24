@@ -488,14 +488,16 @@ export default {
       async handler(newValue, oldValue) {
         await this.reorderProgress();
 
-        this.navigation(newValue, oldValue);
-
         if (
           this.lesson.structure[newValue].data &&
           this.lesson.structure[newValue].data.rating
         ) {
           this.rating = this.lesson.structure[newValue].data.rating;
         }
+
+        this.navigation(newValue, oldValue);
+
+
       },
     },
     rating(val) {
@@ -749,6 +751,7 @@ export default {
             }
 
             if (this.lesson.structure[oldIndex].data) {
+              
               if (this.getAssessments[oldIndex]) {
                 this.lesson.structure[oldIndex].data.time_use += this.time;
 
