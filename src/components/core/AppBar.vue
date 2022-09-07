@@ -3,9 +3,7 @@
         <v-container class="py-0 fill-height">
 
             <img class="mr-3 hidden-sm-and-down" :src="require('@/assets/images/logo-its.png')" height="40"/>
-
-             <img class="mr-3 hidden-xs" :src="require('@/assets/images/unicordoba-header.png')" height="40"/>
-
+            
             <v-spacer></v-spacer>
 
             <v-menu>

@@ -69,8 +69,13 @@
           </v-col>
 
           <v-col lg="5" md="5" sm="5" cols="12">
-            <v-sheet>
-              <v-img :src="lesson.hasObjectiveLesson" />
+            <v-sheet >
+              <v-layout wrap align-center>
+                <v-flex>
+                  <v-img class="mt-5"  :src="lesson.hasObjectiveLesson" />
+                </v-flex>
+              </v-layout>
+              
             </v-sheet>
           </v-col>
 
@@ -78,13 +83,12 @@
             <v-sheet class="border">
               <div class="mb-1">
                 <v-toolbar flat rounded prominent>
-                  <v-layout column wrap align-content-space-around align-start>
-                    <v-flex shrink>
+                  <v-layout column align-content-space-around align-center>
+                    <v-flex>
                       <v-btn
                         color="purple"
                         dark
                         elevation="0"
-                        class="mb-4 mt-4"
                         @click="$router.go(-1)"
                       >
                         volver al area personal
@@ -92,8 +96,27 @@
                       </v-btn>
                     </v-flex>
 
-                    <v-flex> Tiempo: {{ time }} Segundos </v-flex>
-                    <v-flex> Intento Realizados: {{ attempts }} </v-flex>
+                    <v-flex class="mt-4 mb-4">
+                      <v-layout row align-center>
+                        <v-flex class="mr-3">Tiempo: </v-flex>
+                        
+                        <v-flex>
+                          <v-progress-circular
+                            :rotate="360"
+                            :size="50"
+                            :width="5"
+                            :value="time"
+                            color="#ebbf4b"
+                          >
+                            {{ time }}s
+                          </v-progress-circular>
+                        </v-flex>
+                      </v-layout>
+                    </v-flex>
+
+                    <v-flex>
+                      <h3>Intento Realizados: {{ attempts }}</h3>
+                    </v-flex>
                   </v-layout>
                 </v-toolbar>
               </div>
@@ -496,8 +519,6 @@ export default {
         }
 
         this.navigation(newValue, oldValue);
-
-
       },
     },
     rating(val) {
@@ -751,7 +772,6 @@ export default {
             }
 
             if (this.lesson.structure[oldIndex].data) {
-              
               if (this.getAssessments[oldIndex]) {
                 this.lesson.structure[oldIndex].data.time_use += this.time;
 
@@ -952,7 +972,7 @@ export default {
             .post("/metacore/review", {
               id_student: this.user.student_id,
               id_trace: lastTrace._id,
-              note: this.note
+              note: this.note,
             })
             .then(async (response) => {
               if (response.status == 200) {
@@ -1008,7 +1028,7 @@ export default {
             .post("/metacore/review", {
               iid_student: this.user.student_id,
               id_trace: lastTrace._id,
-              note: this.note
+              note: this.note,
             })
             .then(async (response) => {
               console.log(response);
@@ -1068,7 +1088,7 @@ export default {
             .post("/metacore/review", {
               id_student: this.user.student_id,
               id_trace: lastTrace._id,
-              note: this.note
+              note: this.note,
             })
             .then(async (result) => {
               if (result.status == 200) {
@@ -1192,5 +1212,9 @@ export default {
 }
 .border {
   border-left: 4px solid purple;
+}
+.v-img {
+  width: 100vh;
+  height:100vh;
 }
 </style>

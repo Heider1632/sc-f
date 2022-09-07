@@ -143,11 +143,19 @@ export default {
 
           let worksheet = workbook.Sheets[sheetName];
           let body = XLSX.utils.sheet_to_json(worksheet);
+          
           //enviar al algoritmo
           $this.$http.post("/data/upload", body)
           .then(async (response) => {
             if (response.status == 200) {
-              console.log(response);
+              let args = {
+                color: "orange",
+                message: "Perfecto!",
+                submessage: "la rutina esta siendo ejecuta",
+                pos: ["top", "center"],
+              };
+              $this.loading = false;
+              $this.open(args);
             } else {
               let args = {
                 color: "error",
