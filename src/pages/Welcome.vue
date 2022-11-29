@@ -11,16 +11,11 @@
     <v-container fluid>
       <v-row class="py-12 mx-auto">
         <v-col cols="12" lg="6" md="6" sm="12" align-self="center">
-          <h1 class="display-5">¡Bienvenidos a tu tutor virtual!</h1>
+          <h1 class="display-5">¡Bienvenidos a tu sistema recomendador!</h1>
           <p class="justify-text">
-            Fichas y protocolos en salud es un Sistema Tutor Inteligente (STI)
-            desarrollado por los grupos de investigación Huellas y EDUTLAN de la
-            Universidad de Córdoba. Con el objetivo de proporcionar formación
-            individualizada a estudiantes y profesionales de Enfermería en
-            Protocolos de atención de sífilis gestacional y congénita. Este STI
-            fue desarrollado en el marco del proyecto de investigación:
-            “Desarrollo de un Sistema Tutor Inteligente para el aprendizaje del
-            protocolo de atención temprana de sífilis gestacional y congénita”
+            Fichas y protocolos en salud es un Sistema Tutor Inteligente 
+            que busca proporcionar formación individualizada a estudiantes de 
+            Enfermería en Protocolos de atención de sífilis gestacional y congénita.
           </p>
         </v-col>
         <v-col cols="12" lg="6" md="6" sm="12">

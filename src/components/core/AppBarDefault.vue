@@ -4,8 +4,6 @@
 
             <img class="mr-3" :src="require('@/assets/images/logo-its.png')" height="40"/>
 
-            <img class="mr-3" :src="require('@/assets/images/unicordoba-header.png')" height="40"/>
-
             <v-spacer></v-spacer>
 
             <v-btn v-if="$route.path != '/about'" elevation="0" color="purple" @click="$router.push('/login')" class="white--text display-5 mx-2">
